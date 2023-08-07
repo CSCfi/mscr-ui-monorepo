@@ -8,7 +8,7 @@ export const MarginContainer = styled.div<{
   $breakpoint: Breakpoint;
 }>`
   max-width: 96%;
-  margin: auto;
+  // margin: auto;
   padding: ${(props) => resolve(props.$breakpoint, '0 15px', '0 30px', 'auto')};
   min-width: 300px;
 `;
@@ -17,7 +17,7 @@ export const MarginContainer = styled.div<{
 
 export const SiteContainer = styled.div`
   width: 100%;
-  margin: auto;
+  // margin: auto;
   height: 100%;
   display: flex;
   flex-direction: column;

@@ -25,15 +25,37 @@ import { useRouter } from 'next/router';
 import { User } from 'yti-common-ui/interfaces/user.interface';
 import GroupWorkspace from '../../modules/group-home-component';
 import PersonalWorkspace from '../../modules/personal-home';
-import { useEffect } from 'react';
+import {
+  useEffect,
+  useState,
+  useContext,
+  createContext,
+  SetStateAction,
+} from 'react';
 import BasicTable from '@app/common/components/table';
+import SearchScreen from '@app/modules/search-screen';
 import MSCRSideBar from '@app/common/components/sidebar/MSCRSideBar';
 import { TableAndSidebarWrapper } from './homepage.styles';
 import { useBreakpoints } from 'yti-common-ui/media-query';
+import { Container } from '@mui/material';
+import SideNavigationPanel from '@app/common/components/side-navigation';
 
 interface IndexPageProps extends CommonContextState {
   _netI18Next: SSRConfig;
 }
+
+type SearchContextType = {
+  isSearchScreenVisible: boolean;
+  setSearchScreenVisible: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const iSearchContextState = {
+  isSearchScreenVisible: false,
+  setSearchScreenVisible: () => {},
+};
+
+export const SearchContext =
+  createContext<SearchContextType>(iSearchContextState);
 
 export default function IndexPage(props: IndexPageProps) {
   const { t } = useTranslation('common');
@@ -41,6 +63,12 @@ export default function IndexPage(props: IndexPageProps) {
   const router = useRouter();
 
   const { breakpoint } = useBreakpoints();
+
+  const [isSearchScreenVisible, setSearchScreenVisible] = useState(false);
+
+  const toggleVisibility = () => {
+    setSearchScreenVisible((prevState: boolean) => !prevState);
+  };
 
   function DisplayedComponent({
     slug,
@@ -50,11 +78,8 @@ export default function IndexPage(props: IndexPageProps) {
     user?: User;
   }): React.ReactElement {
     if (slug === 'group-home') {
-      console.log('SOMETHING');
       return <GroupWorkspace />;
     } else {
-      console.log(slug);
-      console.log('I AM HERE');
       return <PersonalWorkspace user={user} />;
     }
   }
@@ -70,18 +95,43 @@ export default function IndexPage(props: IndexPageProps) {
           title={t('datamodel-title')}
           description={t('service-description')}
         />
+        <div id="main" style={{ display: 'flex' }}>
+          <SideNavigationPanel user={props.user ?? undefined} />
 
-        <FrontPage></FrontPage>
+          <SearchContext.Provider
+            value={{ isSearchScreenVisible, setSearchScreenVisible }}
+          >
+            {isSearchScreenVisible ? <SearchScreen /> : null}
+          </SearchContext.Provider>
 
-        <DisplayedComponent
-          slug={(router.query.homepage as string) ?? undefined}
-          user={props.user ?? undefined}
-        />
+          <div
+            id="default-screen"
+            style={{
+              display: isSearchScreenVisible ? 'none' : 'block',
+              margin: 15,
+            }}
+          >
+            <button onClick={toggleVisibility}>
+              {isSearchScreenVisible
+                ? 'Hide SearchScreen'
+                : 'Show SearchScreen'}
+            </button>
+            <FrontPage />
 
-        <TableAndSidebarWrapper $breakpoint={breakpoint} id="table-and-sidebar">
-          <MSCRSideBar />
-          <BasicTable />
-        </TableAndSidebarWrapper>
+            <DisplayedComponent
+              slug={(router.query.homepage as string) ?? undefined}
+              user={props.user ?? undefined}
+            />
+
+            <TableAndSidebarWrapper
+              $breakpoint={breakpoint}
+              id="table-and-sidebar"
+            >
+              <MSCRSideBar />
+              <BasicTable />
+            </TableAndSidebarWrapper>
+          </div>
+        </div>
       </Layout>
     </CommonContextProvider>
   );

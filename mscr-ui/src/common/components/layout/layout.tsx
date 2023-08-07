@@ -86,7 +86,7 @@ export default function Layout({
           />
 
           <Block style={styles.navigationMainRow}>
-            <SideNavigationPanel user={user ?? undefined} />
+            {/* <SideNavigationPanel user={user ?? undefined} /> */}
             <ContentContainer>
               {alerts && alerts}
               <MarginContainer $breakpoint={breakpoint}>

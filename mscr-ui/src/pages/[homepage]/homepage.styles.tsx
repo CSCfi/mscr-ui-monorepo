@@ -6,6 +6,7 @@ export const TableAndSidebarWrapper = styled.aside<{ $breakpoint: Breakpoint }>`
   display: flex;
   //   flex-direction: row;
   // flex-grow: 2;
+  flex: 1;
   width: 100%;
   //   background-color: ${(props) =>
     props.theme.suomifi.colors.depthSecondary};
