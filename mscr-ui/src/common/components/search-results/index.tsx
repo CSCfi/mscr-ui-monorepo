@@ -1,19 +1,15 @@
 import { Container } from '@mui/material';
 import { Block, Heading } from 'suomifi-ui-components';
 import { useBreakpoints } from 'yti-common-ui/media-query';
-import { SearchResultElementWrapper } from './search-results.styles';
+import {
+  SearchResultElementWrapper,
+  SearchResultsWrapper,
+} from './search-results.styles';
 
 export default function SearchResults({ searchResults }) {
+  const { breakpoint } = useBreakpoints();
   return (
-    // <Block>
-    //   <Heading variant="h2">DataCite</Heading>
-    //   <p>Description</p>
-    //   <div style={{ display: 'flex', flexDirection: 'row' }}>
-    //     <div>english | </div>
-    //     <div>something </div>
-    //   </div>
-    // </Block>
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <SearchResultsWrapper $breakpoint={breakpoint}>
       {searchResults &&
         searchResults.hits.hits.map((hit) => (
           <SearchResultElement
@@ -22,7 +18,7 @@ export default function SearchResults({ searchResults }) {
             iconType={hit._source.type}
           />
         ))}
-    </div>
+    </SearchResultsWrapper>
   );
 }
 
@@ -56,8 +52,6 @@ const SearchResultElement = ({
         <div
           style={{
             display: 'flex',
-            //   justifyContent: 'space-between',
-            //   alignItems: 'normal',
           }}
         >
           <Heading variant="h1">{icon}</Heading>

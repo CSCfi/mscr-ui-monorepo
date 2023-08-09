@@ -24,15 +24,20 @@ export default function SearchFilterBar({ searchResults }) {
 
 // props.searchResults.aggregations.languages.buckets.map( b => b.key and b.doc_count)
 
-const SearchFacetElement = ({ keyN, count }) => {
+const SearchFacetElement = ({
+  keyN,
+  count,
+}: {
+  keyN: string;
+  count: string;
+}) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', margin: '50px' }}>
       <Heading style={{ margin: '10px' }} variant="h3">
-        {keyN + ' '}{' '}
+        {keyN + ' '}
       </Heading>
       <Heading style={{ margin: '10px' }} variant="h3">
-        {' '}
-        {count}{' '}
+        {count}
       </Heading>
     </div>
   );
