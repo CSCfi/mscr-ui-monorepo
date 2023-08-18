@@ -30,6 +30,7 @@ import BasicTable from '@app/common/components/table';
 import MSCRSideBar from '@app/common/components/sidebar/MSCRSideBar';
 import { TableAndSidebarWrapper } from './homepage.styles';
 import { useBreakpoints } from 'yti-common-ui/media-query';
+import TreeviewTest, {TreeViewTest} from "@app/common/components/treeview-test";
 
 interface IndexPageProps extends CommonContextState {
   _netI18Next: SSRConfig;
@@ -52,7 +53,12 @@ export default function IndexPage(props: IndexPageProps) {
     if (slug === 'group-home') {
       console.log('SOMETHING');
       return <GroupWorkspace />;
-    } else {
+    }
+    if (slug === 'crosswalk-edit') {
+      return <TreeviewTest />;
+    }
+
+    else {
       console.log(slug);
       return <PersonalWorkspace user={user} />;
     }
