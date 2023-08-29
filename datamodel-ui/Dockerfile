@@ -1,7 +1,7 @@
 #
 # PRE-BUILD STAGE
 #
-FROM node:18.16.0-alpine3.16@sha256:f47850733d8522489f57bfe86d790b1ee167a4b863d83d37572fb28cf10ec5e8 AS deps
+FROM docker-registry.default.svc:5000/mscr-test/node@sha256:9801e92cc0764e0c53621116fb59c2588acafc220c00bd061eaee4e56d9da62e AS deps
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
@@ -17,7 +17,7 @@ RUN npm ci
 #
 
 # Rebuild the source code only when needed
-FROM node:18.16.0-alpine3.16@sha256:f47850733d8522489f57bfe86d790b1ee167a4b863d83d37572fb28cf10ec5e8 AS builder
+FROM docker-registry.default.svc:5000/mscr-test/node@sha256:9801e92cc0764e0c53621116fb59c2588acafc220c00bd061eaee4e56d9da62e AS builder
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
@@ -54,7 +54,7 @@ RUN npm run build && npm install --production --ignore-scripts --prefer-offline
 # INSTALL STAGE
 #
 
-FROM node:18.16.0-alpine3.16@sha256:f47850733d8522489f57bfe86d790b1ee167a4b863d83d37572fb28cf10ec5e8 AS runner
+FROM docker-registry.default.svc:5000/mscr-test/node@sha256:9801e92cc0764e0c53621116fb59c2588acafc220c00bd061eaee4e56d9da62e AS runner
 WORKDIR /app/datamodel-ui
 
 ENV NODE_ENV production
@@ -66,7 +66,7 @@ ENV NODE_ENV production
 
 # Allow process to run on port 80 for compatibility with earlier versions of
 # the application.
-RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
+#RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
 
 COPY --from=builder /app/datamodel-ui/next.config.js ./
 COPY --from=builder /app/datamodel-ui/next-i18next.config.js ./
