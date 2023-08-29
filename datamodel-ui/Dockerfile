@@ -66,12 +66,12 @@ ENV NODE_ENV production
 
 # Allow process to run on port 80 for compatibility with earlier versions of
 # the application.
-#RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
+RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
 
 COPY --from=builder /app/datamodel-ui/next.config.js ./
 COPY --from=builder /app/datamodel-ui/next-i18next.config.js ./
 COPY --from=builder /app/datamodel-ui/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/datamodel-ui/.next ./.next
+COPY --from=builder /app/datamodel-ui/.next ./.next
 COPY --from=builder /app/datamodel-ui/node_modules /app/node_modules ./node_modules/
 COPY --from=builder /app/datamodel-ui/package.json ./package.json
 COPY --from=builder /app/datamodel-ui/.env ./
@@ -80,7 +80,7 @@ COPY --from=builder /app/common-ui ../common-ui
 # COPY --from=builder /app/datamodel-ui/junit.xml ./
 # COPY --from=builder /app/datamodel-ui/coverage ./coverage
 
-USER nextjs
+#USER nextjs
 
 # listen on privileged port for compatibilty with older versions of the
 # application
