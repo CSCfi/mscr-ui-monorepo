@@ -59,7 +59,7 @@ WORKDIR /app/datamodel-ui
 
 ENV NODE_ENV production
 
-RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+#RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
 # for testing during dev:
 RUN apk add curl bash
@@ -84,9 +84,9 @@ USER nextjs
 
 # listen on privileged port for compatibilty with older versions of the
 # application
-EXPOSE 80
+EXPOSE 8080
 
 # https://nextjs.org/telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 
-CMD ["npm", "start", "--", "--port", "80"]
+CMD ["npm", "start", "--", "--port", "8080"]
