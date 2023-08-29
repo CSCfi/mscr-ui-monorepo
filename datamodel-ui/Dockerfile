@@ -62,11 +62,11 @@ ENV NODE_ENV production
 #RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
 # for testing during dev:
-RUN apk add curl bash
+#RUN apk add curl bash
 
 # Allow process to run on port 80 for compatibility with earlier versions of
 # the application.
-RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
+#RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /usr/local/bin/node
 
 COPY --from=builder /app/datamodel-ui/next.config.js ./
 COPY --from=builder /app/datamodel-ui/next-i18next.config.js ./
