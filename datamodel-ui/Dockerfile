@@ -1,7 +1,7 @@
 #
 # PRE-BUILD STAGE
 #
-FROM docker-registry.default.svc:5000/mscr-test/node@sha256:9801e92cc0764e0c53621116fb59c2588acafc220c00bd061eaee4e56d9da62e AS deps
+FROM docker-registry.rahti.csc.fi/mscr-test/node:16.13.1-alpine3.14 AS deps
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
@@ -17,7 +17,7 @@ RUN npm ci
 #
 
 # Rebuild the source code only when needed
-FROM docker-registry.default.svc:5000/mscr-test/node@sha256:9801e92cc0764e0c53621116fb59c2588acafc220c00bd061eaee4e56d9da62e AS builder
+FROM docker-registry.rahti.csc.fi/mscr-test/node:16.13.1-alpine3.14 AS builder
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
@@ -54,7 +54,7 @@ RUN npm run build && npm install --production --ignore-scripts --prefer-offline
 # INSTALL STAGE
 #
 
-FROM docker-registry.default.svc:5000/mscr-test/node@sha256:9801e92cc0764e0c53621116fb59c2588acafc220c00bd061eaee4e56d9da62e AS runner
+FROM docker-registry.rahti.csc.fi/mscr-test/node:16.13.1-alpine3.14 AS runner
 WORKDIR /app/datamodel-ui
 
 ENV NODE_ENV production
