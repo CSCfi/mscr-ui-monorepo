@@ -11,7 +11,9 @@ COPY common-ui ./common-ui
 COPY package.json package-lock.json ./
 COPY datamodel-ui ./datamodel-ui
 
+USER root
 RUN chmod -R 775 /app
+USER 1001
 RUN npm ci
 
 ENV NEXT_TELEMETRY_DISABLED 1
