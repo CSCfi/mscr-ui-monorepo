@@ -38,7 +38,6 @@ export default function Footer({
           <Text>{t('terminology-footer-text')}</Text>
         </Paragraph>
       </FooterContentWrapper>
-
       <FooterLinkWrapper $breakpoint={breakpoint}>
         <ExternalLink
           href={`mailto:yhteentoimivuus@dvv.fi?subject=${subject}`}
