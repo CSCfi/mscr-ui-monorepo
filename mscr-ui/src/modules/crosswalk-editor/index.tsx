@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import TreeItem from '@mui/lab/TreeItem';
 import {useEffect} from 'react';
 import {Text} from 'suomifi-ui-components';
-import MockupSchemaLoader from '../crosswalk-edit/schema-mockup';
+import MockupSchemaLoader from '../crosswalk-editor/schema-mockup';
 import {cloneDeep} from 'lodash';
 import {useBreakpoints} from 'yti-common-ui/components/media-query';
 import TableRow from '@mui/material/TableRow';
@@ -20,10 +20,10 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import JointListingAccordion from '@app/common/components/treeview-test/joint-listing-accordion';
-import NodeInfo from '@app/common/components/treeview-test/tabs/crosswalk-info/node-info';
+import JointListingAccordion from '@app/modules/crosswalk-editor/joint-listing-accordion';
+import NodeInfo from '@app/modules/crosswalk-editor/tabs/crosswalk-info/node-info';
 import { SearchInput } from 'suomifi-ui-components';
-import SchemaTree from '@app/common/components/treeview-test/tabs/edit-crosswalk/schema-tree'
+import SchemaTree from '@app/modules/crosswalk-editor/tabs/edit-crosswalk/schema-tree'
 
 import {
     Button as Sbutton,
@@ -42,7 +42,7 @@ import {
     CrosswalkConnectionNew
 } from "@app/common/interfaces/crosswalk-connection.interface";
 
-export default function TreeviewTest() {
+export default function CrosswalkEditor() {
     interface simpleNode {
         name: string | undefined;
         id: string;
