@@ -17,6 +17,10 @@
   background-color: #fff;
 }
 
+.node-info-dropdown {
+
+}
+
 .node-info-box {
   min-height: 175px;
   font-size: 0.95rem;
@@ -39,8 +43,41 @@ h5 {
   font-weight: bold;
 }
 
+.node-selection-action-buttons {
+}
+
 .actions-link-icon svg{
   font-size: 2.1rem;
+}
+
+.actions-error {
+  color: #a5acb1;
+}
+
+.accordion-row {
+  display: flex;
+  justify-content: left;
+  width: 100%;
+}
+
+selection-active {
+  color: #1976D2;
+}
+
+.bg-light-blue {
+  background: #d5e4f6;
+}
+
+.bg-white {
+  background: #fff;
+}
+
+.selected-accordion-row {
+  background: #d5e4f6;
+}
+
+.selected-row {
+  background: #eaf2fa;
 }
 
 /* CROSSWALK SELECTION */

@@ -16,8 +16,15 @@ import {styled} from "@mui/material";
 import TableCell, {tableCellClasses} from '@mui/material/TableCell';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import AddLinkIcon from '@mui/icons-material/AddLink';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import {Button as Sbutton, Textarea, TextInput} from "suomifi-ui-components";
 import Button from '@mui/material/Button';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import CheckIcon from '@mui/icons-material/Check';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+
+
 import {
     CrosswalkConnection,
     CrosswalkConnectionNew,
@@ -59,50 +66,47 @@ const StyledTableRow = styled(TableRow)(({theme}) => ({
 function Row(props: { row: CrosswalkConnectionNew, cbf: any }) {
     const { row } = props;
     const [open, setOpen] = React.useState(false);
-    const [changedNotes, setChangedNotes] = React.useState<any>('');
+    const [changedNotes, setChangedNotes] = React.useState<string>('');
     const addNotes = 'addNotes';
 
-    const styles = {
-        headerRow:{
-
-        },
-        selectFromTreeLink:{
-            color: 'blue',
-            cursor: 'pointer',
-            textDecorationLine: 'underline',
-            width: '45%'
-        }
-    };
 
     return (
         <React.Fragment>
-            <StyledTableRow sx={{ '& > *': { borderBottom: 'unset' } }} style={styles.headerRow}>
-
-                <StyledTableCell align="left" style={{width: '40%'}}>
-                    <Button className='ms-2 py-0' style={{textTransform: 'none'}} title='Select linked node from source tree'
-                            onClick={() => {
-                                props.cbf.performAccordionAction(row, 'selectFromSourceTree')
-                            }}>{row.source.name}</Button>
-                </StyledTableCell>
-
-                <StyledTableCell className='fw-bold' style={{width: '10%'}}>
-                    <IconButton onClick={(e) => props.cbf.performAccordionAction(row, 'remove')} aria-label="unlink" color="primary" title='Unlink nodes'
-                                size="large">
-                    <LinkOffIcon/>
-                    </IconButton>
-                </StyledTableCell>
-
-                <StyledTableCell align="center" style={{width: '40%'}}>
-                    <Button className='me-2 py-0' style={{textTransform: 'none'}} title='Select linked node from target tree'
-                            onClick={() => {
-                                props.cbf.performAccordionAction(row, 'selectFromTargetTree')
-                            }}>{row.target.name}</Button>
-                </StyledTableCell>
-                <StyledTableCell className='fw-bold' style={{width: '10%'}}>
+            <StyledTableRow className='accordion-row'>
+                <StyledTableCell className='col-1'>
                     <IconButton
                         aria-label="expand row"
                         size="small"
-                        onClick={() => setOpen(!open)}
+                        onClick={(e) => {props.cbf.performAccordionAction(row, 'openJointDetails')}}
+                    >
+                        {row.isSelected ? <EditRoundedIcon className='selection-active'/> : <EditRoundedIcon/>}
+                    </IconButton>
+                </StyledTableCell>
+                <StyledTableCell className='col-2'>
+                    <Button className='ms-2 py-0' style={{textTransform: 'none'}} title='Select linked node from source tree'
+                            onClick={(e) => {
+                                props.cbf.performAccordionAction(row, 'selectFromSourceTree'); e.stopPropagation();
+                            }}>{row.source.name}</Button>
+                </StyledTableCell>
+
+{/*                <StyledTableCell className='fw-bold' style={{width: '10%'}}>
+                    <IconButton onClick={(e) => {props.cbf.performAccordionAction(row, 'remove'); e.stopPropagation();}} aria-label="unlink" color="primary" title='Unlink nodes'
+                                size="large">
+                    <LinkOffIcon/>
+                    </IconButton>
+                </StyledTableCell>*/}
+
+                <StyledTableCell className='col-2'>
+                    <Button className='me-2 py-0' style={{textTransform: 'none'}} title='Select linked node from target tree'
+                            onClick={(e) => {
+                                props.cbf.performAccordionAction(row, 'selectFromTargetTree'); e.stopPropagation();
+                            }}>{row.target.name}</Button>
+                </StyledTableCell>
+                <StyledTableCell className='col-2 fw-bold' style={{width: '10%'}}>
+                    <IconButton
+                        aria-label="expand row"
+                        size="small"
+                        onClick={(e) => {setOpen(!open); e.stopPropagation();}}
                     >
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
@@ -116,7 +120,7 @@ function Row(props: { row: CrosswalkConnectionNew, cbf: any }) {
                         <Box sx={{ margin: 1 }}>
                             <div className='fw-bold mt-3 mb-2' style={{fontSize: '0.9em'}}>Mapping type: <span className='fw-normal'>exact match</span></div>
                             <Textarea
-                                onChange={text => setChangedNotes(text.toString())}
+                                onChange={(event) => setChangedNotes(event.target.value)}
                                 onBlur={() => props.cbf.performAccordionAction(row, addNotes, changedNotes)}
                                 labelText="Notes:"
                                 visualPlaceholder="No notes set. Add free form notes here."
@@ -149,12 +153,12 @@ export default function JointListingAccordion(props: any) {
     <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
             <TableHead>
-                <TableRow>
-                    <TableCell>Source node</TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell align="right">Target node</TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell />
+                <TableRow className='accordion-row row'>
+                    <StyledTableCell className='col-1'></StyledTableCell>
+                    <StyledTableCell className='col-2'>Source node</StyledTableCell>
+                    <StyledTableCell className='col-2'>Target node</StyledTableCell>
+                    <StyledTableCell className='col-1'></StyledTableCell>
+                    <StyledTableCell className='col-6'/>
                 </TableRow>
             </TableHead>
             <TableBody onClick={(e) => {

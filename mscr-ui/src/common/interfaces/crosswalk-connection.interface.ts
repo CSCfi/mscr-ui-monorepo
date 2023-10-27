@@ -1,6 +1,6 @@
 export interface CrosswalkConnection {
     source: string;
-    target: string;
+    target: string | string[];
     sourceTitle: string | undefined;
     targetTitle: string | undefined;
     sourceType: string | undefined;
@@ -33,6 +33,16 @@ export interface RenderTree {
 export interface CrosswalkConnectionNew {
     source: RenderTree;
     target: RenderTree;
+    id: string,
+    description: string | undefined;
+    isSelected: boolean
+    isDraft: boolean
+}
+
+export interface CrosswalkConnectionsNew {
+    source: RenderTree[];
+    target: RenderTree[];
     id: string;
+    description: string | undefined;
 }
 

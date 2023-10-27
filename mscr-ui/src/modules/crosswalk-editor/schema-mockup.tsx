@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {cloneDeep} from 'lodash';
 import {RenderTree} from "@app/common/interfaces/crosswalk-connection.interface";
+import {Checkbox} from "suomifi-ui-components";
 
 export default function MockupSchemaLoader(emptyTemplate: boolean) {
     const testData: any = {
@@ -306,17 +307,17 @@ export default function MockupSchemaLoader(emptyTemplate: boolean) {
     let allTreeNodes: RenderTree[] = [];
 
     let currentTreeNode: RenderTree = {
-        isMappable: '',
-        jsonPath: '$schema',
-        parentName: '',
-        isLinked: false,
         idNumeric: 0,
         id: '0',
         name: '',
+        isLinked: false,
         title: '',
         type: '',
         description: '',
         required: '',
+        isMappable: '',
+        parentName: '',
+        jsonPath: '$schema',
         parentId: 0,
         children: []
     };
@@ -327,43 +328,41 @@ export default function MockupSchemaLoader(emptyTemplate: boolean) {
         nodeId += 1;
     }
 
-    function addObjectToTree(object: string, value: string, parent: string, rootId: any, jsonPath: string) {
-        currentTreeNode.jsonPath = jsonPath + '.' + object + '(LEAF)';
+    function createTreeObject(object: string, value: string, parent: string, rootId: any, jsonPath: string) {
+        currentTreeNode.jsonPath = jsonPath + '.' + object;
         currentTreeNode.idNumeric = nodeId;
         currentTreeNode.id = nodeId.toString();
         currentTreeNode.parentId = rootId;
-
-         if (object === 'description') {
-             currentTreeNode.description = value;
-         } else if (object === 'title') {
-             currentTreeNode.title = value;
-         }
-
         currentTreeNode.name = object;
         currentTreeNode.title = value;
         currentTreeNode.parentName = parent;
-
         increaseNodeNumber();
     }
 
     function walkJson(json_object: any, parent: any, rootId: number, jsonPath: string) {
-        //console.log('WALK JSON', json_object);
         for (const obj in json_object) {
             if (typeof json_object[obj] === 'string') {
-                //console.log(`${obj} = ${json_object[obj]}`);
+                //console.log(`leaf ${obj} = ${json_object[obj]}`);
 
                 // OBJECT IS A LEAF LEVEL OBJECT
                 currentTreeNode = {
                     isLinked: false, idNumeric: 0, id: '0', name: '', title: '', type: 'string', description: '', required: '', parentId: 0, jsonPath, children: []};
-                addObjectToTree(obj, json_object[obj], parent, rootId, jsonPath);
+                createTreeObject(obj, json_object[obj], parent, rootId, jsonPath);
                 allTreeNodes.push(cloneDeep(currentTreeNode));
                 }
-            else if (Array.isArray(json_object[obj])) {
-                //console.log('IS ARRAY!');
-            } else {
+            else if (typeof json_object[obj] === 'boolean') {
+                //console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FOUND BOOLEAN', obj, json_object[obj], json_object);
+
+                // OBJECT IS A LEAF LEVEL OBJECT
+                currentTreeNode = {
+                    isLinked: false, idNumeric: 0, id: '0', name: '', title: '', type: json_object[obj].toString(), description: '', required: '', parentId: 0, jsonPath, children: []};
+                createTreeObject(obj, json_object[obj], parent, rootId, jsonPath);
+                allTreeNodes.push(cloneDeep(currentTreeNode));
+            }
+                else {
                 // OBJECT HAS CHILDREN
                 currentTreeNode = {
-                    isLinked: false, idNumeric: 0, id: '0', name: '', title: '', type: 'composite', description: '', required: '', parentId: 0, jsonPath, children: []};
+                    isLinked: false, idNumeric: 0, id: '0', name: '', title: '', type: Array.isArray(json_object[obj]) ? 'array' : 'composite', description: '', required: '', parentId: 0, jsonPath, children: []};
                 currentTreeNode.name = obj;
                 currentTreeNode.parentName = parent;
                 currentTreeNode.parentId = rootId;
@@ -380,6 +379,35 @@ export default function MockupSchemaLoader(emptyTemplate: boolean) {
         return allTreeNodes;
     }
 
+    function mergeAttributesToParent(inputNodes: RenderTree[] | undefined) {
+        if (inputNodes) {
+            let outputNodes = inputNodes.map((parent: RenderTree) => {
+                    if (parent.children) {
+                        let i = parent.children.length;
+                        while (i--) {
+                         // @ts-ignore
+                            if (parent.children[i] && parent.children[i].children.length > 0) {
+                             mergeAttributesToParent([parent.children[i]]);
+                         }
+                         if (parent.children[i].name === 'type') {
+                                parent.type = parent.children[i].title;
+                                //parent.children.splice(i, 1);
+                            } else if (parent.children[i].name === 'description') {
+                                parent.description = parent.children[i].title;
+                                //parent.children.splice(i, 1);
+                            } else if (parent.children[i].name === 'title') {
+                                parent.title = parent.children[i].title;
+                                //parent.children.splice(i, 1);
+                            }
+                        }
+                    }
+                    return parent;
+                }
+            );
+            return outputNodes;
+        }
+    }
+
     function processChildNodes() {
         for (let i = allTreeNodes.length - 1; i > 0; i -= 1) {
             if (allTreeNodes[i]) {
@@ -389,8 +417,45 @@ export default function MockupSchemaLoader(emptyTemplate: boolean) {
         return {allTreeNodes};
     }
 
+    // Recursive tree creation causes tree to build in reversed order, so tree needs to be reversed to match the node order in original JSON
+    function reverseTreeRootLevel(inputNodes: RenderTree[] | undefined) {
+        let retNodes: RenderTree[];
+        if (inputNodes){
+            return inputNodes.reverse();
+        }
+    }
+
+    // Unused
+    function reverseTreeChildren(inputNodes: RenderTree[] | undefined) {
+        if (inputNodes){
+            for (let i = 0; i < inputNodes.length; i += 1) {
+                // @ts-ignore
+                if (inputNodes[i].children.length > 1) {
+                    // @ts-ignore
+                    inputNodes[i].children = inputNodes[i].children.reverse()
+                    reverseTreeChildren(inputNodes[i].children);
+                }
+            }
+            return inputNodes;
+        }
+    }
+
     walkJson(emptyTemplate ? testSchema : currentTreeNode, null, 0, 'ROOT');
     processChildNodes();
-        //console.log(allTreeNodes);
-    return allTreeNodes;
+    console.log('######### NEW', mergeAttributesToParent(reverseTreeRootLevel(allTreeNodes)));
+
+    return reverseTreeRootLevel(allTreeNodes);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

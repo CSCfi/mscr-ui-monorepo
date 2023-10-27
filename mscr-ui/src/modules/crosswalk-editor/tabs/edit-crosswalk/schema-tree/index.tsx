@@ -28,6 +28,7 @@ export default function SchemaTree({nodes, treeSelectedArray, treeExpanded, isSo
 
     return (<TreeView
                 aria-label="controlled"
+                multiSelect
                 expanded={treeExpanded}
                 selected={treeSelectedArray}
                 onNodeSelect={handleSelect}
