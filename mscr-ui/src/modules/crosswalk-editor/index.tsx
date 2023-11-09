@@ -179,7 +179,7 @@ export default function CrosswalkEditor() {
 
     const [crosswalksList, setCrosswalkList] = React.useState<string[]>([]);
 
-    const [isEditModeActive, setEditModeActive] = React.useState<boolean>(false);
+    const [isEditModeActive, setEditModeActive] = React.useState<boolean>(true);
 
     useEffect(() => {
         console.log('########## GOT FILTER FUNCTIONS', filterFunctions);
@@ -211,7 +211,7 @@ export default function CrosswalkEditor() {
         setSelectedSourceNodes(getTreeNodesById(sourceTreeSelectedArray, true));
 
         // USED BY NODE INFO BOX TARGET
-        setSelectedTargetNodes(getTreeNodesById(targetTreeSelectedArray, true));
+        setSelectedTargetNodes(getTreeNodesById(targetTreeSelectedArray, false));
 
         //updateIsLinkedStatus(sourceNode, targetNode);
         //setSelectedSourceNodes(sourceNode);
@@ -288,10 +288,16 @@ export default function CrosswalkEditor() {
     }
 
     function getTreeNodesById(nodeIds: string[], isSourceTree: boolean) {
-        if (isSourceTree) {
-            return sourceTreeDataOriginal.filter(item => nodeIds.includes(item.id));
+        let nodeIdsArr: string[] = [];
+        if (typeof nodeIds === 'string') {
+            nodeIdsArr.push(nodeIds);
         } else {
-            return targetTreeDataOriginal.filter(item => nodeIds.includes(item.id));
+            nodeIdsArr = nodeIds;
+        }
+        if (isSourceTree) {
+            return sourceTreeDataOriginal.filter(item => nodeIdsArr.includes(item.id));
+        } else {
+            return targetTreeDataOriginal.filter(item => nodeIdsArr.includes(item.id));
         }
     }
 
@@ -344,12 +350,12 @@ export default function CrosswalkEditor() {
         setLinkingError(linkingError);
     }
 
-    const handleTreeSelect = (event: React.SyntheticEvent | undefined, nodeIds: any[], isSourceTree: boolean) => {
+    const handleTreeSelect = (event: React.SyntheticEvent | undefined, nodeIds: string[], isSourceTree: boolean) => {
         let newTreeSelection: RenderTree[] = [];
         if (isSourceTree) {
             sourceTreeData.forEach((item: RenderTree) => {
                 if (item.id === nodeIds.toString()) {
-                    newTreeSelection.push(cloneDeep(item));
+                    newTreeSelection.push(item);
                 }
             });
             //setSourceSelection(newTreeSelection);
@@ -357,7 +363,7 @@ export default function CrosswalkEditor() {
         } else {
             targetTreeData.forEach((item: RenderTree) => {
                 if (item.id === nodeIds.toString()) {
-                    newTreeSelection.push(cloneDeep(item));
+                    newTreeSelection.push(item);
                 }
             });
             //setTargetSelection(newTreeSelection);
