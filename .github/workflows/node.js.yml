@@ -20,4 +20,6 @@ jobs:
     - working-directory: ./
       run: npm install
     - working-directory: ./mscr-ui
-      run: npm run build && npm install --production --ignore-scripts --prefer-offline    
+      run: |
+        echo "latest" > public/version.txt
+        npm run build && npm install --production --ignore-scripts --prefer-offline    
