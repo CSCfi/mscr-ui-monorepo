@@ -17,9 +17,9 @@ jobs:
       image: 'node:18.16.0-alpine3.16'
     steps:
     - uses: actions/checkout@v3
-    - working-directory: ./
-      run: npm install
     - working-directory: ./mscr-ui
       run: |
+        npm install -g npm@8.1.2
+        npm install
         echo "latest" > public/version.txt
         npm run build && npm install --production --ignore-scripts --prefer-offline    
