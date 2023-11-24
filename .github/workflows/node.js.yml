@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v3
     - working-directory: ./mscr-ui
       run: |
-        npm install -g npm@8.1.2
+        npm install -g npm@9.5.1
         npm install
         echo "latest" > public/version.txt
         npm run build && npm install --production --ignore-scripts --prefer-offline    
