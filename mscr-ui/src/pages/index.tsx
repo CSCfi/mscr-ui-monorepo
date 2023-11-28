@@ -126,8 +126,8 @@ export const getServerSideProps = createCommonGetServerSideProps(
       }
     }
 
-    store.dispatch(getServiceCategories.initiate(locale ?? 'fi'));
-    store.dispatch(getOrganizations.initiate(locale ?? 'fi'));
+    store.dispatch(getServiceCategories.initiate(locale ?? 'en'));
+    store.dispatch(getOrganizations.initiate(locale ?? 'en'));
     store.dispatch(getCount.initiate());
 
     await Promise.all(

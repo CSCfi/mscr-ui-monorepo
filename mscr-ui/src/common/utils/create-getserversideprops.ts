@@ -68,7 +68,11 @@ export function createCommonGetServerSideProps<
           functionKey: 'getAuthenticatedUser',
         });
 
+        // here we are calling the login api
+        console.log(user);
+
         if (!user || user.anonymous) {
+          console.log("setting user anonymous");
           store.dispatch(setLogin(anonymousUser));
         } else {
           store.dispatch(

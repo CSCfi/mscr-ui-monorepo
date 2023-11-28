@@ -7,7 +7,7 @@ import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
 import isHydrate from '@app/store/isHydrate';
 
 export const initialState: User = {
-  anonymous: true,
+  anonymous: false,
   email: '',
   firstName: '',
   lastName: '',
