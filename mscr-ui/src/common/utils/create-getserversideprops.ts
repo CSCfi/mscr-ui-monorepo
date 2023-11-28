@@ -49,6 +49,9 @@ export function createCommonGetServerSideProps<
   return wrapper.getServerSideProps((store) => {
     return withSession(
       async ({ req, res, resolvedUrl, params, query, locale }) => {
+        console.log(req)
+        console.log(resolvedUrl)
+        console.log(query)
         const results = await handler?.({
           req,
           res,
