@@ -56,7 +56,6 @@ export default function FrontPage() {
         }
       />
       <Separator isLarge />
-        <p>BUTTONIT PITÄS OLLA TÄSSÄ</p>
       <ButtonBlock>
         <SchemaFormModal refetch={refetchInfo}></SchemaFormModal>
         <CrosswalkFormModal refetch={refetchInfo}></CrosswalkFormModal>
