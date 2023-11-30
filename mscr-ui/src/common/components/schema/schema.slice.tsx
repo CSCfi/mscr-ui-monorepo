@@ -53,6 +53,18 @@ export const schemaApi = createApi({
         method: 'GET',
       }),
     }),
+    getPublicSchemas: builder.query<any, any>({
+      query: () => ({
+        url: `/frontend/mscrSearch?type=SCHEMA`,
+        method: 'GET',
+      }),
+    }),
+    getFrontendSchema: builder.query<any, string>({
+      query: (pid) => ({
+        url: `/frontend/schema/${pid}`,
+        method: 'GET',
+      }),
+    }),
     postSchema: builder.mutation<
       string,
       {
@@ -84,6 +96,8 @@ export const schemaApi = createApi({
 
 export const {
   usePutSchemaMutation,
+  useGetPublicSchemasQuery,
+  useGetFrontendSchemaQuery,
   useGetSchemaQuery,
   useGetSchemaWithRevisionsQuery,
   usePostSchemaMutation,
