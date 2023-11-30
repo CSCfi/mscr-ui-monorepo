@@ -24,9 +24,8 @@ export default function CrosswalkList({
   }
 
   function handleClick(pid: string) {
-    console.log('crosswalklist');
     // will go the crosswalk detail page
-    router.push('/crosswalk-edit');
+    router.push('/crosswalk');
   }
 
   return (

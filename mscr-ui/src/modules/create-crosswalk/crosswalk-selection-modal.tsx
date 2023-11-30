@@ -66,12 +66,12 @@ export default function CrosswalkSelectionModal({
       // MSCR = to be edited with crosswalk editor
       refetch();
       handleClose();
-      router.push(`/crosswalk-edit/${result.data.pid}`);
+      router.push(`/crosswalk/${result.data.pid}`);
     }
     if (userPosted && result.isSuccess) {
       refetch();
       handleClose();
-      router.push(`/crosswalk-edit/${result.data.pid}`);
+      router.push(`/crosswalk/${result.data.pid}`);
     }
   }, [result, refetch, userPosted, handleClose, router]);
 
