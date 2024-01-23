@@ -138,7 +138,6 @@ export default function InfoManual({
 
   return (
     <form>
-      {/* <TallerSeparator /> */}
       <LanguageSelector
         items={languageList}
         labelText={t('information-description-languages')}
@@ -188,7 +187,7 @@ export default function InfoManual({
         disabled={disabled}
       />
       <TallerSeparator />
-      <Paragraph marginBottomSpacing="m">
+      <Paragraph mb="m">
         <Text variant="bold">{t('terminology-other-information')}</Text>
       </Paragraph>
       <OrganizationSelector

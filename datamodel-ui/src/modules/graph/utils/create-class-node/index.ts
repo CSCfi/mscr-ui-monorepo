@@ -20,21 +20,20 @@ export default function createClassNode(
       ...(applicationProfile !== undefined
         ? { applicationProfile: applicationProfile }
         : {}),
+      uri: node.uri,
       resources: [
-        ...node.attributes.map((a) => ({
+        ...(node.attributes ?? []).map((a) => ({
           ...a,
           type: ResourceType.ATTRIBUTE as ResourceType.ATTRIBUTE,
         })),
-        ...(applicationProfile
-          ? node.associations.map((a) => {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              const { referenceTarget, ...rest } = a;
-              return {
-                ...rest,
-                type: ResourceType.ASSOCIATION as ResourceType.ASSOCIATION,
-              };
-            })
-          : []),
+        ...(node.associations ?? []).map((a) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { referenceTarget, ...rest } = a;
+          return {
+            ...rest,
+            type: ResourceType.ASSOCIATION as ResourceType.ASSOCIATION,
+          };
+        }),
       ],
       ...(typeof organizationIds !== 'undefined'
         ? { organizationIds: organizationIds }

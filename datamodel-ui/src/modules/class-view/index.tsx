@@ -42,6 +42,7 @@ import ClassInfo from './class-info';
 import useSetView from '@app/common/utils/hooks/use-set-view';
 import useSetPage from '@app/common/utils/hooks/use-set-page';
 import { SimpleResource } from '@app/common/interfaces/simple-resource.interface';
+import ResourceError from '@app/common/components/resource-error';
 
 interface ClassViewProps {
   modelId: string;
@@ -72,13 +73,13 @@ export default function ClassView({
   const displayLang = useSelector(selectDisplayLang());
   const [currentPage, setCurrentPage] = useState(getPage());
   const [query, setQuery] = useState('');
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(hasPermission ? 112 : 97);
   const [isEdit, setIsEdit] = useState(false);
   const [showAppProfileModal, setShowAppProfileModal] = useState(false);
   const [basedOnNodeShape, setBasedOnNodeShape] = useState(false);
-  const [selectedNodeShape, setSelectedNodeShape] = useState<
+  const [selectedTargetClass, setSelectedTargetClass] = useState<
     | {
-        nodeShape: InternalClassInfo;
+        targetClass: InternalClassInfo;
         isAppProfile?: boolean;
       }
     | undefined
@@ -97,7 +98,7 @@ export default function ClassView({
   const {
     data: classData,
     isSuccess,
-    refetch: refetchData,
+    isError: classIsError,
   } = useGetClassQuery(
     {
       modelId: modelId,
@@ -124,9 +125,9 @@ export default function ClassView({
 
     if (applicationProfile && value && !targetIsAppProfile) {
       setShowAppProfileModal(true);
-      setSelectedNodeShape({
-        nodeShape: value,
-        isAppProfile: targetIsAppProfile ?? false,
+      setSelectedTargetClass({
+        targetClass: value,
+        isAppProfile: false,
       });
       return;
     }
@@ -147,12 +148,7 @@ export default function ClassView({
 
     dispatch(
       setClass(
-        internalClassToClassForm(
-          value,
-          languages,
-          applicationProfile,
-          targetIsAppProfile
-        )
+        internalClassToClassForm(value, applicationProfile, targetIsAppProfile)
       )
     );
 
@@ -167,7 +163,7 @@ export default function ClassView({
     attributes?: SimpleResource[];
   }) => {
     setShowAppProfileModal(false);
-    setSelectedNodeShape(undefined);
+    setSelectedTargetClass(undefined);
 
     if (!data || !data.value) {
       return;
@@ -177,7 +173,6 @@ export default function ClassView({
       setClass(
         internalClassToClassForm(
           data.value,
-          languages,
           applicationProfile,
           data.targetIsAppProfile,
           data.associations,
@@ -205,11 +200,11 @@ export default function ClassView({
 
   const handleFollowUp = (classId: string) => {
     setView('classes', 'info', classId);
-    dispatch(setSelected(classId, 'classes'));
+    dispatch(setSelected(classId, 'classes', modelId));
   };
 
   const handleActive = (classId: string) => {
-    dispatch(setSelected(classId, 'classes'));
+    dispatch(setSelected(classId, 'classes', modelId));
     dispatch(resetHovered());
   };
 
@@ -265,10 +260,10 @@ export default function ClassView({
                   handleFollowUp={handleFollowUpAction}
                   applicationProfile={applicationProfile}
                 />
-                {selectedNodeShape && (
+                {selectedTargetClass && (
                   <ApplicationProfileFlow
                     visible={showAppProfileModal}
-                    selectedNodeShape={selectedNodeShape}
+                    selectedTargetClass={selectedTargetClass}
                     handleFollowUp={handleAppProfileFollowUpAction}
                   />
                 )}
@@ -350,6 +345,10 @@ export default function ClassView({
       return <></>;
     }
 
+    if (classIsError) {
+      return <ResourceError handleReturn={handleReturn} />;
+    }
+
     return (
       <ClassInfo
         data={classData}
@@ -359,7 +358,6 @@ export default function ClassView({
         applicationProfile={applicationProfile}
         handleReturn={handleReturn}
         handleEdit={handleEdit}
-        handleRefetch={refetchData}
         disableEdit={version ? true : false}
         handleShowClass={handleShowClass}
         organizationIds={organizationIds}

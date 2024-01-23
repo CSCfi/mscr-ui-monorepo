@@ -1,4 +1,3 @@
-import { HYDRATE } from 'next-redux-wrapper';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
 import { Status } from '@app/common/interfaces/status.interface';
@@ -9,6 +8,7 @@ import {
 import { ResourceType } from '@app/common/interfaces/resource-type.interface';
 import { Type } from '@app/common/interfaces/type.interface';
 import { inUseStatusList } from '@app/common/utils/status-list';
+import { SUOMI_FI_NAMESPACE } from '@app/common/utils/get-value';
 
 export interface InternalResourcesSearchParams {
   query: string;
@@ -23,6 +23,7 @@ export interface InternalResourcesSearchParams {
   limitToModelType?: Type;
   extend?: boolean;
   fromVersion?: string;
+  includeDraftFrom?: string[];
 }
 
 export function initialSearchData(
@@ -70,7 +71,7 @@ function createUrl(obj: InternalResourcesSearchParams): string {
 
   if (obj.limitToDataModel) {
     baseQuery = baseQuery.concat(
-      `&limitToDataModel=http://uri.suomi.fi/datamodel/ns/${obj.limitToDataModel}`
+      `&limitToDataModel=${SUOMI_FI_NAMESPACE}${obj.limitToDataModel}/`
     );
   }
 
@@ -94,18 +95,21 @@ function createUrl(obj: InternalResourcesSearchParams): string {
     baseQuery = baseQuery.concat(`&fromVersion=${obj.fromVersion}`);
   }
 
+  if (obj.includeDraftFrom) {
+    baseQuery = baseQuery.concat(
+      `&includeDraftFrom=${obj.includeDraftFrom
+        .map((modelId) => `${SUOMI_FI_NAMESPACE}${modelId}/`)
+        .join(',')}`
+    );
+  }
+
   return baseQuery;
 }
 
 export const searchInternalResourcesApi = createApi({
   reducerPath: 'searchInternalResourcesApi',
   baseQuery: getDatamodelApiBaseQuery(),
-  tagTypes: ['internalResources'],
-  extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === HYDRATE) {
-      return action.payload[reducerPath];
-    }
-  },
+  tagTypes: ['InternalResources'],
   endpoints: (builder) => ({
     getInternalResources: builder.mutation<
       SearchInternalClasses,
@@ -124,6 +128,17 @@ export const searchInternalResourcesApi = createApi({
         url: createUrl(object),
         method: 'GET',
       }),
+      providesTags: (results, error, args) => {
+        return args.resourceTypes
+          ? [
+              {
+                type: 'InternalResources' as const,
+                id:
+                  args.resourceTypes.length > 0 ? args.resourceTypes[0] : 'ALL',
+              },
+            ]
+          : ['InternalResources'];
+      },
     }),
     getInternalResourcesInfo: builder.mutation<
       SearchInternalClassesInfo,

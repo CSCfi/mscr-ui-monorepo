@@ -1,4 +1,3 @@
-import { HYDRATE } from 'next-redux-wrapper';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
 import {
@@ -9,12 +8,7 @@ import {
 export const visualizationApi = createApi({
   reducerPath: 'visualizationApi',
   baseQuery: getDatamodelApiBaseQuery(),
-  tagTypes: ['visualization'],
-  extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === HYDRATE) {
-      return action.payload[reducerPath];
-    }
-  },
+  tagTypes: ['Visualization'],
   endpoints: (builder) => ({
     getVisualization: builder.query<
       VisualizationResult,
@@ -29,19 +23,24 @@ export const visualizationApi = createApi({
         },
         method: 'GET',
       }),
+      providesTags: ['Visualization'],
     }),
     putPositions: builder.mutation<
       null,
       {
         modelId: string;
+        version?: string;
         data: VisualizationPutType[];
       }
     >({
       query: (value) => ({
-        url: `/visualization/${value.modelId}/positions`,
+        url: `/visualization/${value.modelId}/positions${
+          value.version ? `?version=${value.version}` : ''
+        }`,
         method: 'PUT',
         data: value.data,
       }),
+      invalidatesTags: ['Visualization'],
     }),
   }),
 });

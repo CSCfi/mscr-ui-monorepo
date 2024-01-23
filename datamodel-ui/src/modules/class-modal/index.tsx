@@ -19,6 +19,14 @@ import { ResourceType } from '@app/common/interfaces/resource-type.interface';
 import { ResultType } from '@app/common/components/resource-list';
 import { mapInternalClassInfoToResultType } from '../class-restriction-modal/utils';
 import LargeModal from '@app/common/components/large-modal';
+import UnsavedAlertModal from '../unsaved-alert-modal';
+import { useStoreDispatch } from '@app/store';
+import { useSelector } from 'react-redux';
+import {
+  selectDisplayGraphHasChanges,
+  selectGraphHasChanges,
+  setDisplayGraphHasChanges,
+} from '@app/common/components/model/model.slice';
 
 export interface ClassModalProps {
   modelId: string;
@@ -32,7 +40,7 @@ export interface ClassModalProps {
   initialSelected?: string;
   plusIcon?: boolean;
   limitToModelType?: 'LIBRARY' | 'PROFILE';
-  hideSelfReference?: string;
+  hiddenClasses?: string[];
   buttonVariant?: 'secondary' | 'secondaryNoBorder';
 }
 
@@ -45,11 +53,14 @@ export default function ClassModal({
   initialSelected,
   plusIcon,
   limitToModelType,
-  hideSelfReference,
+  hiddenClasses,
   buttonVariant,
 }: ClassModalProps) {
   const { t, i18n } = useTranslation('admin');
   const { isSmall } = useBreakpoints();
+  const dispatch = useStoreDispatch();
+  const displayGraphHasChanges = useSelector(selectDisplayGraphHasChanges());
+  const graphHasChanges = useSelector(selectGraphHasChanges());
   const [visible, setVisible] = useState(false);
   const [selectedId, setSelectedId] = useState(initialSelected ?? '');
   const [resultsFormatted, setResultsFormatted] = useState<ResultType[]>([]);
@@ -73,6 +84,15 @@ export default function ClassModal({
     if (initialSelected && initialSelected !== 'selectedId') {
       setSelectedId(initialSelected);
     }
+  };
+
+  const handleOpenClick = () => {
+    if (graphHasChanges) {
+      dispatch(setDisplayGraphHasChanges(true));
+      return;
+    }
+
+    handleOpen();
   };
 
   const handleClose = () => {
@@ -118,22 +138,27 @@ export default function ClassModal({
     if (result.isSuccess) {
       setResultsFormatted(
         result.data.responseObjects
-          .filter((r) => r.id !== hideSelfReference)
+          .filter((r) => !hiddenClasses?.includes(r.id))
           .map((r) => mapInternalClassInfoToResultType(r, i18n.language))
       );
     }
-  }, [result, i18n.language, t, contentLanguage, hideSelfReference]);
+  }, [result, i18n.language, t, contentLanguage, hiddenClasses]);
 
   return (
     <>
       <Button
         variant={buttonVariant ?? 'secondary'}
         icon={modalButtonLabel && !plusIcon ? undefined : <IconPlus />}
-        onClick={() => handleOpen()}
+        onClick={() => handleOpenClick()}
         id="add-class-button"
       >
         {modalButtonLabel ? modalButtonLabel : t('add-class')}
       </Button>
+
+      <UnsavedAlertModal
+        visible={displayGraphHasChanges}
+        handleFollowUp={() => handleOpen()}
+      />
 
       <LargeModal
         appElementId="__next"
@@ -146,7 +171,7 @@ export default function ClassModal({
           <MultiColumnSearch
             primaryColumnName={t('class-name')}
             result={{
-              totalHitCount: result.data?.totalHitCount ?? 0,
+              totalHitCount: resultsFormatted.length,
               items: resultsFormatted,
             }}
             selectedId={selectedId}
@@ -156,7 +181,7 @@ export default function ClassModal({
             setContentLanguage={setContentLanguage}
             modelId={modelId}
             languageVersioned
-            multiTypeSelection={applicationProfile}
+            multiTypeSelection={applicationProfile && !limitToModelType}
           />
         </ModalContent>
         <ModalFooter>

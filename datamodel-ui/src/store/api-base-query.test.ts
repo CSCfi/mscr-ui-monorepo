@@ -27,7 +27,7 @@ describe('axios base query', () => {
       req: httpMocks.createRequest({ headers: { foo: 'bar' } }),
       res: httpMocks.createResponse(),
       query: {},
-      resolvedUrl: '',
+      resolvedUrl: '/',
       locale: 'en',
     };
 

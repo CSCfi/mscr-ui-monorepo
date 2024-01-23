@@ -5,7 +5,7 @@ import SearchView from './search-view';
 import ClassView from '../class-view';
 import { useTranslation } from 'next-i18next';
 import { useGetModelQuery } from '@app/common/components/model/model.slice';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import Graph from '../graph';
 import LinkedDataView from '../linked-data-view';
 import { compareLocales } from '@app/common/utils/compare-locals';
@@ -39,7 +39,10 @@ export default function Model({ modelId, fullScreen }: ModelProps) {
   const { t } = useTranslation('common');
   const dispatch = useStoreDispatch();
   const router = useRouter();
-  const [version] = useState(getSlugAsString(router.query.ver));
+  const version = useMemo(
+    () => getSlugAsString(router.query.ver),
+    [router.query.ver]
+  );
   const { data: modelInfo } = useGetModelQuery({
     modelId: modelId,
     version: version,
@@ -62,6 +65,9 @@ export default function Model({ modelId, fullScreen }: ModelProps) {
   }, [modelInfo]);
 
   const views: ViewType[] = useMemo(() => {
+    if (!modelInfo) {
+      return [];
+    }
     return [
       {
         id: 'search',
@@ -73,6 +79,20 @@ export default function Model({ modelId, fullScreen }: ModelProps) {
         id: 'graph',
         icon: <IconApplicationProfile />,
         buttonLabel: t('graph'),
+        component: (
+          <Graph
+            modelId={modelId}
+            version={version}
+            applicationProfile={modelInfo?.type === 'PROFILE'}
+            organizationIds={organizationIds}
+          >
+            <ModelTools
+              modelId={modelId}
+              applicationProfile={modelInfo?.type === 'PROFILE'}
+              organisations={organizationIds}
+            />
+          </Graph>
+        ),
       },
       {
         id: 'info',
@@ -182,8 +202,6 @@ export default function Model({ modelId, fullScreen }: ModelProps) {
       style={{
         height: fullScreen ? '100vh' : 0,
         flex: '1 1 auto',
-        display: 'flex',
-        flexDirection: 'column',
       }}
     >
       <Notification applicationProfile={modelInfo?.type === 'PROFILE'} />
@@ -194,12 +212,12 @@ export default function Model({ modelId, fullScreen }: ModelProps) {
           version={version}
           applicationProfile={modelInfo?.type === 'PROFILE'}
           organizationIds={organizationIds}
+          drawer={<Drawer views={views} />}
         >
-          <Drawer views={views} />
           <ModelTools
             modelId={modelId}
-            version={version}
             applicationProfile={modelInfo?.type === 'PROFILE'}
+            organisations={organizationIds}
           />
         </Graph>
       </ContentWrapper>

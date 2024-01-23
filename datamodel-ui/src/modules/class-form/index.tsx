@@ -1,7 +1,5 @@
 import {
   Button,
-  Dropdown,
-  DropdownItem,
   ExpanderGroup,
   IconArrowLeft,
   Text,
@@ -11,15 +9,13 @@ import {
 } from 'suomifi-ui-components';
 import Separator from 'yti-common-ui/separator';
 import { useTranslation } from 'next-i18next';
-import { Status } from '@app/common/interfaces/status.interface';
 import ConceptBlock from '../concept-block';
 import { ClassFormType } from '@app/common/interfaces/class-form.interface';
 import { ClassFormErrors, validateClassForm } from './utils';
 import FormFooterAlert from 'yti-common-ui/form-footer-alert';
-import { statusList } from '@app/common/utils/status-list';
 import {
   translateClassFormErrors,
-  translateStatus,
+  translatePageTitle,
 } from '@app/common/utils/translation-helpers';
 import { useEffect, useRef, useState } from 'react';
 import StaticHeader from 'yti-common-ui/drawer/static-header';
@@ -32,13 +28,18 @@ import {
   useGetClassExistsQuery,
   useUpdateClassMutation,
 } from '@app/common/components/class/class.slice';
-import { AxiosQueryErrorFields } from 'yti-common-ui/interfaces/axios-base-query.interface';
+import {
+  AxiosBaseQueryError,
+  AxiosQueryErrorFields,
+} from 'yti-common-ui/interfaces/axios-base-query.interface';
 import { useSelector } from 'react-redux';
 import { useStoreDispatch } from '@app/store';
 import { ConceptType } from '@app/common/interfaces/concept-interface';
 import ClassModal from '../class-modal';
-import { InternalClass } from '@app/common/interfaces/internal-class.interface';
-import { getLanguageVersion } from '@app/common/utils/get-language-version';
+import {
+  InternalClass,
+  InternalClassInfo,
+} from '@app/common/interfaces/internal-class.interface';
 import { BasicBlock } from 'yti-common-ui/block';
 import ResourceInfo from '../class-view/resource-info';
 import getApiError from '@app/common/utils/get-api-errors';
@@ -59,6 +60,7 @@ import {
 import { HeaderRow, StyledSpinner } from '@app/common/components/header';
 import { DEFAULT_SUBCLASS_OF } from '../class-view/utils';
 import { UriData } from '@app/common/interfaces/uri.interface';
+import { ResourceType } from '@app/common/interfaces/resource-type.interface';
 import { LanguageVersionedWrapper } from './class-form.styles';
 
 export interface ClassFormProps {
@@ -82,24 +84,32 @@ export default function ClassForm({
   applicationProfile,
   basedOnNodeShape,
 }: ClassFormProps) {
-  const { t, i18n } = useTranslation('admin');
+  const { t } = useTranslation('admin');
   const { enableConfirmation, disableConfirmation } =
     useConfirmBeforeLeavingPage('disabled');
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(99);
   const ref = useRef<HTMLDivElement>(null);
   const dispatch = useStoreDispatch();
   const data = useSelector(selectClass());
   const hasChanges = useSelector(selectHasChanges());
   const [userPosted, setUserPosted] = useState(false);
+  const [isSubClass] = useState(
+    data.subClassOf &&
+      data.subClassOf.length > 0 &&
+      data.subClassOf[0].uri !== 'owl:Thing'
+  );
   const [errors, setErrors] = useState<ClassFormErrors>(
     validateClassForm(data)
   );
   const [showResourcePicker, setShowResourcePicker] = useState(false);
   const [selectedTargetClass, setSelectedTargetClass] = useState<{
     modelId: string;
+    identifier: string;
+    version?: string;
     classInfo: UriData;
   }>({
     modelId: '',
+    identifier: '',
     classInfo: {
       uri: '',
       curie: '',
@@ -188,13 +198,15 @@ export default function ClassForm({
     });
   };
 
-  const handleTargetClassUpdate = (value?: InternalClass) => {
+  const handleTargetClassUpdate = (value?: InternalClassInfo) => {
     if (!value) {
       return;
     }
 
     setSelectedTargetClass({
       modelId: getPrefixFromURI(value.namespace) ?? '',
+      identifier: value.identifier,
+      version: value.dataModelInfo.version,
       classInfo: convertToUriData(value),
     });
     setShowResourcePicker(true);
@@ -332,7 +344,7 @@ export default function ClassForm({
 
     let backendErrorFields: string[] = [];
 
-    const handleError = (error: AxiosQueryError): void => {
+    const handleError = (error: AxiosBaseQueryError): void => {
       if (error?.status === 401) {
         setErrors({
           ...validateClassForm(data),
@@ -340,7 +352,7 @@ export default function ClassForm({
         });
         return;
       }
-      if (error.data.details) {
+      if ('data' in error && (error as AxiosQueryErrorFields).data.details) {
         const asFields = (error as AxiosQueryErrorFields).data.details;
         backendErrorFields = Array.isArray(asFields)
           ? asFields.map((d) => d.field)
@@ -396,11 +408,20 @@ export default function ClassForm({
             style={{ textTransform: 'uppercase' }}
             id="back-button"
           >
-            {t('back', { ns: 'common' })}
+            {isEdit
+              ? t('return-to-class')
+              : t('return-to-class-list', { ns: 'common' })}
           </Button>
 
           <div style={{ display: 'flex', gap: '10px' }}>
-            <Button onClick={() => handleSubmit()} id="submit-button">
+            <Button
+              onClick={() => handleSubmit()}
+              id={
+                updateResult.isLoading || createResult.isLoading
+                  ? 'submit-button_submitted'
+                  : 'submit-button'
+              }
+            >
               {updateResult.isLoading || createResult.isLoading ? (
                 <div role="alert">
                   <StyledSpinner
@@ -428,19 +449,19 @@ export default function ClassForm({
 
         <HeaderRow>
           <Text variant="bold">
-            {Object.values(data.label).filter(
-              (l) => l !== '' && typeof l !== 'undefined'
-            ).length > 0
-              ? getLanguageVersion({
-                  data: Object.fromEntries(
-                    Object.entries(data.label).filter(
-                      (l) => l[1] !== '' && typeof l[1] !== 'undefined'
-                    )
-                  ),
-                  lang: i18n.language,
-                  appendLocale: true,
-                })
-              : t('class-name')}
+            {isEdit
+              ? translatePageTitle(
+                  'edit',
+                  ResourceType.CLASS,
+                  t,
+                  applicationProfile
+                )
+              : translatePageTitle(
+                  isSubClass ? 'create-sub' : 'create',
+                  ResourceType.CLASS,
+                  t,
+                  applicationProfile
+                )}
           </Text>
         </HeaderRow>
 
@@ -504,7 +525,9 @@ export default function ClassForm({
         </LanguageVersionedWrapper>
 
         <TextInput
-          labelText={`${t('class-identifier')} (dcterms:identifier)`}
+          labelText={`${t('class-identifier', {
+            ns: 'common',
+          })} (dcterms:identifier)`}
           visualPlaceholder={t('input-class-identifier')}
           defaultValue={data.identifier}
           status={
@@ -530,7 +553,7 @@ export default function ClassForm({
               ariaToggleButtonLabelText={''}
               ariaCloseButtonLabelText={''}
             >
-              <Text>Tooltip sisältö</Text>
+              <Text>{t('tooltip.class-identifier', { ns: 'common' })}</Text>
             </Tooltip>
           }
           id="prefix-input"
@@ -547,11 +570,19 @@ export default function ClassForm({
                 applicationProfile={applicationProfile}
                 modalButtonLabel={t('add-upper-class')}
                 plusIcon
-                hideSelfReference={data.uri}
+                hiddenClasses={[
+                  data.uri,
+                  ...(data.subClassOf?.map((s) => s.uri) ?? []),
+                ]}
               />
             }
             items={data.subClassOf}
             label={`${t('upper-classes')} (rdfs:subClassOf)`}
+            tooltip={{
+              text: t('tooltip.upper-classes', { ns: 'common' }),
+              ariaCloseButtonLabelText: '',
+              ariaToggleButtonLabelText: '',
+            }}
             handleRemoval={(id: string) =>
               handleClassOfRemoval(id, 'subClassOf')
             }
@@ -572,11 +603,16 @@ export default function ClassForm({
                   handleFollowUp={handleTargetClassUpdate}
                   initialSelected={data.targetClass?.uri}
                   applicationProfile
-                  hideSelfReference={data.uri}
+                  hiddenClasses={[data.uri]}
                 />
               }
               items={data.targetClass ? [data.targetClass] : []}
               label={`${t('target-class-profile')} (sh:targetClass)`}
+              tooltip={{
+                text: t('tooltip.target-class-profile', { ns: 'common' }),
+                ariaCloseButtonLabelText: '',
+                ariaToggleButtonLabelText: '',
+              }}
               handleRemoval={() =>
                 handleUpdate({ ...data, targetClass: undefined })
               }
@@ -586,7 +622,8 @@ export default function ClassForm({
               visible={showResourcePicker}
               selectedNodeShape={{
                 modelId: selectedTargetClass.modelId,
-                classId: selectedTargetClass.classInfo.uri,
+                classId: selectedTargetClass.identifier,
+                version: selectedTargetClass.version,
                 isAppProfile: false,
               }}
               handleFollowUp={handleResourceUpdate}
@@ -602,11 +639,21 @@ export default function ClassForm({
                 applicationProfile={applicationProfile}
                 modalButtonLabel={t('add-corresponding-class')}
                 plusIcon
-                hideSelfReference={data.uri}
+                hiddenClasses={[
+                  data.uri,
+                  ...(data.equivalentClass?.map((s) => s.uri) ?? []),
+                ]}
               />
             }
             items={data.equivalentClass}
-            label={`${t('corresponding-classes')} (owl:equivalentClass)`}
+            label={`${t('equivalent-classes', {
+              ns: 'common',
+            })} (owl:equivalentClass)`}
+            tooltip={{
+              text: t('tooltip.equivalent-classes', { ns: 'common' }),
+              ariaCloseButtonLabelText: '',
+              ariaToggleButtonLabelText: '',
+            }}
             handleRemoval={(id: string) =>
               handleClassOfRemoval(id, 'equivalentClass')
             }
@@ -617,7 +664,14 @@ export default function ClassForm({
           <>
             {data.node?.curie}
             <InlineListBlock
-              label={`${t('utilizes-class-restriction')} (sh:node)`}
+              label={`${t('utilizes-class-restriction', {
+                ns: 'common',
+              })} (sh:node)`}
+              tooltip={{
+                text: t('tooltip.utilizes-class-restriction', { ns: 'common' }),
+                ariaCloseButtonLabelText: '',
+                ariaToggleButtonLabelText: '',
+              }}
               addNewComponent={
                 <ClassModal
                   modelId={modelId}
@@ -627,7 +681,7 @@ export default function ClassForm({
                   initialSelected={data.node?.uri}
                   applicationProfile
                   limitToModelType="PROFILE"
-                  hideSelfReference={data.uri}
+                  hiddenClasses={[data.uri]}
                 />
               }
               items={data.node ? [data.node] : []}
@@ -647,36 +701,39 @@ export default function ClassForm({
                 applicationProfile={applicationProfile}
                 modalButtonLabel={t('add-disjoint-class')}
                 plusIcon
-                hideSelfReference={data.uri}
+                hiddenClasses={[
+                  data.uri,
+                  ...(data.disjointWith?.map((s) => s.uri) ?? []),
+                ]}
               />
             }
+            tooltip={{
+              text: t('tooltip.disjoint-classes', { ns: 'common' }),
+              ariaCloseButtonLabelText: '',
+              ariaToggleButtonLabelText: '',
+            }}
             items={data.disjointWith}
             handleRemoval={(id) => handleClassOfRemoval(id, 'disjointWith')}
           />
         )}
 
-        <div>
-          <Dropdown
-            labelText={t('status')}
-            defaultValue={data.status}
-            onChange={(e) => handleUpdate({ ...data, status: e as Status })}
-            id="status-dropdown"
-          >
-            {statusList.map((status) => (
-              <DropdownItem key={status} value={status}>
-                {translateStatus(status, t)}
-              </DropdownItem>
-            ))}
-          </Dropdown>
-        </div>
-
         <LanguageVersionedWrapper>
           {languages.map((lang) => (
             <Textarea
               key={`comment-${lang}`}
-              labelText={`${t('technical-description')}, ${lang} ${
+              labelText={`${t('technical-description', {
+                ns: 'common',
+              })}, ${lang} ${
                 applicationProfile ? '(sh:description)' : '(rdfs:comment)'
               }`}
+              tooltipComponent={
+                <Tooltip
+                  ariaCloseButtonLabelText=""
+                  ariaToggleButtonLabelText=""
+                >
+                  {t('tooltip.technical-description', { ns: 'common' })}
+                </Tooltip>
+              }
               optionalText={t('optional')}
               defaultValue={data.note[lang as keyof typeof data.note]}
               onChange={(e) =>
@@ -697,8 +754,8 @@ export default function ClassForm({
         <BasicBlock
           title={
             applicationProfile
-              ? `${t('attributes')} (sh:PropertyShape)`
-              : t('attributes')
+              ? `${t('attributes', { ns: 'common' })} (sh:PropertyShape)`
+              : t('attributes', { ns: 'common' })
           }
         >
           {(!applicationProfile && !isEdit) ||
@@ -740,8 +797,8 @@ export default function ClassForm({
         <BasicBlock
           title={
             applicationProfile
-              ? `${t('associations')} (sh:PropertyShape)`
-              : t('associations')
+              ? `${t('associations', { ns: 'common' })} (sh:PropertyShape)`
+              : t('associations', { ns: 'common' })
           }
         >
           {(!applicationProfile && !isEdit) ||
@@ -762,6 +819,7 @@ export default function ClassForm({
                     classId={data.identifier}
                     applicationProfile={applicationProfile}
                     hasPermission
+                    disableAssocTarget={true}
                     handlePropertiesUpdate={() => {
                       const newAssociations = data.association
                         ? data.association.filter(

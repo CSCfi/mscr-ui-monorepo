@@ -107,7 +107,19 @@ export default function ModelEditView({
     ) {
       setHeaderHeight(ref.current.clientHeight);
     }
-  }, [ref, errors, result, versionedResult]);
+
+    if (
+      ref.current &&
+      headerHeight > ref.current.clientHeight &&
+      (errors
+        ? Object.values(errors).filter((val) => val).length === 0
+        : true) &&
+      !result.isError &&
+      !versionedResult.isError
+    ) {
+      setHeaderHeight(ref.current.clientHeight);
+    }
+  }, [ref, errors, result, versionedResult, headerHeight]);
 
   const handleSubmit = () => {
     setUserPosted(true);
@@ -153,7 +165,7 @@ export default function ModelEditView({
     <>
       <StaticHeader ref={ref}>
         <HeaderRow>
-          <Text variant="bold">{t('details', { ns: 'common' })}</Text>
+          <Text variant="bold">{t('edit-data-model')}</Text>
           <HeaderRow>
             <Button onClick={() => handleSubmit()}>
               {result.isLoading || versionedResult.isLoading ? (

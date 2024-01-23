@@ -14,14 +14,19 @@ export function translateModelType(type: Type, t: TFunction) {
   }
 }
 
-export function translateResourceType(type: ResourceType, t: TFunction) {
+export function translateResourceType(
+  type: ResourceType | string,
+  t: TFunction
+) {
   switch (type) {
     case ResourceType.ASSOCIATION:
+    case 'association':
       return t('association');
     case ResourceType.ATTRIBUTE:
+    case 'attribute':
       return t('attribute');
     default:
-      return t('class');
+      return t('class', { ns: 'common' });
   }
 }
 
@@ -165,6 +170,37 @@ export function translateCommonForm(
       return t('common-view.transitive', { ns: 'common' });
     case 'reflexive':
       return t('common-view.reflexive', { ns: 'common' });
+    default:
+      return '';
+  }
+}
+
+export function translateCommonTooltips(
+  tooltip: string,
+  type: ResourceType,
+  t: TFunction
+) {
+  switch (tooltip) {
+    case 'identifier':
+      return type === ResourceType.ASSOCIATION
+        ? t('tooltip.associations-identifier', { ns: 'common' })
+        : t('tooltip.attributes-identifier', { ns: 'common' });
+    case 'upper':
+      return type === ResourceType.ASSOCIATION
+        ? t('tooltip.upper-associations', { ns: 'common' })
+        : t('tooltip.upper-attributes', { ns: 'common' });
+    case 'equivalent':
+      return type === ResourceType.ASSOCIATION
+        ? t('tooltip.equivalent-associations', { ns: 'common' })
+        : t('tooltip.equivalent-attributes', { ns: 'common' });
+    case 'functional':
+      return type === ResourceType.ASSOCIATION
+        ? t('tooltip.associations-functional', { ns: 'common' })
+        : t('tooltip.attributes-functional', { ns: 'common' });
+    case 'transitive':
+      return t('tooltip.transitive', { ns: 'common' });
+    case 'reflexive':
+      return t('tooltip.reflexive', { ns: 'common' });
     default:
       return '';
   }
@@ -414,9 +450,11 @@ export function translateDrawerButton(
     case 'associations':
       return applicationProfile
         ? t('association-restrictions')
-        : t('associations');
+        : t('associations', { ns: 'common' });
     case 'attributes':
-      return applicationProfile ? t('attribute-restrictions') : t('attributes');
+      return applicationProfile
+        ? t('attribute-restrictions')
+        : t('attributes', { ns: 'common' });
     default:
       return '';
   }
@@ -508,6 +546,157 @@ export function translateNotification(
       return t('link-edited', { ns: 'admin' });
     case 'POSITION_SAVE':
       return t('position-saved', { ns: 'admin' });
+    default:
+      return '';
+  }
+}
+
+export function translateTooltip(key: string, t: TFunction) {
+  switch (key) {
+    case 'graph-tools_zoom-in':
+      return t('graph-tools.zoom-in', { ns: 'common' });
+    case 'graph-tools_zoom-out':
+      return t('graph-tools.zoom-out', { ns: 'common' });
+    case 'graph-tools_fullscreen':
+      return t('graph-tools.fullscreen', { ns: 'common' });
+    case 'graph-tools_reset-positions':
+      return t('graph-tools.reset-positions', { ns: 'common' });
+    case 'graph-tools_zoom-to':
+      return t('graph-tools.zoom-to', { ns: 'common' });
+    case 'graph-tools_save-positions':
+      return t('graph-tools.save-positions', { ns: 'common' });
+    case 'graph-tools_download-picture':
+      return t('graph-tools.download-picture', { ns: 'common' });
+    default:
+      return '';
+  }
+}
+
+export function translatePageTitle(
+  key: string,
+  type: ResourceType,
+  t: TFunction,
+  applicationProfile?: boolean
+) {
+  switch (key) {
+    case 'return-to-list':
+      switch (type) {
+        case 'CLASS':
+          return t('return-to-class-list', { ns: 'common' });
+        case 'ASSOCIATION':
+          return t('return-to-association-list', { ns: 'common' });
+        case 'ATTRIBUTE':
+          return t('return-to-attribute-list', { ns: 'common' });
+        default:
+          return '';
+      }
+    case 'return-to-resource':
+      switch (type) {
+        case 'CLASS':
+          return applicationProfile
+            ? t('return-to-class-restriction', { ns: 'admin' })
+            : t('return-to-class', { ns: 'admin' });
+        case 'ASSOCIATION':
+          return applicationProfile
+            ? t('return-to-association-restriction', { ns: 'admin' })
+            : t('return-to-association', { ns: 'admin' });
+        case 'ATTRIBUTE':
+          return applicationProfile
+            ? t('return-to-attribute-restriction', { ns: 'admin' })
+            : t('return-to-attribute', { ns: 'admin' });
+        default:
+          return '';
+      }
+    case 'edit':
+      switch (type) {
+        case 'CLASS':
+          return applicationProfile
+            ? t('edit-class-restriction', { ns: 'admin' })
+            : t('edit-class', { ns: 'admin' });
+        case 'ASSOCIATION':
+          return applicationProfile
+            ? t('edit-association-restriction', { ns: 'admin' })
+            : t('edit-association', { ns: 'admin' });
+        case 'ATTRIBUTE':
+          return applicationProfile
+            ? t('edit-attribute-restriction', { ns: 'admin' })
+            : t('edit-attribute', { ns: 'admin' });
+        default:
+          return '';
+      }
+    case 'create':
+      switch (type) {
+        case 'CLASS':
+          return applicationProfile
+            ? t('create-class-restriction', { ns: 'admin' })
+            : t('create-class', { ns: 'admin' });
+        case 'ASSOCIATION':
+          return applicationProfile
+            ? t('create-association-restriction', { ns: 'admin' })
+            : t('create-association', { ns: 'admin' });
+        case 'ATTRIBUTE':
+          return applicationProfile
+            ? t('create-attribute-restriction', { ns: 'admin' })
+            : t('create-attribute', { ns: 'admin' });
+        default:
+          return '';
+      }
+    case 'create-sub':
+      switch (type) {
+        case 'CLASS':
+          return t('create-subclass', { ns: 'admin' });
+        case 'ASSOCIATION':
+          return t('create-sub-assocation', { ns: 'admin' });
+        case 'ATTRIBUTE':
+          return t('create-sub-attribute', { ns: 'admin' });
+        default:
+          return '';
+      }
+    default:
+      return '';
+  }
+}
+
+export function translateLinkPlaceholder(key: string, t: TFunction) {
+  switch (key) {
+    case 'link':
+      return t('link-title-placeholder', { ns: 'admin' });
+    case 'image':
+      return t('image-title-placeholder', { ns: 'admin' });
+    default:
+      return '';
+  }
+}
+
+export function translateDocumentationTooltip(key: string, t: TFunction) {
+  switch (key) {
+    case 'bold-button':
+      return t('bold-button-tooltip', { ns: 'admin' });
+    case 'italic-button':
+      return t('italic-button-tooltip', { ns: 'admin' });
+    case 'quote-button':
+      return t('quote-button-tooltip', { ns: 'admin' });
+    case 'list-bulleted-button':
+      return t('list-bulleted-button-tooltip', { ns: 'admin' });
+    case 'list-numbered-button':
+      return t('list-numbered-button-tooltip', { ns: 'admin' });
+    case 'link-button':
+      return t('link-button-tooltip', { ns: 'admin' });
+    case 'image-button':
+      return t('image-button-tooltip', { ns: 'admin' });
+    default:
+      return '';
+  }
+}
+
+export function translateResultType(key: string, t: TFunction) {
+  switch (key) {
+    case 'class':
+      return t('classes', { ns: 'common' });
+    case 'attribute':
+      return t('attributes', { ns: 'common' });
+    case 'association':
+      return t('associations', { ns: 'common' });
     default:
       return '';
   }

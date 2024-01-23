@@ -1,3 +1,5 @@
+const isBrowser = typeof window !== 'undefined';
+
 module.exports = {
   i18n: {
     defaultLocale: 'fi',
@@ -5,4 +7,5 @@ module.exports = {
     localeDetection: false,
   },
   react: { useSuspense: false }, //this line
+  partialBundledLanguages: isBrowser && true,
 };

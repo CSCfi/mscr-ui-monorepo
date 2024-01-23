@@ -1,7 +1,10 @@
 import { ResourceType } from '@app/common/interfaces/resource-type.interface';
 import { Resource } from '@app/common/interfaces/resource.interface';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import { translateCommonForm } from '@app/common/utils/translation-helpers';
+import {
+  translateCommonForm,
+  translateCommonTooltips,
+} from '@app/common/utils/translation-helpers';
 import { useTranslation } from 'next-i18next';
 import {
   Button,
@@ -9,7 +12,6 @@ import {
   IconCopy,
   Link,
   Text,
-  Tooltip,
 } from 'suomifi-ui-components';
 import { BasicBlock } from 'yti-common-ui/block';
 import FormattedDate from 'yti-common-ui/formatted-date';
@@ -22,28 +24,36 @@ import { selectDisplayLang } from '@app/common/components/model/model.slice';
 import { ADMIN_EMAIL } from '@app/common/utils/get-value';
 import { useGetAllCodesQuery } from '@app/common/components/code/code.slice';
 import UriList from '@app/common/components/uri-list';
-import UriInfo from '@app/common/components/uri-info';
+import UriInfo, { getEnvParam } from '@app/common/components/uri-info';
+import ClassModal from '../class-modal';
+import { InternalClassInfo } from '@app/common/interfaces/internal-class.interface';
+import { default as NextLink } from 'next/link';
+import { UriData } from '@app/common/interfaces/uri.interface';
 
 export default function CommonViewContent({
   modelId,
-  hideInUse,
   inUse,
   data,
   displayLabel,
   applicationProfile,
+  disableAssocTarget = false,
   renderActions,
+  handleChangeTarget,
+  targetInClassRestriction,
 }: {
   modelId: string;
-  hideInUse?: boolean;
   inUse?: boolean;
   data: Resource;
   displayLabel?: boolean;
   applicationProfile?: boolean;
+  disableAssocTarget?: boolean;
   renderActions?: () => void;
+  handleChangeTarget?: (value?: InternalClassInfo) => void;
+  targetInClassRestriction?: UriData;
 }) {
   const { t, i18n } = useTranslation('common');
   const hasPermission = HasPermission({
-    actions: ['ADMIN_ASSOCIATION', 'ADMIN_ATTRIBUTE'],
+    actions: ['EDIT_ASSOCIATION', 'EDIT_ATTRIBUTE'],
   });
   const displayLang = useSelector(selectDisplayLang());
   const { data: codesResult } = useGetAllCodesQuery(
@@ -87,45 +97,71 @@ export default function CommonViewContent({
         <>
           {data.type === ResourceType.ASSOCIATION ? (
             <>
-              <BasicBlock title={t('target-association', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('target-association', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.target-association'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 <UriInfo uri={data.path} lang={displayLang} />
               </BasicBlock>
 
-              <BasicBlock title={t('association-targets-class')}>
+              <BasicBlock
+                title={t('association-targets-class')}
+                tooltip={{
+                  text: t('tooltip.association-targets-class'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 <UriInfo uri={data.classType} lang={displayLang} />
               </BasicBlock>
 
-              <BasicBlock title={t('minimum-count')}>
+              <BasicBlock
+                title={t('minimum-count')}
+                tooltip={{
+                  text: t('tooltip.minimum-amount'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.minCount ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('maximum-count')}>
+              <BasicBlock
+                title={t('maximum-count')}
+                tooltip={{
+                  text: t('tooltip.minimum-amount'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.maxCount ?? t('not-defined')}
-              </BasicBlock>
-
-              <BasicBlock title={translateCommonForm('note', data.type, t)}>
-                {getLanguageVersion({
-                  data: data.note,
-                  lang: displayLang ?? i18n.language,
-                }) !== '' ? (
-                  <SanitizedTextContent
-                    text={getLanguageVersion({
-                      data: data.note,
-                      lang: displayLang ?? i18n.language,
-                    })}
-                  />
-                ) : (
-                  t('no-note')
-                )}
               </BasicBlock>
             </>
           ) : (
             <>
-              <BasicBlock title={t('target-attribute', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('target-attribute', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.target-attribute'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 <UriInfo uri={data.path} lang={displayLang} />
               </BasicBlock>
-              <BasicBlock title={t('data-type')}>
-                {data.dataType ?? t('not-defined')}
+              <BasicBlock
+                title={t('data-type')}
+                tooltip={{
+                  text: t('tooltip.data-type'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
+                {data.dataType?.curie ?? t('not-defined')}
               </BasicBlock>
               <Separator />
               <div>
@@ -135,14 +171,24 @@ export default function CommonViewContent({
               <BasicBlock title={t('codelist', { ns: 'admin' })}>
                 {data.codeLists && data.codeLists?.length > 0
                   ? data.codeLists.map((codeList) => (
-                      <Link key={codeList} href={codeList}>
+                      <Link
+                        key={codeList}
+                        href={`${codeList}${getEnvParam(codeList, true)}`}
+                      >
                         {codeList.split('/').slice(-2).join(':')}
                       </Link>
                     ))
                   : t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('allowed-values')}>
+              <BasicBlock
+                title={t('allowed-values', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.allowed-values'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.allowedValues && data.allowedValues.length > 0 ? (
                   <ul
                     style={{ padding: '0', margin: '0', paddingLeft: '20px' }}
@@ -156,56 +202,138 @@ export default function CommonViewContent({
                 )}
               </BasicBlock>
 
-              <BasicBlock title={t('default-value', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('default-value', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.default-value'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.defaultValue
                   ? getCodeListLabel(data.defaultValue)
                   : t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('required-value', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('required-value', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.required-value'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.hasValue
                   ? getCodeListLabel(data.hasValue)
                   : t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('minimum-length', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('minimum-length', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.minimum-length'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.minLength ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('maximum-length', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('maximum-length', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.maximum-length'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.maxLength ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('minimum-amount', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('minimum-count')}
+                tooltip={{
+                  text: t('tooltip.minimum-amount'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.minCount ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('maximum-amount', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('maximum-count')}
+                tooltip={{
+                  text: t('tooltip.maximum-amount'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.maxCount ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('larger-or-as-large-as', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('larger-or-as-large-as', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.larger-or-as-large-as', { ns: 'common' }),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.minInclusive ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('smaller-or-as-small-as', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('smaller-or-as-small-as', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.smaller-or-as-small-as', { ns: 'common' }),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.maxInclusive ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('larger-than', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('larger-than', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.larger-than', { ns: 'common' }),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.minExclusive ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('smaller-than', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('smaller-than', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.smaller-than', { ns: 'common' }),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.maxExclusive ?? t('not-defined')}
               </BasicBlock>
 
-              <BasicBlock title={t('string-attribute-format', { ns: 'admin' })}>
+              <BasicBlock
+                title={t('string-attribute-format', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.string-attribute-format'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
+              >
                 {data.pattern ?? t('not-defined')}
               </BasicBlock>
 
               <BasicBlock
                 title={t('string-attribute-languages', { ns: 'admin' })}
+                tooltip={{
+                  text: t('tooltip.string-attribute-languages'),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
               >
                 {data.languageIn
                   ? data.languageIn.join(', ')
@@ -213,22 +341,6 @@ export default function CommonViewContent({
               </BasicBlock>
 
               <Separator />
-
-              <BasicBlock title={translateCommonForm('note', data.type, t)}>
-                {getLanguageVersion({
-                  data: data.note,
-                  lang: displayLang ?? i18n.language,
-                }) !== '' ? (
-                  <SanitizedTextContent
-                    text={getLanguageVersion({
-                      data: data.note,
-                      lang: displayLang ?? i18n.language,
-                    })}
-                  />
-                ) : (
-                  t('no-note')
-                )}
-              </BasicBlock>
             </>
           )}
         </>
@@ -239,7 +351,14 @@ export default function CommonViewContent({
       <>
         {data.type === ResourceType.ATTRIBUTE && (
           <>
-            <BasicBlock title={t('range', { ns: 'admin' })}>
+            <BasicBlock
+              title={t('data-type')}
+              tooltip={{
+                text: t('tooltip.data-type'),
+                ariaCloseButtonLabelText: '',
+                ariaToggleButtonLabelText: '',
+              }}
+            >
               <UriInfo
                 uri={data.range}
                 lang={displayLang}
@@ -248,7 +367,14 @@ export default function CommonViewContent({
               />
             </BasicBlock>
 
-            <BasicBlock title={`${t('class', { ns: 'admin' })} (rdfs:domain)`}>
+            <BasicBlock
+              title={`${t('class')} (rdfs:domain)`}
+              tooltip={{
+                text: t('tooltip.class'),
+                ariaCloseButtonLabelText: '',
+                ariaToggleButtonLabelText: '',
+              }}
+            >
               <UriInfo
                 uri={data.domain}
                 lang={displayLang}
@@ -260,7 +386,14 @@ export default function CommonViewContent({
 
         {data.type === ResourceType.ASSOCIATION && (
           <>
-            <BasicBlock title={t('source-class', { ns: 'admin' })}>
+            <BasicBlock
+              title={t('associations-source', { ns: 'admin' })}
+              tooltip={{
+                text: t('tooltip.associations-source'),
+                ariaToggleButtonLabelText: '',
+                ariaCloseButtonLabelText: '',
+              }}
+            >
               <UriInfo
                 uri={data.domain}
                 lang={displayLang}
@@ -268,7 +401,14 @@ export default function CommonViewContent({
               />
             </BasicBlock>
 
-            <BasicBlock title={t('target-class', { ns: 'admin' })}>
+            <BasicBlock
+              title={t('associations-target', { ns: 'admin' })}
+              tooltip={{
+                text: t('tooltip.associations-target'),
+                ariaToggleButtonLabelText: '',
+                ariaCloseButtonLabelText: '',
+              }}
+            >
               <UriInfo
                 uri={data.range}
                 lang={displayLang}
@@ -278,7 +418,14 @@ export default function CommonViewContent({
           </>
         )}
 
-        <BasicBlock title={translateCommonForm('upper', data.type, t)}>
+        <BasicBlock
+          title={translateCommonForm('upper', data.type, t)}
+          tooltip={{
+            text: translateCommonTooltips('upper', data.type, t),
+            ariaToggleButtonLabelText: '',
+            ariaCloseButtonLabelText: '',
+          }}
+        >
           {!data.subResourceOf || data.subResourceOf.length === 0 ? (
             <>{translateCommonForm('no-upper', data.type, t)}</>
           ) : (
@@ -286,7 +433,14 @@ export default function CommonViewContent({
           )}
         </BasicBlock>
 
-        <BasicBlock title={translateCommonForm('equivalent', data.type, t)}>
+        <BasicBlock
+          title={translateCommonForm('equivalent', data.type, t)}
+          tooltip={{
+            text: translateCommonTooltips('equivalent', data.type, t),
+            ariaToggleButtonLabelText: '',
+            ariaCloseButtonLabelText: '',
+          }}
+        >
           {!data.equivalentResource || data.equivalentResource.length === 0 ? (
             <>{translateCommonForm('no-equivalent', data.type, t)}</>
           ) : (
@@ -297,17 +451,12 @@ export default function CommonViewContent({
         {!applicationProfile && (
           <>
             <BasicBlock
-              title={
-                <>
-                  {translateCommonForm('functional', data.type, t)}
-                  <Tooltip
-                    ariaToggleButtonLabelText={''}
-                    ariaCloseButtonLabelText={''}
-                  >
-                    <Text>Tooltip sisältö</Text>
-                  </Tooltip>
-                </>
-              }
+              title={translateCommonForm('functional', data.type, t)}
+              tooltip={{
+                text: translateCommonTooltips('functional', data.type, t),
+                ariaCloseButtonLabelText: '',
+                ariaToggleButtonLabelText: '',
+              }}
             >
               {data.functionalProperty ? t('yes') : t('no')}
             </BasicBlock>
@@ -315,32 +464,22 @@ export default function CommonViewContent({
             {data.type === ResourceType.ASSOCIATION && (
               <>
                 <BasicBlock
-                  title={
-                    <>
-                      {translateCommonForm('transitive', data.type, t)}
-                      <Tooltip
-                        ariaToggleButtonLabelText={''}
-                        ariaCloseButtonLabelText={''}
-                      >
-                        <Text>Tooltip sisältö</Text>
-                      </Tooltip>
-                    </>
-                  }
+                  title={translateCommonForm('transitive', data.type, t)}
+                  tooltip={{
+                    text: translateCommonTooltips('transitive', data.type, t),
+                    ariaCloseButtonLabelText: '',
+                    ariaToggleButtonLabelText: '',
+                  }}
                 >
                   {data.transitiveProperty ? t('yes') : t('no')}
                 </BasicBlock>
                 <BasicBlock
-                  title={
-                    <>
-                      {translateCommonForm('reflexive', data.type, t)}
-                      <Tooltip
-                        ariaToggleButtonLabelText={''}
-                        ariaCloseButtonLabelText={''}
-                      >
-                        <Text>Tooltip sisältö</Text>
-                      </Tooltip>
-                    </>
-                  }
+                  title={translateCommonForm('reflexive', data.type, t)}
+                  tooltip={{
+                    text: translateCommonTooltips('reflexive', data.type, t),
+                    ariaCloseButtonLabelText: '',
+                    ariaToggleButtonLabelText: '',
+                  }}
                 >
                   {data.reflexiveProperty ? t('yes') : t('no')}
                 </BasicBlock>
@@ -348,22 +487,6 @@ export default function CommonViewContent({
             )}
           </>
         )}
-
-        <BasicBlock title={translateCommonForm('note', data.type, t)}>
-          {getLanguageVersion({
-            data: data.note,
-            lang: displayLang ?? i18n.language,
-          }) !== '' ? (
-            <SanitizedTextContent
-              text={getLanguageVersion({
-                data: data.note,
-                lang: displayLang ?? i18n.language,
-              })}
-            />
-          ) : (
-            t('no-note')
-          )}
-        </BasicBlock>
       </>
     );
   }
@@ -377,7 +500,14 @@ export default function CommonViewContent({
             justifyContent: 'space-between',
           }}
         >
-          <BasicBlock title={t('in-use-in-this-model', { ns: 'admin' })}>
+          <BasicBlock
+            title={t('in-use-in-this-model', { ns: 'admin' })}
+            tooltip={{
+              text: t('tooltip.in-use-in-this-model'),
+              ariaCloseButtonLabelText: '',
+              ariaToggleButtonLabelText: '',
+            }}
+          >
             {inUse
               ? t('in-use', { ns: 'admin' })
               : t('not-in-use', { ns: 'admin' })}
@@ -385,6 +515,65 @@ export default function CommonViewContent({
           {renderActions && renderActions()}
         </div>
       )}
+
+      {!applicationProfile &&
+        renderActions &&
+        data.type === ResourceType.ASSOCIATION && (
+          <>
+            {renderActions()}
+            <Separator />
+          </>
+        )}
+
+      {!disableAssocTarget &&
+        !applicationProfile &&
+        data.type === ResourceType.ASSOCIATION &&
+        handleChangeTarget && (
+          <>
+            <BasicBlock
+              title={t('association-target-in-this-class', { ns: 'admin' })}
+              largeGap
+              extra={
+                <div
+                  style={{
+                    width: 'max-content',
+                  }}
+                >
+                  <ClassModal
+                    modalButtonLabel={t('choose-association-target', {
+                      ns: 'admin',
+                    })}
+                    mode="select"
+                    handleFollowUp={handleChangeTarget}
+                    modelId={modelId}
+                    applicationProfile={applicationProfile}
+                  />
+                </div>
+              }
+            >
+              {targetInClassRestriction && (
+                <NextLink
+                  href={`${targetInClassRestriction.uri}${getEnvParam(
+                    targetInClassRestriction.uri,
+                    true
+                  )}`}
+                  passHref
+                  legacyBehavior
+                >
+                  <Link href="">
+                    {getLanguageVersion({
+                      data: targetInClassRestriction.label,
+                      lang: displayLang ?? i18n.language,
+                      appendLocale: true,
+                    })}
+                    <br />({targetInClassRestriction.curie})
+                  </Link>
+                </NextLink>
+              )}
+            </BasicBlock>
+            <Separator />
+          </>
+        )}
 
       {displayLabel && (
         <div
@@ -400,11 +589,21 @@ export default function CommonViewContent({
               appendLocale: true,
             })}
           </BasicBlock>
-          {!applicationProfile && renderActions && renderActions()}
+          {!applicationProfile &&
+            renderActions &&
+            data.type === ResourceType.ATTRIBUTE &&
+            renderActions()}
         </div>
       )}
 
-      <BasicBlock title={translateCommonForm('identifier', data.type, t)}>
+      <BasicBlock
+        title={translateCommonForm('identifier', data.type, t)}
+        tooltip={{
+          text: translateCommonTooltips('identifier', data.type, t),
+          ariaCloseButtonLabelText: '',
+          ariaToggleButtonLabelText: '',
+        }}
+      >
         {data.curie}
       </BasicBlock>
 
@@ -427,6 +626,29 @@ export default function CommonViewContent({
       </BasicBlock>
 
       {renderInfoTopPart()}
+
+      <BasicBlock
+        title={translateCommonForm('note', data.type, t)}
+        tooltip={{
+          text: t('tooltip.technical-description'),
+          ariaCloseButtonLabelText: '',
+          ariaToggleButtonLabelText: '',
+        }}
+      >
+        {getLanguageVersion({
+          data: data.note,
+          lang: displayLang ?? i18n.language,
+        }) !== '' ? (
+          <SanitizedTextContent
+            text={getLanguageVersion({
+              data: data.note,
+              lang: displayLang ?? i18n.language,
+            })}
+          />
+        ) : (
+          t('no-note')
+        )}
+      </BasicBlock>
 
       <Separator />
 

@@ -1,6 +1,6 @@
 import { translateLanguage } from '@app/common/utils/translation-helpers';
 import { useTranslation } from 'next-i18next';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Dropdown,
   DropdownItem,
@@ -16,11 +16,12 @@ import { InternalResourcesSearchParams } from '../search-internal-resources/sear
 import ResourceList, { ResultType } from '../resource-list';
 import { DetachedPagination } from 'yti-common-ui/pagination';
 import { compareLocales } from '@app/common/utils/compare-locals';
-import { Status } from '@app/common/interfaces/status.interface';
 import {
   inUseStatusList,
   notInUseStatusList,
+  usedStatusList,
 } from '@app/common/utils/status-list';
+import { Status } from '@app/common/interfaces/status.interface';
 
 interface MultiColumnSearchProps {
   primaryColumnName: string;
@@ -29,12 +30,18 @@ interface MultiColumnSearchProps {
     items: ResultType[];
   };
   selectedId?: string;
-  setSelectedId: (value: string) => void;
+  selectedIds?: string[];
+  setSelectedId?: (value: string) => void;
+  setSelectedIds?: (value: string[]) => void;
   searchParams: InternalResourcesSearchParams;
   setSearchParams: (value: InternalResourcesSearchParams) => void;
   setContentLanguage: (value: string) => void;
   languageVersioned?: boolean;
   multiTypeSelection?: boolean;
+  noDataModelPicker?: boolean;
+  noDraftStatus?: boolean;
+  multiSelect?: boolean;
+  extra?: React.ReactFragment;
   modelId: string;
 }
 
@@ -42,13 +49,19 @@ export default function MultiColumnSearch({
   primaryColumnName,
   result,
   selectedId,
+  selectedIds,
   setSelectedId,
+  setSelectedIds,
   searchParams,
   setSearchParams,
   setContentLanguage,
   languageVersioned,
   modelId,
   multiTypeSelection,
+  multiSelect,
+  extra,
+  noDataModelPicker = false,
+  noDraftStatus = false,
 }: MultiColumnSearchProps) {
   const { t, i18n } = useTranslation('admin');
   const {
@@ -111,8 +124,20 @@ export default function MultiColumnSearch({
   }, [serviceCategoriesResult, serviceCategoriesIsSuccess, t, i18n.language]);
 
   const handleRadioButtonClick = (id: string | string[]) => {
-    const targetId = Array.isArray(id) ? id[0] : id;
-    setSelectedId(selectedId === targetId ? '' : targetId);
+    if (setSelectedId) {
+      const targetId = Array.isArray(id) ? id[0] : id;
+      setSelectedId(selectedId === targetId ? '' : targetId);
+      return;
+    }
+
+    if (setSelectedIds && selectedIds) {
+      const targetId = Array.isArray(id) ? id[0] : id;
+      setSelectedIds(
+        selectedIds.includes(targetId)
+          ? selectedIds.filter((id) => id !== targetId)
+          : [...selectedIds, targetId]
+      );
+    }
   };
 
   const handleAvailableDataModelsChange = (value: string | null) => {
@@ -128,6 +153,7 @@ export default function MultiColumnSearch({
         ...searchParams,
         ['limitToDataModel']: '',
         ['fromAddedNamespaces']: false,
+        ['includeDraftFrom']: [modelId],
         pageFrom: 0,
       });
     }
@@ -145,12 +171,13 @@ export default function MultiColumnSearch({
     }
 
     if (key === 'status') {
-      const setStatuses =
-        value !== '-1'
-          ? value === 'in-use'
-            ? inUseStatusList
-            : notInUseStatusList
-          : [];
+      let setStatuses: Status[] = [];
+
+      if (value === 'in-use') {
+        setStatuses = noDraftStatus ? usedStatusList : inUseStatusList;
+      } else if (value === 'not-in-use') {
+        setStatuses = notInUseStatusList;
+      }
 
       setSearchParams({
         ...searchParams,
@@ -172,7 +199,7 @@ export default function MultiColumnSearch({
 
   return (
     <div>
-      {multiTypeSelection && (
+      {multiTypeSelection && !noDataModelPicker && (
         <div style={{ marginBottom: '20px' }}>
           <SearchInput
             className="wider"
@@ -189,7 +216,7 @@ export default function MultiColumnSearch({
         </div>
       )}
       <SearchToolsBlock>
-        {!multiTypeSelection && (
+        {(!multiTypeSelection || (multiTypeSelection && noDataModelPicker)) && (
           <SearchInput
             className="wider"
             clearButtonLabel={t('clear-keyword-filter')}
@@ -208,10 +235,7 @@ export default function MultiColumnSearch({
             className="data-model-type-picker"
             labelText={t('datamodel-type')}
             defaultValue={'LIBRARY'}
-            onChange={(e) => {
-              setSelectedId('');
-              handleSearchChange('limitToModelType', e);
-            }}
+            onChange={(e) => handleSearchChange('limitToModelType', e)}
             id="data-model-type-picker"
           >
             <DropdownItem value={'LIBRARY'}>
@@ -223,21 +247,23 @@ export default function MultiColumnSearch({
           </Dropdown>
         )}
 
-        <Dropdown
-          className="data-model-picker"
-          labelText={t('data-model')}
-          defaultValue="self"
-          onChange={(item) => {
-            handleAvailableDataModelsChange(item);
-          }}
-          id="data-model-picker"
-        >
-          {dataModelType.map((type) => (
-            <DropdownItem key={type.uniqueItemId} value={type.uniqueItemId}>
-              {type.labelText}
-            </DropdownItem>
-          ))}
-        </Dropdown>
+        {!noDataModelPicker && (
+          <Dropdown
+            className="data-model-picker"
+            labelText={t('data-model')}
+            defaultValue="self"
+            onChange={(item) => {
+              handleAvailableDataModelsChange(item);
+            }}
+            id="data-model-picker"
+          >
+            {dataModelType.map((type) => (
+              <DropdownItem key={type.uniqueItemId} value={type.uniqueItemId}>
+                {type.labelText}
+              </DropdownItem>
+            ))}
+          </Dropdown>
+        )}
 
         <MultiSelect
           labelText={t('information-domain')}
@@ -339,12 +365,17 @@ export default function MultiColumnSearch({
         )}
       </SearchToolsBlock>
 
+      {extra && extra}
+
       <ResourceList
         primaryColumnName={primaryColumnName}
         items={result.items}
-        selected={selectedId}
+        selected={
+          selectedId ? selectedId : selectedIds ? selectedIds : undefined
+        }
         handleClick={handleRadioButtonClick}
         serviceCategories={serviceCategoriesResult}
+        type={multiSelect ? 'multiple-without-global' : 'single'}
         id="search-list"
       />
 

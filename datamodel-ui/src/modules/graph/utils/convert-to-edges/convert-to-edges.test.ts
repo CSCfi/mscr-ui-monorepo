@@ -1,39 +1,46 @@
 import convertToEdges from '.';
 import {
-  dottedEdgeExpected,
-  solidEdgeExpected,
-  visualizationHiddenTypeArray,
-  visualizationTypeArray,
-  withHiddenEdgeExpected,
-} from './convert-to-edges.test.data';
+  expectedLibraryEdges,
+  expectedProfileEdges,
+  libraryData,
+  profileData,
+} from '../visualization-test-data';
 
 describe('convert-to-edges', () => {
-  it('should return an empty array if no associations defined', () => {
-    const returned = convertToEdges([], []);
-
-    expect(returned).toStrictEqual([]);
-  });
-
-  it('should return solid edges', () => {
-    const returned = convertToEdges(visualizationTypeArray(), []);
-
-    expect(returned).toHaveLength(2);
-    expect(returned).toStrictEqual(solidEdgeExpected);
-  });
-
-  it('should return dotted edges', () => {
-    const returned = convertToEdges(visualizationTypeArray(), [], true);
-
-    expect(returned).toHaveLength(2);
-    expect(returned).toStrictEqual(dottedEdgeExpected);
-  });
-
-  it('should return edges with corners', () => {
+  it('should return an empty array if no associations or parent class references defined', () => {
     const returned = convertToEdges(
-      visualizationTypeArray(true),
-      visualizationHiddenTypeArray
+      [],
+      [],
+      (key: string) => key,
+      'modelId',
+      (value: string) => value,
+      false
     );
 
-    expect(returned).toStrictEqual(withHiddenEdgeExpected);
+    expect(returned).toStrictEqual({ edges: [] });
+  });
+
+  it('should return edges for library', () => {
+    const returned = convertToEdges(
+      libraryData.nodes,
+      libraryData.hiddenNodes,
+      (key: string) => key,
+      'modelId',
+      (value: string) => value,
+      false
+    );
+    expect(returned).toStrictEqual(expectedLibraryEdges);
+  });
+
+  it('should return edges for application profile', () => {
+    const returned = convertToEdges(
+      profileData.nodes,
+      profileData.hiddenNodes,
+      (key: string) => key,
+      'modelId',
+      (value: string) => value,
+      true
+    );
+    expect(returned).toStrictEqual(expectedProfileEdges);
   });
 });

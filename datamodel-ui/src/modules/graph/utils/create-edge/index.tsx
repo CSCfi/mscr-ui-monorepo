@@ -1,4 +1,5 @@
 import { EdgeDataType } from '@app/common/interfaces/graph.interface';
+import { ReferenceType } from '@app/common/interfaces/visualization.interface';
 import { Edge, MarkerType } from 'reactflow';
 
 interface CreateEdgeProps {
@@ -8,12 +9,14 @@ interface CreateEdgeProps {
     sourceHandle: string;
     target: string;
     targetHandle: string;
+    referenceType?: ReferenceType;
   };
   applicationProfile?: boolean;
   identifier?: string;
   isCorner?: boolean;
-  label?: { [key: string]: string };
+  label?: { [key: string]: string } | string;
   offsetSource?: number;
+  modelId?: string;
 }
 
 export default function createEdge({
@@ -23,27 +26,29 @@ export default function createEdge({
   isCorner,
   label,
   offsetSource,
+  modelId,
 }: CreateEdgeProps): Edge<EdgeDataType> {
   return {
     ...params,
     type: 'generalEdge',
-    markerEnd: getMarkerEnd(applicationProfile, isCorner),
+    markerEnd: getMarkerEnd(isCorner, params.referenceType),
     data: {
+      ...(modelId ? { modelId: modelId } : {}),
       ...(label ? { label: label } : {}),
       ...(identifier ? { identifier: identifier } : {}),
       ...(offsetSource ? { offsetSource: offsetSource } : {}),
       ...(applicationProfile ? { applicationProfile: true } : {}),
     },
-    ...getAdditionalStyles(applicationProfile),
+    ...getAdditionalStyles(params.referenceType),
   };
 }
 
-function getMarkerEnd(applicationProfile?: boolean, isCorner?: boolean) {
+function getMarkerEnd(isCorner?: boolean, referenceType?: ReferenceType) {
   if (isCorner) {
     return undefined;
   }
 
-  if (applicationProfile) {
+  if (referenceType === 'PARENT_CLASS') {
     return 'clearArrow';
   }
 
@@ -55,15 +60,13 @@ function getMarkerEnd(applicationProfile?: boolean, isCorner?: boolean) {
   };
 }
 
-function getAdditionalStyles(applicationProfile?: boolean) {
-  if (!applicationProfile) {
-    return undefined;
-  }
-
-  return {
-    style: {
-      strokeDasharray: '4 2',
-      stroke: '#235A9A',
-    },
-  };
+function getAdditionalStyles(referenceType?: ReferenceType) {
+  return referenceType === 'PARENT_CLASS'
+    ? {
+        style: {
+          strokeDasharray: '4 2',
+          stroke: '#235A9A',
+        },
+      }
+    : {};
 }

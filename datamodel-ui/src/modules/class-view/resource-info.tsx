@@ -1,14 +1,13 @@
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import {
-  Button,
   Expander,
   ExpanderContent,
   ExpanderTitleButton,
-  Tooltip,
   IconCheckCircle,
   IconDisabled,
-  IconOptionsVertical,
   InlineAlert,
+  ActionMenu,
+  ActionMenuItem,
 } from 'suomifi-ui-components';
 import { useTranslation } from 'next-i18next';
 import {
@@ -16,7 +15,6 @@ import {
   useGetResourceQuery,
 } from '@app/common/components/resource/resource.slice';
 import CommonViewContent from '@app/modules/common-view-content';
-import { TooltipWrapper } from '../model/model.styles';
 import { setSelected, setView } from '@app/common/components/model/model.slice';
 import { useStoreDispatch } from '@app/store';
 import { resourceToResourceFormType } from '../resource/utils';
@@ -27,12 +25,12 @@ import {
   SecondaryTextWrapper,
 } from './resource-info-styles';
 import { SimpleResource } from '@app/common/interfaces/simple-resource.interface';
-import ClassModal from '../class-modal';
 import { InternalClassInfo } from '@app/common/interfaces/internal-class.interface';
 import { UriData } from '@app/common/interfaces/uri.interface';
 import { useUpdateClassResrictionTargetMutation } from '@app/common/components/class/class.slice';
 import getApiError from '@app/common/utils/get-api-errors';
 import { useEffect, useState } from 'react';
+import ResourceError from '@app/common/components/resource-error';
 
 interface ResourceInfoProps {
   data: SimpleResource;
@@ -41,9 +39,10 @@ interface ResourceInfoProps {
   hasPermission: boolean;
   applicationProfile?: boolean;
   attribute?: boolean;
-  handlePropertiesUpdate: () => void;
+  handlePropertiesUpdate?: () => void;
   disableEdit?: boolean;
   targetInClassRestriction?: UriData;
+  disableAssocTarget?: boolean;
 }
 
 export default function ResourceInfo({
@@ -56,13 +55,17 @@ export default function ResourceInfo({
   handlePropertiesUpdate,
   disableEdit,
   targetInClassRestriction,
+  disableAssocTarget,
 }: ResourceInfoProps) {
   const { t, i18n } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const dispatch = useStoreDispatch();
-  const [showTooltip, setShowTooltip] = useState(false);
 
-  const { data: resourceData, isSuccess } = useGetResourceQuery(
+  const {
+    data: resourceData,
+    isSuccess,
+    isError,
+  } = useGetResourceQuery(
     {
       modelId: data.modelId,
       resourceIdentifier: data.identifier,
@@ -90,11 +93,10 @@ export default function ResourceInfo({
       currentTarget: targetInClassRestriction?.uri,
       newTarget: newTarget?.id,
     });
-    setShowTooltip(false);
   };
 
   useEffect(() => {
-    if (updateResult.isSuccess) {
+    if (handlePropertiesUpdate && updateResult.isSuccess) {
       handlePropertiesUpdate();
     }
   }, [updateResult, handlePropertiesUpdate]);
@@ -142,65 +144,36 @@ export default function ResourceInfo({
         {!disableEdit &&
           hasPermission &&
           (!applicationProfile || modelId === data.modelId) && (
-            <div>
-              <Button
-                variant="secondary"
-                iconRight={<IconOptionsVertical />}
-                onClick={() => setShowTooltip(!showTooltip)}
-              >
-                {t('actions')}
-              </Button>
-              <TooltipWrapper id="actions-tooltip">
-                <Tooltip
-                  ariaCloseButtonLabelText=""
-                  ariaToggleButtonLabelText=""
-                  open={showTooltip}
-                  onCloseButtonClick={() => setShowTooltip(false)}
-                >
-                  {modelId === data.modelId && (
-                    <Button
-                      variant="secondaryNoBorder"
-                      onClick={handleEdit}
-                      id="edit-reference-button"
-                    >
-                      {t('edit', { ns: 'admin' })}
-                    </Button>
-                  )}
-                  {!applicationProfile && !attribute && (
-                    <ClassModal
-                      modalButtonLabel={t('choose-association-target', {
-                        ns: 'admin',
-                      })}
-                      mode="select"
-                      handleFollowUp={handleChangeTarget}
-                      modelId={modelId}
-                      applicationProfile={applicationProfile}
-                      buttonVariant="secondaryNoBorder"
-                    />
-                  )}
-                  {(!data.fromShNode || !applicationProfile) && (
-                    <RemoveReferenceModal
-                      modelId={modelId}
-                      classId={classId}
-                      uri={data.uri}
-                      handleReturn={handlePropertiesUpdate}
-                      name={getLanguageVersion({
-                        data: data.label,
-                        lang: i18n.language,
-                        appendLocale: true,
-                      })}
-                      applicationProfile={applicationProfile}
-                      resourceType={
-                        attribute
-                          ? ResourceType.ATTRIBUTE
-                          : ResourceType.ASSOCIATION
-                      }
-                      currentTarget={targetInClassRestriction?.uri}
-                    />
-                  )}
-                </Tooltip>
-              </TooltipWrapper>
-            </div>
+            <ActionMenu id="actions-menu" buttonText={t('actions')}>
+              {modelId === data.modelId ? (
+                <ActionMenuItem onClick={handleEdit}>
+                  {t('edit', { ns: 'admin' })}
+                </ActionMenuItem>
+              ) : (
+                <></>
+              )}
+              {!data.fromShNode || !applicationProfile ? (
+                <RemoveReferenceModal
+                  modelId={modelId}
+                  classId={classId}
+                  uri={data.uri}
+                  name={getLanguageVersion({
+                    data: data.label,
+                    lang: i18n.language,
+                    appendLocale: true,
+                  })}
+                  applicationProfile={applicationProfile}
+                  resourceType={
+                    attribute
+                      ? ResourceType.ATTRIBUTE
+                      : ResourceType.ASSOCIATION
+                  }
+                  currentTarget={targetInClassRestriction?.uri}
+                />
+              ) : (
+                <></>
+              )}
+            </ActionMenu>
           )}
       </>
     );
@@ -215,6 +188,7 @@ export default function ResourceInfo({
         </InlineAlert>
       )}
       <ExpanderContent>
+        {isError && <ResourceError noHeader={true} />}
         {isSuccess && (
           <CommonViewContent
             data={resourceData}
@@ -222,7 +196,10 @@ export default function ResourceInfo({
             displayLabel
             inUse={!data.deactivated}
             applicationProfile={applicationProfile}
+            disableAssocTarget={disableAssocTarget}
             renderActions={renderActions}
+            handleChangeTarget={handleChangeTarget}
+            targetInClassRestriction={targetInClassRestriction}
           />
         )}
       </ExpanderContent>

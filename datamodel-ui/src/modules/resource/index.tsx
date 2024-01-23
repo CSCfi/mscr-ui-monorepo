@@ -43,6 +43,8 @@ import useSetPage from '@app/common/utils/hooks/use-set-page';
 import { useReactFlow } from 'reactflow';
 import getConnectedElements from '../graph/utils/get-connected-elements';
 import { UriData } from '@app/common/interfaces/uri.interface';
+import ResourceError from '@app/common/components/resource-error';
+import { SUOMI_FI_NAMESPACE } from '@app/common/utils/get-value';
 
 interface ResourceViewProps {
   modelId: string;
@@ -80,7 +82,7 @@ export default function ResourceView({
   const { setPage, getPage } = useSetPage();
   const { getNodes, getEdges } = useReactFlow();
   const displayLang = useSelector(selectDisplayLang());
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(hasPermission ? 112 : 97);
   const [currentPage, setCurrentPage] = useState(getPage());
   const [query, setQuery] = useState('');
 
@@ -93,12 +95,16 @@ export default function ResourceView({
     fromVersion: version,
   });
 
-  const { data: resourceData, refetch: refetchResource } = useGetResourceQuery(
+  const {
+    data: resourceData,
+    refetch: refetchResource,
+    isError: resourceIsError,
+  } = useGetResourceQuery(
     {
       modelId: globalSelected.modelId ?? modelId,
       resourceIdentifier: globalSelected.id ?? '',
       applicationProfile,
-      version: version,
+      version: globalSelected.version ?? version,
     },
     {
       skip:
@@ -110,11 +116,12 @@ export default function ResourceView({
   const { data: inUse, refetch: refetchInUse } = useGetResourceActiveQuery(
     {
       prefix: modelId,
-      uri: `http://uri.suomi.fi/datamodel/ns/${globalSelected.modelId}/${globalSelected.id}`,
+      uri: `${SUOMI_FI_NAMESPACE}${globalSelected.modelId}/${globalSelected.id}`,
       version: version,
     },
     {
-      skip: !globalSelected.id || !globalSelected.modelId,
+      skip:
+        !globalSelected.id || !globalSelected.modelId || !applicationProfile,
     }
   );
 
@@ -188,7 +195,7 @@ export default function ResourceView({
   };
 
   const handleFollowUp = (value?: UriData) => {
-    dispatch(initializeResource(type, languages, value, applicationProfile));
+    dispatch(initializeResource(type, value, applicationProfile));
 
     setView(
       type === ResourceType.ASSOCIATION ? 'associations' : 'attributes',
@@ -326,9 +333,14 @@ export default function ResourceView({
   }
 
   function renderInfo() {
-    if (!view.info || !resourceData) {
+    if (!view.info) {
       return <></>;
     }
+
+    if (resourceIsError) {
+      return <ResourceError handleReturn={handleReturn} />;
+    }
+
     return (
       <ResourceInfo
         data={resourceData}

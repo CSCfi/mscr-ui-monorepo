@@ -1,4 +1,3 @@
-import { HYDRATE } from 'next-redux-wrapper';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
 import { ClassType } from '@app/common/interfaces/class.interface';
@@ -22,12 +21,7 @@ interface ClassData {
 export const classApi = createApi({
   reducerPath: 'classApi',
   baseQuery: getDatamodelApiBaseQuery(),
-  tagTypes: ['classApi'],
-  extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === HYDRATE) {
-      return action.payload[reducerPath];
-    }
-  },
+  tagTypes: ['Class'],
   endpoints: (builder) => ({
     updateClass: builder.mutation<string, ClassData>({
       query: (value) => ({
@@ -42,6 +36,7 @@ export const classApi = createApi({
           value.basedOnNodeShape
         ),
       }),
+      invalidatesTags: ['Class'],
     }),
     createClass: builder.mutation<null, ClassData>({
       query: (value) => ({
@@ -77,17 +72,7 @@ export const classApi = createApi({
         },
         method: 'GET',
       }),
-    }),
-    getClassMut: builder.mutation<
-      ClassType,
-      { modelId: string; classId: string; applicationProfile?: boolean }
-    >({
-      query: (value) => ({
-        url: `/class/${pathForModelType(value.applicationProfile)}${
-          value.modelId
-        }/${value.classId}`,
-        method: 'GET',
-      }),
+      providesTags: ['Class'],
     }),
     getNodeShapes: builder.query<InternalClassInfo[], string>({
       query: (targetClass) => ({
@@ -136,6 +121,7 @@ export const classApi = createApi({
         },
         method: 'PUT',
       }),
+      invalidatesTags: ['Class'],
     }),
     deletePropertyReference: builder.mutation<
       string,
@@ -157,6 +143,7 @@ export const classApi = createApi({
         },
         method: 'DELETE',
       }),
+      invalidatesTags: ['Class'],
     }),
     updateClassResrictionTarget: builder.mutation<
       string,
@@ -177,6 +164,7 @@ export const classApi = createApi({
         },
         method: 'PUT',
       }),
+      invalidatesTags: ['Class'],
     }),
     renameClass: builder.mutation<
       string,
@@ -193,6 +181,7 @@ export const classApi = createApi({
         },
         method: 'POST',
       }),
+      invalidatesTags: ['Class'],
     }),
   }),
 });
@@ -226,7 +215,6 @@ export const {
   useUpdateClassMutation,
   useCreateClassMutation,
   useGetClassQuery,
-  useGetClassMutMutation,
   useGetNodeShapesQuery,
   useDeleteClassMutation,
   useGetClassExistsQuery,
@@ -237,5 +225,4 @@ export const {
   util: { getRunningQueriesThunk },
 } = classApi;
 
-export const { updateClass, createClass, getClass, getClassMut } =
-  classApi.endpoints;
+export const { updateClass, createClass, getClass } = classApi.endpoints;

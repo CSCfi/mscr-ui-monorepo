@@ -1,5 +1,4 @@
 const { i18n } = require('./next-i18next.config');
-const withTM = require('next-transpile-modules')(['../common-ui']);
 
 module.exports = () => {
   let config = {
@@ -20,16 +19,18 @@ module.exports = () => {
       ],
     },
     i18n,
+    transpilePackages: ['common-ui'],
     async headers() {
       const isProd = process.env.NODE_ENV === 'production';
+      const matomoUrl = process.env.MATOMO_URL ?? '';
 
       const ProductionContentSecurityPolicy = [
         "base-uri 'self';",
         "default-src 'self';",
         "font-src 'self';",
         "img-src 'self' data:;",
-        "script-src 'self' 'unsafe-inline';",
-        "connect-src 'self';",
+        `script-src 'self' 'unsafe-inline' ${matomoUrl};`,
+        `connect-src 'self' ${matomoUrl};`,
         "style-src 'self' 'unsafe-inline' data:;",
         "frame-src 'self';",
       ];
@@ -39,8 +40,8 @@ module.exports = () => {
         "default-src 'self';",
         "font-src 'self';",
         "img-src 'self' 'unsafe-eval' 'unsafe-inline' data:;",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
-        "connect-src 'self';",
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${matomoUrl};`,
+        `connect-src 'self' ${matomoUrl};`,
         "style-src 'self' 'unsafe-inline' data:;",
         "frame-src 'self';",
       ];
@@ -142,5 +143,5 @@ module.exports = () => {
     };
   }
 
-  return withTM(config);
+  return config;
 };

@@ -9,6 +9,7 @@ import {
   IconAttachment,
   IconImage,
   Text,
+  Tooltip,
 } from 'suomifi-ui-components';
 import DrawerContent from 'yti-common-ui/drawer/drawer-content-wrapper';
 import StaticHeader from 'yti-common-ui/drawer/static-header';
@@ -19,10 +20,14 @@ import {
   FullWidthTextarea,
   LanguageSelectorBtn,
   LanguageSelectorWrapper,
+  TipTooltipWrapper,
 } from './documentation.styles';
 import { useTranslation } from 'next-i18next';
 import {
+  selectDisplayGraphHasChanges,
   selectDisplayLang,
+  selectGraphHasChanges,
+  setDisplayGraphHasChanges,
   setHasChanges,
   useGetModelQuery,
   useUpdateModelMutation,
@@ -32,7 +37,10 @@ import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import generatePayloadUpdate, {
   generatePayloadVersionedUpdate,
 } from '../model/generate-payload';
-import { translateLanguage } from '@app/common/utils/translation-helpers';
+import {
+  translateDocumentationTooltip,
+  translateLanguage,
+} from '@app/common/utils/translation-helpers';
 import FormattedDate from 'yti-common-ui/formatted-date';
 import { compareLocales } from '@app/common/utils/compare-locals';
 import {
@@ -55,6 +63,8 @@ import { HeaderRow, StyledSpinner } from '@app/common/components/header';
 import Image from 'next/image';
 import { IconBold, IconItalics, IconQuotes } from 'suomifi-icons';
 import HasPermission from '@app/common/utils/has-permission';
+import UnsavedAlertModal from '../unsaved-alert-modal';
+import { useBreakpoints } from 'yti-common-ui/media-query';
 
 export default function Documentation({
   modelId,
@@ -68,6 +78,7 @@ export default function Documentation({
   organizationIds?: string[];
 }) {
   const { t, i18n } = useTranslation('admin');
+  const { breakpoint } = useBreakpoints();
   const hasPermission = HasPermission({
     actions: 'EDIT_DATA_MODEL',
     targetOrganization: organizationIds,
@@ -78,9 +89,22 @@ export default function Documentation({
   const dispatch = useStoreDispatch();
   const textAreaRef = createRef<HTMLTextAreaElement>();
   const displayLang = useSelector(selectDisplayLang());
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const displayGraphHasChanges = useSelector(selectDisplayGraphHasChanges());
+  const graphHasChanges = useSelector(selectGraphHasChanges());
+  const [headerHeight, setHeaderHeight] = useState(hasPermission ? 57 : 42);
   const [value, setValue] = useState<{ [key: string]: string }>({});
   const [isEdit, setIsEdit] = useState(false);
+  const [updateSelectionPosition, setUpdateSelectionPosition] = useState<{
+    update: boolean;
+    startOffset: number;
+    endOffset: number;
+  }>({
+    update: false,
+    startOffset: 0,
+    endOffset: 0,
+  });
+  const [hoverRef, setHoverRef] = useState<HTMLButtonElement | null>(null);
+  const [showHover, setShowHover] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(
     languages.sort((a, b) => compareLocales(a, b))[0]
   );
@@ -93,7 +117,7 @@ export default function Documentation({
     end: 0,
   });
 
-  const { data: modelData, refetch } = useGetModelQuery({
+  const { data: modelData } = useGetModelQuery({
     modelId: modelId,
     version: version,
   });
@@ -120,13 +144,16 @@ export default function Documentation({
       ?.match(/width:[0-9]+px/g)?.[0]
       ?.split(':')?.[1]
       ?.replace('px', '');
+    const altText = props.alt
+      ? props.alt.replaceAll(/(width|height):[0-9]*px/g, '').trim()
+      : 'Image alt text';
 
     return (
       <Image
         src={src.startsWith('https://') ? src : ''}
-        alt={'Markdown image'}
-        width={width ?? 350}
-        height={height ?? 190}
+        alt={altText}
+        width={width ? parseInt(width) : 350}
+        height={height ? parseInt(height) : 190}
       />
     );
   };
@@ -188,15 +215,52 @@ export default function Documentation({
 
   const handleButtonClick = (key: string) => {
     const addNewLine = getAddNewLine(value[currentLanguage], selection.start);
-    const elem = getSpecialCharacters(key, addNewLine);
+    const selectionData =
+      ['link', 'image'].includes(key) && selection.start !== selection.end
+        ? value[currentLanguage].substring(selection.start, selection.end)
+        : undefined;
+    const elem = getSpecialCharacters(key, addNewLine, t, selectionData);
 
     handleUpdate({
       ...value,
       [currentLanguage]: injectSpecialCharacters(
         value[currentLanguage],
         selection,
-        elem
+        elem,
+        selectionData ? true : false
       ),
+    });
+
+    textAreaRef.current?.focus();
+
+    let startOffset = 0;
+    let endOffset = 0;
+
+    switch (key) {
+      case 'italic':
+      case 'link':
+        startOffset = 1;
+        endOffset = 1;
+        break;
+      case 'bold':
+      case 'listBulleted':
+      case 'quote':
+      case 'image':
+        startOffset = 2;
+        endOffset = 2;
+        break;
+      case 'listNumbered':
+        startOffset = 3;
+        endOffset = 3;
+        break;
+      default:
+        break;
+    }
+
+    setUpdateSelectionPosition({
+      update: true,
+      startOffset: startOffset,
+      endOffset: endOffset,
     });
   };
 
@@ -248,6 +312,15 @@ export default function Documentation({
     }
   };
 
+  const handleIsEdit = () => {
+    if (graphHasChanges) {
+      dispatch(setDisplayGraphHasChanges(true));
+      return;
+    }
+
+    setIsEdit(true);
+  };
+
   useEffect(() => {
     if (ref.current) {
       setHeaderHeight(ref.current.clientHeight);
@@ -280,10 +353,9 @@ export default function Documentation({
     if (result.isSuccess || versionedResult.isSuccess) {
       setIsEdit(false);
       disableConfirmation();
-      refetch();
       dispatch(setNotification('DOCUMENTATION_EDIT'));
     }
-  }, [result, versionedResult, refetch, disableConfirmation, dispatch]);
+  }, [result, versionedResult, disableConfirmation, dispatch]);
 
   useEffect(() => {
     if (!textAreaRef.current) {
@@ -302,11 +374,41 @@ export default function Documentation({
     }
   }, [realignCursor, selection.start, textAreaRef]);
 
+  useEffect(() => {
+    if (updateSelectionPosition.update && textAreaRef.current) {
+      textAreaRef.current.setSelectionRange(
+        selection.start + updateSelectionPosition.startOffset,
+        selection.end + updateSelectionPosition.endOffset
+      );
+      setUpdateSelectionPosition({
+        update: false,
+        startOffset: 0,
+        endOffset: 0,
+      });
+    }
+  }, [updateSelectionPosition, textAreaRef, selection.start, selection.end]);
+
+  useEffect(() => {
+    if (hoverRef) {
+      const timer = setTimeout(() => {
+        setShowHover(true);
+      }, 750);
+
+      return () => clearTimeout(timer);
+    }
+
+    if (!hoverRef) {
+      setShowHover(false);
+    }
+  }, [hoverRef]);
+
   return (
     <>
       <StaticHeader ref={ref}>
         <HeaderRow>
-          <Text variant="bold">{t('documentation')}</Text>
+          <Text variant="bold">
+            {!isEdit ? t('documentation') : t('edit-documentation')}
+          </Text>
 
           {hasPermission &&
             (isEdit ? (
@@ -316,7 +418,14 @@ export default function Documentation({
                   gap: '15px',
                 }}
               >
-                <Button onClick={() => handleSubmit()} id="submit-button">
+                <Button
+                  onClick={() => handleSubmit()}
+                  id={
+                    result.isLoading || versionedResult.isLoading
+                      ? 'submit-button_submitted'
+                      : 'submit-button'
+                  }
+                >
                   {result.isLoading || versionedResult.isLoading ? (
                     <div role="alert">
                       <StyledSpinner
@@ -340,7 +449,7 @@ export default function Documentation({
             ) : (
               <Button
                 variant="secondary"
-                onClick={() => setIsEdit(true)}
+                onClick={() => handleIsEdit()}
                 id="edit-button"
               >
                 {t('edit')}
@@ -349,6 +458,10 @@ export default function Documentation({
         </HeaderRow>
       </StaticHeader>
 
+      <UnsavedAlertModal
+        visible={displayGraphHasChanges}
+        handleFollowUp={() => setIsEdit(true)}
+      />
       {renderView()}
       {renderEdit()}
     </>
@@ -427,48 +540,79 @@ export default function Documentation({
                   onClick={() => handleButtonClick('bold')}
                   id="bold-button"
                   icon={<IconBold />}
+                  onMouseEnter={(ref) => setHoverRef(ref.currentTarget)}
+                  onMouseLeave={() => setHoverRef(null)}
                 />
                 <ControlButton
                   variant="secondary"
                   onClick={() => handleButtonClick('italic')}
                   id="italic-button"
                   icon={<IconItalics />}
+                  onMouseEnter={(ref) => setHoverRef(ref.currentTarget)}
+                  onMouseLeave={() => setHoverRef(null)}
                 />
                 <ControlButton
                   variant="secondary"
                   onClick={() => handleButtonClick('quote')}
                   id="quote-button"
                   icon={<IconQuotes />}
+                  onMouseEnter={(ref) => setHoverRef(ref.currentTarget)}
+                  onMouseLeave={() => setHoverRef(null)}
                 />
                 <ControlButton
                   variant="secondary"
                   onClick={() => handleButtonClick('listBulleted')}
                   id="list-bulleted-button"
                   icon={<IconListBulleted />}
+                  onMouseEnter={(ref) => setHoverRef(ref.currentTarget)}
+                  onMouseLeave={() => setHoverRef(null)}
                 />
                 <ControlButton
                   variant="secondary"
                   onClick={() => handleButtonClick('listNumbered')}
                   id="list-numbered-button"
                   icon={<IconListNumbered />}
+                  onMouseEnter={(ref) => setHoverRef(ref.currentTarget)}
+                  onMouseLeave={() => setHoverRef(null)}
                 />
                 <ControlButton
                   variant="secondary"
                   onClick={() => handleButtonClick('link')}
                   id="link-button"
                   icon={<IconAttachment />}
+                  onMouseEnter={(ref) => setHoverRef(ref.currentTarget)}
+                  onMouseLeave={() => setHoverRef(null)}
                 />
                 <ControlButton
                   variant="secondary"
                   onClick={() => handleButtonClick('image')}
                   id="image-button"
                   icon={<IconImage />}
+                  onMouseEnter={(ref) => setHoverRef(ref.currentTarget)}
+                  onMouseLeave={() => setHoverRef(null)}
                 />
               </div>
               <HintText>
-                {value[currentLanguage]?.length ?? 0} / 5000 {t('characters')}
+                {value[currentLanguage]?.length ?? 0} / 50000 {t('characters')}
               </HintText>
             </ControlsRow>
+
+            {hoverRef && (
+              <TipTooltipWrapper
+                $x={hoverRef && hoverRef.getBoundingClientRect().x}
+                $y={hoverRef && hoverRef.getBoundingClientRect().y}
+                breakpoint$={breakpoint}
+              >
+                <Tooltip
+                  ariaCloseButtonLabelText=""
+                  ariaToggleButtonLabelText=""
+                  anchorElement={hoverRef}
+                  open={showHover}
+                >
+                  {translateDocumentationTooltip(hoverRef.id, t)}
+                </Tooltip>
+              </TipTooltipWrapper>
+            )}
 
             <FullWidthTextarea
               ref={textAreaRef}

@@ -2,7 +2,7 @@ import InlineListBlock from '@app/common/components/inline-list-block';
 import { ResourceFormType } from '@app/common/interfaces/resource-form.interface';
 import { ResourceType } from '@app/common/interfaces/resource-type.interface';
 import { useTranslation } from 'next-i18next';
-import { TextInput } from 'suomifi-ui-components';
+import { TextInput, Tooltip } from 'suomifi-ui-components';
 import ResourceModal from '../../resource-modal';
 import ClassModal from '@app/modules/class-modal';
 import { TEXT_INPUT_MAX } from 'yti-common-ui/utils/constants';
@@ -65,11 +65,18 @@ export default function AssociationRestrictions({
               }
               buttonIcon={true}
               applicationProfile={applicationProfile}
+              hiddenResources={[data.uri]}
             />
           }
-          handleRemoval={() => handleUpdate('path', undefined)}
+          deleteDisabled={true}
+          handleRemoval={() => null}
           items={data.path ? [data.path] : []}
           label={`${t('target-association')} (sh:path)`}
+          tooltip={{
+            text: t('tooltip.target-association', { ns: 'common' }),
+            ariaCloseButtonLabelText: '',
+            ariaToggleButtonLabelText: '',
+          }}
         />
 
         <InlineListBlock
@@ -99,21 +106,36 @@ export default function AssociationRestrictions({
           label={`${t('association-targets-class', {
             ns: 'common',
           })} (sh:class)`}
+          tooltip={{
+            text: t('tooltip.association-targets-class', { ns: 'common' }),
+            ariaCloseButtonLabelText: '',
+            ariaToggleButtonLabelText: '',
+          }}
           optionalText={t('optional')}
         />
 
         <TextInputWrapper>
           <TextInput
-            labelText={`${t('minimum-amount')} (sh:minCount)`}
+            labelText={`${t('minimum-count', { ns: 'common' })} (sh:minCount)`}
             optionalText={t('optional')}
+            tooltipComponent={
+              <Tooltip ariaCloseButtonLabelText="" ariaToggleButtonLabelText="">
+                {t('tooltip.minimum-amount', { ns: 'common' })}
+              </Tooltip>
+            }
             defaultValue={data.minCount?.toString() ?? ''}
             onChange={(e) => handleUpdate('minCount', e?.toString() ?? '')}
             maxLength={TEXT_INPUT_MAX}
           />
 
           <TextInput
-            labelText={`${t('maximum-amount')} (sh:maxCount)`}
+            labelText={`${t('maximum-count', { ns: 'common' })} (sh:maxCount)`}
             optionalText={t('optional')}
+            tooltipComponent={
+              <Tooltip ariaCloseButtonLabelText="" ariaToggleButtonLabelText="">
+                {t('tooltip.maximum-amount', { ns: 'common' })}
+              </Tooltip>
+            }
             defaultValue={data.maxCount?.toString() ?? ''}
             onChange={(e) => handleUpdate('maxCount', e?.toString() ?? '')}
             maxLength={TEXT_INPUT_MAX}

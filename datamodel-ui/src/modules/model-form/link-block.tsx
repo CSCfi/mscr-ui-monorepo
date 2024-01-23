@@ -1,5 +1,4 @@
 import { ModelFormType } from '@app/common/interfaces/model-form.interface';
-import { Link } from '@app/common/interfaces/model.interface';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import {
@@ -105,7 +104,9 @@ export default function LinkBlock({
                       />
                       <Textarea
                         key={`link-description-${lang.uniqueItemId}`}
-                        labelText={`${t('description')}, ${lang.uniqueItemId}`}
+                        labelText={`${t('description', { ns: 'common' })}, ${
+                          lang.uniqueItemId
+                        }`}
                         optionalText={t('optional')}
                         defaultValue={link.description[lang.uniqueItemId]}
                         onBlur={(e) =>

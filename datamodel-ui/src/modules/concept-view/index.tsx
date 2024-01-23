@@ -1,3 +1,4 @@
+import { getEnvParam } from '@app/common/components/uri-info';
 import { ConceptType } from '@app/common/interfaces/concept-interface';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { translateStatus } from '@app/common/utils/translation-helpers';
@@ -38,7 +39,7 @@ export default function ConceptView({
         </ExpanderTitleButton>
         <ExpanderContent>
           {data.definition && Object.keys(data.definition).length !== 0 && (
-            <Paragraph marginBottomSpacing="m">
+            <Paragraph mb="m">
               <SanitizedTextContent
                 text={getLanguageVersion({
                   data: data.definition,
@@ -49,9 +50,9 @@ export default function ConceptView({
             </Paragraph>
           )}
           <Heading variant="h4">{t('concept')}</Heading>
-          <Paragraph marginBottomSpacing="m">
+          <Paragraph mb="m">
             <ExternalLink
-              href={data.conceptURI}
+              href={`${data.conceptURI}${getEnvParam(data.conceptURI, true)}`}
               labelNewWindow={t('link-opens-new-window-external')}
             >
               {getLanguageVersion({
@@ -65,14 +66,15 @@ export default function ConceptView({
           <Separator />
 
           <Heading variant="h4">{t('concept-status')}</Heading>
-          <Paragraph marginBottomSpacing="m">
-            {translateStatus(data.status, t)}
-          </Paragraph>
+          <Paragraph mb="m">{translateStatus(data.status, t)}</Paragraph>
 
           <Heading variant="h4">{t('terminology')}</Heading>
           <Paragraph>
             <ExternalLink
-              href={data.terminology?.uri}
+              href={`${data.terminology.uri}${getEnvParam(
+                data.terminology.uri,
+                true
+              )}`}
               labelNewWindow={t('link-opens-new-window-external')}
             >
               {getLanguageVersion({

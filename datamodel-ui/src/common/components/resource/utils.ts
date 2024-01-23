@@ -1,6 +1,5 @@
 import { ResourceFormType } from '@app/common/interfaces/resource-form.interface';
 import { ResourceType } from '@app/common/interfaces/resource-type.interface';
-import { Status } from '@app/common/interfaces/status.interface';
 import { UriData } from '@app/common/interfaces/uri.interface';
 
 export interface LibraryResourcePutType {
@@ -8,12 +7,12 @@ export interface LibraryResourcePutType {
     [key: string]: string;
   };
   identifier?: string;
+  uri?: string;
   subject?: string;
   note?: {
     [key: string]: string;
   };
   editorialNote?: string;
-  status: Status;
   subResourceOf?: string[];
   equivalentResource?: string[];
   domain?: string;
@@ -25,12 +24,12 @@ export interface ApplicationProfileResourcePutType {
     [key: string]: string;
   };
   identifier?: string;
+  uri?: string;
   subject?: string;
   note?: {
     [key: string]: string;
   };
   editorialNote?: string;
-  status: Status;
   path?: string;
   classType?: string;
   type?: ResourceType.ASSOCIATION | ResourceType.ATTRIBUTE;
@@ -63,10 +62,10 @@ export function convertToPayload(
   applicationProfile?: boolean
 ): LibraryResourcePutType | ApplicationProfileResourcePutType | {} {
   const removeKeys: string[] = isEdit
-    ? ['identifier', 'type', 'concept']
+    ? ['identifier', 'type', 'concept', 'uri']
     : applicationProfile
-    ? ['concept']
-    : ['concept', 'type'];
+    ? ['concept', 'uri']
+    : ['concept', 'type', 'uri'];
 
   const ret = Object.fromEntries(
     Object.entries(data)
@@ -94,13 +93,10 @@ export function convertToPayload(
           e[0] === 'range' ||
           e[0] === 'domain' ||
           e[0] === 'classType' ||
-          e[0] === 'path'
+          e[0] === 'path' ||
+          e[0] === 'dataType'
         ) {
           return [e[0], e[1].uri];
-        }
-
-        if (e[0] === 'dataType') {
-          return [e[0], e[1].id];
         }
 
         if (e[0] === 'subResourceOf' || e[0] === 'equivalentResource') {
@@ -139,7 +135,18 @@ export function convertToPayload(
       })
   );
 
+  // Remove unnecessary info from payload
+  // these come from GET request of the resource when editing
+  delete ret.contributor;
+  delete ret.creator;
+  delete ret.created;
+  delete ret.modifier;
+  delete ret.modified;
+  delete ret.contact;
+  delete ret.status;
+
   if (!data.concept) {
+    delete ret.subject;
     return ret;
   }
 

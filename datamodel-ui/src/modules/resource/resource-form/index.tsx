@@ -12,6 +12,8 @@ import { ResourceType } from '@app/common/interfaces/resource-type.interface';
 import {
   translateCommonForm,
   translateCommonFormErrors,
+  translatePageTitle,
+  translateCommonTooltips,
 } from '@app/common/utils/translation-helpers';
 import ConceptBlock from '@app/modules/concept-block';
 import { useStoreDispatch } from '@app/store';
@@ -20,28 +22,23 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { IconArrowLeft } from 'suomifi-icons';
 import {
-  Block,
   Button,
-  Dropdown,
-  DropdownItem,
-  Label,
   Text,
   TextInput,
   Textarea,
-  ToggleInput,
+  Tooltip,
 } from 'suomifi-ui-components';
 import DrawerContent from 'yti-common-ui/drawer/drawer-content-wrapper';
 import StaticHeader from 'yti-common-ui/drawer/static-header';
 import { FormWrapper, LanguageVersionedWrapper } from './resource-form.styles';
 import validateForm from './validate-form';
 import { ConceptType } from '@app/common/interfaces/concept-interface';
-import { translateStatus } from 'yti-common-ui/utils/translation-helpers';
-import { statusList } from '@app/common/utils/status-list';
 import FormFooterAlert from 'yti-common-ui/form-footer-alert';
 import {
   selectHasChanges,
   setHasChanges,
   setSelected,
+  setUpdateVisualization,
 } from '@app/common/components/model/model.slice';
 import { useRouter } from 'next/router';
 import getApiError from '@app/common/utils/get-api-errors';
@@ -57,12 +54,12 @@ import { setNotification } from '@app/common/components/notifications/notificati
 import { TEXT_AREA_MAX, TEXT_INPUT_MAX } from 'yti-common-ui/utils/constants';
 import { HeaderRow, StyledSpinner } from '@app/common/components/header';
 import { UriData } from '@app/common/interfaces/uri.interface';
-import { Status } from '@app/common/interfaces/status.interface';
 import {
   DEFAULT_ASSOCIATION_SUBPROPERTY,
   DEFAULT_ATTRIBUTE_SUBPROPERTY,
 } from '@app/common/components/resource/utils';
 import PropertyToggle from './components/property-toggle';
+import { SUOMI_FI_NAMESPACE } from '@app/common/utils/get-value';
 
 interface ResourceFormProps {
   modelId: string;
@@ -90,16 +87,22 @@ export default function ResourceForm({
   const { t } = useTranslation('admin');
   const { enableConfirmation, disableConfirmation } =
     useConfirmBeforeLeavingPage('disabled');
-  const statuses = statusList;
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const dispatch = useStoreDispatch();
   const data = useSelector(selectResource());
   const [inUse, setInUse] = useState(true);
+  const [isSubResource] = useState(
+    !applicationProfile &&
+      data.subResourceOf &&
+      data.subResourceOf.length > 0 &&
+      data.subResourceOf[0].curie !== 'owl:topDataProperty' &&
+      data.subResourceOf[0].curie !== 'owl:topObjectProperty'
+  );
   const hasChanges = useSelector(selectHasChanges());
   const { setView } = useSetView();
   const [userPosted, setUserPosted] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(99);
   const [errors, setErrors] = useState(validateForm(data));
   const [updateResource, updateResult] = useUpdateResourceMutation();
   const [createResource, createResult] = useCreateResourceMutation();
@@ -118,7 +121,7 @@ export default function ResourceForm({
   const { data: inUseResult, isSuccess: isActiveSuccess } =
     useGetResourceActiveQuery({
       prefix: currentModelId,
-      uri: `http://uri.suomi.fi/datamodel/ns/${modelId}/${data.identifier}`,
+      uri: `${SUOMI_FI_NAMESPACE}${modelId}/${data.identifier}`,
     });
 
   useEffect(() => {
@@ -165,7 +168,7 @@ export default function ResourceForm({
     if (inUseResult !== inUse) {
       togglePropertyShape({
         modelId: currentModelId,
-        uri: `http://uri.suomi.fi/datamodel/ns/${modelId}/${data.identifier}`,
+        uri: `${SUOMI_FI_NAMESPACE}${modelId}/${data.identifier}`,
       });
     }
   };
@@ -262,7 +265,7 @@ export default function ResourceForm({
 
     handleUpdate({
       ...data,
-      [key]: data[key]?.filter((r) => r.uri !== id) ?? [],
+      [key]: data[key]?.filter((r: UriData) => r.uri !== id) ?? [],
     });
   };
 
@@ -300,7 +303,10 @@ export default function ResourceForm({
       dispatch(
         setSelected(
           data.identifier,
-          data.type === ResourceType.ASSOCIATION ? 'associations' : 'attributes'
+          data.type === ResourceType.ASSOCIATION
+            ? 'associations'
+            : 'attributes',
+          modelId
         )
       );
       setView(
@@ -318,6 +324,7 @@ export default function ResourceForm({
           data.type === ResourceType.ASSOCIATION ? 'association' : 'attribute'
         }/${data.identifier}`
       );
+      dispatch(setUpdateVisualization(true));
     }
 
     if (
@@ -361,13 +368,33 @@ export default function ResourceForm({
               }
             }}
             style={{ textTransform: 'uppercase' }}
+            className="long-text"
             id="back-button"
           >
-            {t('back', { ns: 'common' })}
+            {isEdit
+              ? translatePageTitle(
+                  'return-to-resource',
+                  data.type,
+                  t,
+                  applicationProfile
+                )
+              : translatePageTitle(
+                  'return-to-list',
+                  data.type,
+                  t,
+                  applicationProfile
+                )}
           </Button>
 
           <div style={{ display: 'flex', gap: '10px' }}>
-            <Button onClick={() => handleSubmit()} id="submit-button">
+            <Button
+              onClick={() => handleSubmit()}
+              id={
+                updateResult.isLoading || createResult.isLoading
+                  ? 'submit-button_submitted'
+                  : 'submit-button'
+              }
+            >
               {updateResult.isLoading || createResult.isLoading ? (
                 <div role="alert">
                   <StyledSpinner
@@ -395,8 +422,14 @@ export default function ResourceForm({
 
         <HeaderRow>
           <Text variant="bold">
-            {Object.entries(data.label).find((l) => l[1] !== '')?.[1] ??
-              translateCommonForm('name', data.type, t)}
+            {isEdit
+              ? translatePageTitle('edit', data.type, t, applicationProfile)
+              : translatePageTitle(
+                  isSubResource ? 'create-sub' : 'create',
+                  data.type,
+                  t,
+                  applicationProfile
+                )}
           </Text>
         </HeaderRow>
 
@@ -485,6 +518,11 @@ export default function ResourceForm({
               data.type,
               t
             )} (dcterms:identifier)`}
+            tooltipComponent={
+              <Tooltip ariaCloseButtonLabelText="" ariaToggleButtonLabelText="">
+                {translateCommonTooltips('identifier', data.type, t)}
+              </Tooltip>
+            }
             defaultValue={data.identifier}
             onChange={(e) =>
               handleUpdate({
@@ -526,6 +564,11 @@ export default function ResourceForm({
                   data.type,
                   t
                 )} (rdfs:subPropertyOf)`}
+                tooltip={{
+                  text: translateCommonTooltips('upper', data.type, t),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
                 items={data.subResourceOf}
                 addNewComponent={
                   <ResourceModal
@@ -548,7 +591,10 @@ export default function ResourceForm({
                     type={data.type}
                     applicationProfile={applicationProfile}
                     buttonIcon
-                    hideSelfReference={data.uri}
+                    hiddenResources={[
+                      data.uri,
+                      ...(data.subResourceOf?.map((s) => s.uri) ?? []),
+                    ]}
                   />
                 }
                 deleteDisabled={[
@@ -566,6 +612,11 @@ export default function ResourceForm({
                   data.type,
                   t
                 )} (owl:equivalentProperty)`}
+                tooltip={{
+                  text: translateCommonTooltips('equivalent', data.type, t),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
                 items={data.equivalentResource}
                 addNewComponent={
                   <ResourceModal
@@ -588,7 +639,10 @@ export default function ResourceForm({
                     type={data.type}
                     applicationProfile={applicationProfile}
                     buttonIcon
-                    hideSelfReference={data.uri}
+                    hiddenResources={[
+                      data.uri,
+                      ...(data.equivalentResource?.map((s) => s.uri) ?? []),
+                    ]}
                   />
                 }
                 optionalText={t('optional')}
@@ -614,6 +668,11 @@ export default function ResourceForm({
                   data.type,
                   t
                 )} (owl:FunctionalProperty)`}
+                tooltip={{
+                  text: translateCommonTooltips('functional', data.type, t),
+                  ariaCloseButtonLabelText: '',
+                  ariaToggleButtonLabelText: '',
+                }}
                 handleUpdate={(value) =>
                   handleUpdate({
                     ...data,
@@ -632,6 +691,11 @@ export default function ResourceForm({
                       data.type,
                       t
                     )} (owl:TransitiveProperty)`}
+                    tooltip={{
+                      text: translateCommonTooltips('transitive', data.type, t),
+                      ariaCloseButtonLabelText: '',
+                      ariaToggleButtonLabelText: '',
+                    }}
                     handleUpdate={(value) =>
                       handleUpdate({
                         ...data,
@@ -648,6 +712,11 @@ export default function ResourceForm({
                       data.type,
                       t
                     )} (owl:ReflexiveProperty)`}
+                    tooltip={{
+                      text: translateCommonTooltips('reflexive', data.type, t),
+                      ariaCloseButtonLabelText: '',
+                      ariaToggleButtonLabelText: '',
+                    }}
                     handleUpdate={(value) =>
                       handleUpdate({
                         ...data,
@@ -662,21 +731,6 @@ export default function ResourceForm({
               )}
             </>
           )}
-
-          <div>
-            <Dropdown
-              labelText={t('status')}
-              defaultValue={data.status ?? 'DRAFT'}
-              onChange={(e) => handleUpdate({ ...data, status: e as Status })}
-              id="status-dropdown"
-            >
-              {statuses.map((status) => (
-                <DropdownItem key={`status-${status}`} value={status}>
-                  {translateStatus(status, t)}
-                </DropdownItem>
-              ))}
-            </Dropdown>
-          </div>
 
           <AttributeRestrictions
             data={data}
@@ -695,6 +749,14 @@ export default function ResourceForm({
                   data.type,
                   t
                 )}, ${lang} (rdfs:comment)`}
+                tooltipComponent={
+                  <Tooltip
+                    ariaCloseButtonLabelText=""
+                    ariaToggleButtonLabelText=""
+                  >
+                    {t('tooltip.technical-description', { ns: 'common' })}
+                  </Tooltip>
+                }
                 defaultValue={data.note?.[lang] ?? ''}
                 onChange={(e) =>
                   handleUpdate({

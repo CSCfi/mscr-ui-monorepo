@@ -12,12 +12,18 @@ import {
 import LinkedDataForm from '../linked-data-form';
 import HasPermission from '@app/common/utils/has-permission';
 import {
+  selectDisplayGraphHasChanges,
   selectDisplayLang,
+  selectGraphHasChanges,
+  setDisplayGraphHasChanges,
   useGetModelQuery,
 } from '@app/common/components/model/model.slice';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { HeaderRow } from '@app/common/components/header';
 import { useSelector } from 'react-redux';
+import { getEnvParam } from '@app/common/components/uri-info';
+import { useStoreDispatch } from '@app/store';
+import UnsavedAlertModal from '../unsaved-alert-modal';
 
 export default function LinkedDataView({
   modelId,
@@ -31,26 +37,33 @@ export default function LinkedDataView({
   organizationIds?: string[];
 }) {
   const { t, i18n } = useTranslation('common');
+  const dispatch = useStoreDispatch();
   const displayLang = useSelector(selectDisplayLang());
+  const displayGraphHasChanges = useSelector(selectDisplayGraphHasChanges());
+  const graphHasChanges = useSelector(selectGraphHasChanges());
   const ref = useRef<HTMLDivElement>(null);
   const hasPermission = HasPermission({
     actions: ['EDIT_DATA_MODEL'],
     targetOrganization: organizationIds,
   });
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(hasPermission ? 57 : 42);
   const [renderForm, setRenderForm] = useState(false);
-  const { data, refetch } = useGetModelQuery({
+  const { data } = useGetModelQuery({
     modelId: modelId,
     version: version,
   });
 
-  const handleShowForm = () => {
-    setRenderForm(true);
-  };
-
   const handleFormReturn = () => {
     setRenderForm(false);
-    refetch();
+  };
+
+  const handleShowForm = () => {
+    if (graphHasChanges) {
+      dispatch(setDisplayGraphHasChanges(true));
+      return;
+    }
+
+    setRenderForm(true);
   };
 
   useEffect(() => {
@@ -84,6 +97,11 @@ export default function LinkedDataView({
             </Button>
           )}
         </HeaderRow>
+
+        <UnsavedAlertModal
+          visible={displayGraphHasChanges}
+          handleFollowUp={() => setRenderForm(true)}
+        />
       </StaticHeader>
 
       <DrawerContent height={headerHeight}>
@@ -101,7 +119,10 @@ export default function LinkedDataView({
                   <LinkedItem key={`linked-terminology-${idx}`}>
                     <ExternalLink
                       labelNewWindow={t('link-opens-new-window-external')}
-                      href={terminology.uri}
+                      href={`${terminology.uri}${getEnvParam(
+                        terminology.uri,
+                        true
+                      )}`}
                     >
                       {label !== '' ? label : terminology.uri}
                     </ExternalLink>
@@ -129,7 +150,7 @@ export default function LinkedDataView({
                     <LinkedItem key={`linked-codeList-${idx}`}>
                       <ExternalLink
                         labelNewWindow={t('link-opens-new-window-external')}
-                        href={codeList.id}
+                        href={`${codeList.id}${getEnvParam(codeList.id, true)}`}
                       >
                         {label !== '' ? label : codeList.id}
                       </ExternalLink>
@@ -156,7 +177,9 @@ export default function LinkedDataView({
                     <LinkExtraInfo>
                       <ExternalLink
                         labelNewWindow={t('link-opens-new-window-external')}
-                        href={namespace.namespace}
+                        href={`${namespace.namespace}${getEnvParam(
+                          namespace.namespace
+                        )}`}
                       >
                         {getLanguageVersion({
                           data: namespace.name,
@@ -182,7 +205,11 @@ export default function LinkedDataView({
                         labelNewWindow={t('link-opens-new-window-external')}
                         href={namespace.namespace}
                       >
-                        {namespace.name[displayLang ?? i18n.language]}
+                        {getLanguageVersion({
+                          lang: displayLang ?? i18n.language,
+                          data: namespace.name,
+                          appendLocale: true,
+                        })}
                       </ExternalLink>
                       <div>
                         {t('linked-datamodel-prefix', {

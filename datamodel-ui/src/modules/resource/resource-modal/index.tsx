@@ -1,4 +1,9 @@
 import LargeModal from '@app/common/components/large-modal';
+import {
+  selectDisplayGraphHasChanges,
+  selectGraphHasChanges,
+  setDisplayGraphHasChanges,
+} from '@app/common/components/model/model.slice';
 import MultiColumnSearch from '@app/common/components/multi-column-search';
 import { ResultType } from '@app/common/components/resource-list';
 import {
@@ -13,8 +18,11 @@ import {
   translateResourceName,
 } from '@app/common/utils/translation-helpers';
 import { mapInternalClassInfoToResultType } from '@app/modules/class-restriction-modal/utils';
+import UnsavedAlertModal from '@app/modules/unsaved-alert-modal';
+import { useStoreDispatch } from '@app/store';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Button,
   IconPlus,
@@ -36,8 +44,8 @@ interface ResourceModalProps {
   defaultSelected?: string;
   buttonIcon?: boolean;
   applicationProfile?: boolean;
-  hideSelfReference?: string;
   buttonVariant?: 'secondary' | 'secondaryNoBorder';
+  hiddenResources?: string[];
 }
 
 export default function ResourceModal({
@@ -48,11 +56,14 @@ export default function ResourceModal({
   defaultSelected,
   buttonIcon,
   applicationProfile,
-  hideSelfReference,
   buttonVariant,
+  hiddenResources,
 }: ResourceModalProps) {
   const { t, i18n } = useTranslation('admin');
   const { isSmall } = useBreakpoints();
+  const dispatch = useStoreDispatch();
+  const displayGraphHasChanges = useSelector(selectDisplayGraphHasChanges());
+  const graphHasChanges = useSelector(selectGraphHasChanges());
   const [visible, setVisible] = useState(false);
   const [selectedId, setSelectedId] = useState(
     defaultSelected ? defaultSelected : ''
@@ -81,6 +92,15 @@ export default function ResourceModal({
     if (defaultSelected && defaultSelected !== selectedId) {
       setSelectedId(defaultSelected);
     }
+  };
+
+  const handleOpenClick = () => {
+    if (graphHasChanges) {
+      dispatch(setDisplayGraphHasChanges(true));
+      return;
+    }
+
+    handleOpen();
   };
 
   const handleClose = () => {
@@ -115,7 +135,7 @@ export default function ResourceModal({
     if (result.isSuccess) {
       setResultsFormatted(
         result.data.responseObjects
-          .filter((r) => r.id !== hideSelfReference)
+          .filter((r) => !hiddenResources?.includes(r.id))
           .map((r) =>
             mapInternalClassInfoToResultType(
               r,
@@ -124,19 +144,24 @@ export default function ResourceModal({
           )
       );
     }
-  }, [result, i18n.language, contentLanguage, t, hideSelfReference]);
+  }, [result, i18n.language, contentLanguage, t, hiddenResources]);
 
   return (
     <>
       <Button
         variant={buttonVariant ?? 'secondary'}
         icon={buttonIcon ? <IconPlus /> : undefined}
-        onClick={() => handleOpen()}
+        onClick={() => handleOpenClick()}
         id="add-resource-button"
       >
         {buttonTranslations.openButton ??
           translateResourceAddition(type, t, applicationProfile)}
       </Button>
+
+      <UnsavedAlertModal
+        visible={displayGraphHasChanges}
+        handleFollowUp={() => handleOpen()}
+      />
 
       <LargeModal
         appElementId="__next"
@@ -153,7 +178,7 @@ export default function ResourceModal({
               applicationProfile
             )}
             result={{
-              totalHitCount: result.data?.totalHitCount ?? 0,
+              totalHitCount: resultsFormatted.length,
               items: resultsFormatted,
             }}
             selectedId={selectedId}

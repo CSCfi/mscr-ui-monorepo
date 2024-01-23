@@ -1,17 +1,19 @@
-import { StatusChip } from '@app/common/components/resource-list/resource-list.styles';
+import { StatusChip } from 'yti-common-ui/components/status-chip';
 import { ClassType } from '@app/common/interfaces/class.interface';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { useTranslation } from 'next-i18next';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   ExpanderGroup,
   ExternalLink,
   IconArrowLeft,
   IconCopy,
-  IconOptionsVertical,
   Text,
-  Tooltip,
+  InlineAlert,
+  ActionMenu,
+  ActionMenuItem,
+  ActionMenuDivider,
 } from 'suomifi-ui-components';
 import { BasicBlock } from 'yti-common-ui/block';
 import DrawerContent from 'yti-common-ui/drawer/drawer-content-wrapper';
@@ -22,13 +24,20 @@ import Separator from 'yti-common-ui/separator';
 import { translateStatus } from 'yti-common-ui/utils/translation-helpers';
 import ConceptView from '../concept-view';
 import ResourceInfo from './resource-info';
-import { TooltipWrapper } from '../model/model.styles';
-import { useGetAwayListener } from '@app/common/utils/hooks/use-get-away-listener';
 import HasPermission from '@app/common/utils/has-permission';
 import DeleteModal from '../delete-modal';
 import { useSelector } from 'react-redux';
-import { selectDisplayLang } from '@app/common/components/model/model.slice';
-import { ADMIN_EMAIL } from '@app/common/utils/get-value';
+import {
+  selectAddResourceRestrictionToClass,
+  selectDisplayGraphHasChanges,
+  selectDisplayLang,
+  selectGraphHasChanges,
+  selectUpdateClassData,
+  setAddResourceRestrictionToClass,
+  setDisplayGraphHasChanges,
+  setUpdateClassData,
+} from '@app/common/components/model/model.slice';
+import { ADMIN_EMAIL, SUOMI_FI_NAMESPACE } from '@app/common/utils/get-value';
 import { ResourceType } from '@app/common/interfaces/resource-type.interface';
 import ResourceModal from './resource-modal';
 import { useAddPropertyReferenceMutation } from '@app/common/components/class/class.slice';
@@ -39,6 +48,12 @@ import UriList from '@app/common/components/uri-list';
 import UriInfo from '@app/common/components/uri-info';
 import { UriData } from '@app/common/interfaces/uri.interface';
 import { RenameModal } from '../rename-modal';
+import getApiError from '@app/common/utils/get-api-errors';
+import {
+  translatePageTitle,
+  translateResourceAddition,
+} from '@app/common/utils/translation-helpers';
+import UnsavedAlertModal from '../unsaved-alert-modal';
 
 interface ClassInfoProps {
   data?: ClassType;
@@ -48,7 +63,6 @@ interface ClassInfoProps {
   terminologies: string[];
   handleReturn: () => void;
   handleEdit: () => void;
-  handleRefetch: () => void;
   handleShowClass: (classId: string) => void;
   disableEdit?: boolean;
   organizationIds?: string[];
@@ -62,7 +76,6 @@ export default function ClassInfo({
   terminologies,
   handleReturn,
   handleEdit,
-  handleRefetch,
   handleShowClass,
   disableEdit,
   organizationIds,
@@ -72,17 +85,24 @@ export default function ClassInfo({
     actions: ['EDIT_CLASS'],
     targetOrganization: organizationIds,
   });
-  const ref = useRef<HTMLDivElement>(null);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(hasPermission ? 57 : 55);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const dispatch = useStoreDispatch();
-
-  const [renderResourceForm, setRenderResourceForm] = useState(false);
+  const updateClassData = useSelector(selectUpdateClassData());
+  const displayGraphHasChanges = useSelector(selectDisplayGraphHasChanges());
+  const graphHasChanges = useSelector(selectGraphHasChanges());
+  const renderResourceForm = useSelector(selectAddResourceRestrictionToClass());
+  const [attributeModalVisible, setAttributeModalVisible] = useState(false);
+  const [associationModalVisible, setAssociationModalVisible] = useState(false);
   const displayLang = useSelector(selectDisplayLang());
   const [addReference, addReferenceResult] = useAddPropertyReferenceMutation();
-  const { ref: toolTipRef } = useGetAwayListener(showTooltip, setShowTooltip);
+
+  useEffect(() => {
+    if (updateClassData) {
+      dispatch(setUpdateClassData(false));
+    }
+  }, [dispatch, updateClassData]);
 
   const handleFollowUp = (value: {
     uriData: UriData;
@@ -101,22 +121,19 @@ export default function ClassInfo({
         applicationProfile: applicationProfile ?? false,
       });
     } else {
-      dispatch(initializeResource(value.type, languages, value.uriData, true));
-      setRenderResourceForm(true);
+      dispatch(initializeResource(value.type, value.uriData, true));
+      dispatch(setAddResourceRestrictionToClass(true));
     }
   };
 
-  useEffect(() => {
-    if (addReferenceResult.isSuccess) {
-      handleRefetch();
+  const handleIsEdit = () => {
+    if (graphHasChanges) {
+      dispatch(setDisplayGraphHasChanges(true));
+      return;
     }
-  }, [addReferenceResult, handleRefetch]);
 
-  useEffect(() => {
-    if (ref.current) {
-      setHeaderHeight(ref.current.clientHeight);
-    }
-  }, [data]);
+    handleEdit();
+  };
 
   function renderTopInfoByType() {
     if (!data) {
@@ -126,11 +143,25 @@ export default function ClassInfo({
     if (applicationProfile) {
       return (
         <>
-          <BasicBlock title={t('targets-library-class')}>
+          <BasicBlock
+            title={t('targets-library-class')}
+            tooltip={{
+              text: t('tooltip.target-class-profile'),
+              ariaCloseButtonLabelText: '',
+              ariaToggleButtonLabelText: '',
+            }}
+          >
             <UriInfo uri={data.targetClass} lang={displayLang} />
           </BasicBlock>
 
-          <BasicBlock title={t('utilizes-class-restriction')}>
+          <BasicBlock
+            title={t('utilizes-class-restriction')}
+            tooltip={{
+              text: t('tooltip.utilizes-class-restriction'),
+              ariaCloseButtonLabelText: '',
+              ariaToggleButtonLabelText: '',
+            }}
+          >
             <UriInfo uri={data.targetNode} lang={displayLang} />
           </BasicBlock>
         </>
@@ -139,7 +170,14 @@ export default function ClassInfo({
 
     return (
       <>
-        <BasicBlock title={t('upper-class')}>
+        <BasicBlock
+          title={t('upper-class')}
+          tooltip={{
+            text: t('tooltip.upper-classes'),
+            ariaCloseButtonLabelText: '',
+            ariaToggleButtonLabelText: '',
+          }}
+        >
           {!data.subClassOf || data.subClassOf.length === 0 ? (
             <> {t('no-upper-classes')}</>
           ) : (
@@ -147,7 +185,14 @@ export default function ClassInfo({
           )}
         </BasicBlock>
 
-        <BasicBlock title={t('equivalent-classes')}>
+        <BasicBlock
+          title={t('equivalent-classes')}
+          tooltip={{
+            text: t('tooltip.equivalent-classes'),
+            ariaCloseButtonLabelText: '',
+            ariaToggleButtonLabelText: '',
+          }}
+        >
           {!data.equivalentClass || data.equivalentClass.length === 0 ? (
             <> {t('no-equivalent-classes')}</>
           ) : (
@@ -155,29 +200,18 @@ export default function ClassInfo({
           )}
         </BasicBlock>
 
-        <BasicBlock title={t('disjoint-classes')}>
+        <BasicBlock
+          title={t('disjoint-classes')}
+          tooltip={{
+            text: t('tooltip.disjoint-classes'),
+            ariaCloseButtonLabelText: '',
+            ariaToggleButtonLabelText: '',
+          }}
+        >
           {!data.disjointWith || data.disjointWith.length === 0 ? (
             <>{t('no-disjoint-classes')}</>
           ) : (
             <UriList items={data.disjointWith} lang={displayLang} />
-          )}
-        </BasicBlock>
-
-        <BasicBlock title={t('technical-description')}>
-          {getLanguageVersion({
-            data: data.note,
-            lang: displayLang ?? i18n.language,
-            appendLocale: true,
-          }) !== '' ? (
-            <SanitizedTextContent
-              text={getLanguageVersion({
-                data: data.note,
-                lang: displayLang ?? i18n.language,
-                appendLocale: true,
-              })}
-            />
-          ) : (
-            t('no-note')
           )}
         </BasicBlock>
       </>
@@ -190,12 +224,12 @@ export default function ClassInfo({
         modelId={modelId}
         languages={languages}
         terminologies={terminologies}
-        handleReturn={() => setRenderResourceForm(false)}
+        handleReturn={() => dispatch(setAddResourceRestrictionToClass(false))}
         handleFollowUp={(identifier, type) => {
-          setRenderResourceForm(false);
+          dispatch(setAddResourceRestrictionToClass(false));
           handleFollowUp({
             uriData: {
-              uri: `http://uri.suomi.fi/datamodel/ns/${modelId}/${identifier}`,
+              uri: `${SUOMI_FI_NAMESPACE}${modelId}/${identifier}`,
               curie: `${modelId}:${identifier}`,
               label: {},
             },
@@ -211,7 +245,11 @@ export default function ClassInfo({
 
   return (
     <>
-      <StaticHeader ref={ref}>
+      <StaticHeader
+        ref={(node) => {
+          setHeaderHeight(node?.clientHeight ?? 50);
+        }}
+      >
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button
             variant="secondaryNoBorder"
@@ -219,56 +257,30 @@ export default function ClassInfo({
             onClick={() => handleReturn()}
             style={{ textTransform: 'uppercase' }}
           >
-            {t('back')}
+            {translatePageTitle(
+              'return-to-list',
+              ResourceType.CLASS,
+              t,
+              applicationProfile
+            )}
           </Button>
           {!disableEdit && hasPermission && data && (
-            <div>
-              <Button
-                variant="secondary"
-                iconRight={<IconOptionsVertical />}
-                onClick={() => setShowTooltip(!showTooltip)}
-                ref={toolTipRef}
-              >
-                {t('actions')}
-              </Button>
-              <TooltipWrapper id="actions-tooltip">
-                <Tooltip
-                  ariaCloseButtonLabelText=""
-                  ariaToggleButtonLabelText=""
-                  open={showTooltip}
-                  onCloseButtonClick={() => setShowTooltip(false)}
-                >
-                  <>
-                    <Button
-                      variant="secondaryNoBorder"
-                      onClick={() => handleEdit()}
-                      id="edit-class-button"
-                    >
-                      {t('edit', { ns: 'admin' })}
-                    </Button>
-                    <Button
-                      variant="secondaryNoBorder"
-                      onClick={() => setShowRenameModal(true)}
-                      id="rename-class-button"
-                    >
-                      {t('rename', { ns: 'admin' })}
-                    </Button>
-                    <Separator />
-                    <Button
-                      variant="secondaryNoBorder"
-                      onClick={() => setShowDeleteModal(true)}
-                      id="delete-class-button"
-                    >
-                      {t('remove', { ns: 'admin' })}
-                    </Button>
-                  </>
-                </Tooltip>
-              </TooltipWrapper>
-            </div>
+            <ActionMenu buttonText={t('actions')} id="actions-menu">
+              <ActionMenuItem onClick={() => handleIsEdit()}>
+                {t('edit', { ns: 'admin' })}
+              </ActionMenuItem>
+              <ActionMenuItem onClick={() => setShowRenameModal(true)}>
+                {t('rename', { ns: 'admin' })}
+              </ActionMenuItem>
+              <ActionMenuDivider />
+              <ActionMenuItem onClick={() => setShowDeleteModal(true)}>
+                {t('remove', { ns: 'admin' })}
+              </ActionMenuItem>
+            </ActionMenu>
           )}
         </div>
         {data ? (
-          <>
+          <div>
             <DeleteModal
               modelId={modelId}
               resourceId={data.identifier}
@@ -289,27 +301,47 @@ export default function ClassInfo({
               hide={() => setShowRenameModal(false)}
               handleReturn={handleShowClass}
             />
-          </>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Text variant="bold">
+                {getLanguageVersion({
+                  data: data.label,
+                  lang: displayLang ?? i18n.language,
+                })}
+              </Text>
+              <StatusChip status={data.status}>
+                {translateStatus(data.status, t)}
+              </StatusChip>
+            </div>
+          </div>
         ) : (
           <></>
         )}
+
+        <UnsavedAlertModal
+          visible={displayGraphHasChanges}
+          handleFollowUp={() => handleEdit()}
+        />
       </StaticHeader>
 
       {data && (
         <DrawerContent height={headerHeight}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <Text variant="bold">
-              {getLanguageVersion({
-                data: data.label,
-                lang: displayLang ?? i18n.language,
-              })}
-            </Text>
-            <StatusChip $isValid={data.status === 'VALID'}>
-              {translateStatus(data.status, t)}
-            </StatusChip>
-          </div>
-
-          <BasicBlock title={t('class-identifier')}>{data.curie}</BasicBlock>
+          {addReferenceResult.error ? (
+            <InlineAlert status="error">
+              {getApiError(addReferenceResult.error)[0]}
+            </InlineAlert>
+          ) : (
+            <></>
+          )}
+          <BasicBlock
+            title={t('class-identifier')}
+            tooltip={{
+              text: t('tooltip.class-identifier'),
+              ariaCloseButtonLabelText: '',
+              ariaToggleButtonLabelText: '',
+            }}
+          >
+            {data.curie}
+          </BasicBlock>
 
           <BasicBlock title={t('uri')}>
             {data.uri}
@@ -330,6 +362,31 @@ export default function ClassInfo({
 
           {renderTopInfoByType()}
 
+          <BasicBlock
+            title={t('technical-description')}
+            tooltip={{
+              text: t('tooltip.technical-description'),
+              ariaCloseButtonLabelText: '',
+              ariaToggleButtonLabelText: '',
+            }}
+          >
+            {getLanguageVersion({
+              data: data.note,
+              lang: displayLang ?? i18n.language,
+              appendLocale: true,
+            }) !== '' ? (
+              <SanitizedTextContent
+                text={getLanguageVersion({
+                  data: data.note,
+                  lang: displayLang ?? i18n.language,
+                  appendLocale: true,
+                })}
+              />
+            ) : (
+              t('no-note')
+            )}
+          </BasicBlock>
+
           <Separator />
 
           <BasicBlock
@@ -349,7 +406,6 @@ export default function ClassInfo({
                     classId={data.identifier}
                     hasPermission={hasPermission}
                     applicationProfile={applicationProfile}
-                    handlePropertiesUpdate={handleRefetch}
                     attribute
                     disableEdit={disableEdit}
                   />
@@ -361,18 +417,29 @@ export default function ClassInfo({
           </BasicBlock>
 
           {!disableEdit && hasPermission ? (
-            <div style={{ display: 'flex', marginTop: '10px', gap: '10px' }}>
+            <div style={{ marginTop: '10px' }}>
+              <Button
+                variant="secondary"
+                onClick={() => setAttributeModalVisible(true)}
+                id="add-attribute-button"
+              >
+                {translateResourceAddition(
+                  ResourceType.ATTRIBUTE,
+                  t,
+                  applicationProfile
+                )}
+              </Button>
               <ResourceModal
                 modelId={modelId}
                 type={ResourceType.ATTRIBUTE}
                 handleFollowUp={handleFollowUp}
                 limitSearchTo={'LIBRARY'}
+                visible={attributeModalVisible}
+                setVisible={setAttributeModalVisible}
                 applicationProfile={applicationProfile}
                 limitToSelect={!applicationProfile}
+                hiddenResources={data.attribute?.map((attr) => attr.uri)}
               />
-              <Button variant="secondary" id="order-attributes-button">
-                {t('order-list', { ns: 'admin' })}
-              </Button>
             </div>
           ) : (
             <></>
@@ -396,7 +463,6 @@ export default function ClassInfo({
                     modelId={modelId}
                     classId={data.identifier}
                     hasPermission={hasPermission}
-                    handlePropertiesUpdate={handleRefetch}
                     applicationProfile={applicationProfile}
                     disableEdit={disableEdit}
                     targetInClassRestriction={assoc.range}
@@ -409,18 +475,29 @@ export default function ClassInfo({
           </BasicBlock>
 
           {!disableEdit && hasPermission ? (
-            <div style={{ display: 'flex', marginTop: '10px', gap: '10px' }}>
+            <div style={{ marginTop: '10px' }}>
+              <Button
+                variant="secondary"
+                onClick={() => setAssociationModalVisible(true)}
+                id="add-association-button"
+              >
+                {translateResourceAddition(
+                  ResourceType.ASSOCIATION,
+                  t,
+                  applicationProfile
+                )}
+              </Button>
               <ResourceModal
                 modelId={modelId}
                 type={ResourceType.ASSOCIATION}
                 limitSearchTo="LIBRARY"
+                visible={associationModalVisible}
+                setVisible={setAssociationModalVisible}
                 handleFollowUp={handleFollowUp}
                 applicationProfile={applicationProfile}
                 limitToSelect={!applicationProfile}
+                hiddenResources={data.association?.map((assoc) => assoc.uri)}
               />
-              <Button variant="secondary" id="order-associations-button">
-                {t('order-list', { ns: 'admin' })}
-              </Button>
             </div>
           ) : (
             <></>

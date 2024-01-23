@@ -1,25 +1,9 @@
-import { HYDRATE } from 'next-redux-wrapper';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
 import { SearchModels } from '@app/common/interfaces/search-models.interface';
 import { UrlState } from 'yti-common-ui/utils/hooks/use-url-state';
 import { inUseStatusList } from '@app/common/utils/status-list';
 
-/*
-  Drops keys with "empty" values in urlState
-  so that only needed parameters are added to url
-
-  Note! This could be theoretically done with RTK's
-  params like so:
-
-    query: (props) => ({
-      url: '/frontend/searchModels',
-      method: 'GET',
-      params: getParams(props.urlState, props.lang)
-    }),
-
-  but it seems to break the SSR.
-*/
 function getUrl(urlState: UrlState, lang?: string) {
   const validEntries = Object.entries({
     pageFrom: Math.max(0, (urlState.page - 1) * 50),
@@ -56,12 +40,7 @@ function getUrl(urlState: UrlState, lang?: string) {
 export const searchModelsApi = createApi({
   reducerPath: 'searchModelsApi',
   baseQuery: getDatamodelApiBaseQuery(),
-  tagTypes: ['searchModels'],
-  extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === HYDRATE) {
-      return action.payload[reducerPath];
-    }
-  },
+  tagTypes: ['SearchModels'],
   endpoints: (builder) => ({
     getSearchModels: builder.query<
       SearchModels,
@@ -71,6 +50,7 @@ export const searchModelsApi = createApi({
         url: getUrl(props.urlState, props.lang),
         method: 'GET',
       }),
+      providesTags: ['SearchModels'],
     }),
   }),
 });

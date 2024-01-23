@@ -14,12 +14,15 @@ import {
   EdgeLabelRenderer,
   EdgeProps,
   getStraightPath,
+  useEdges,
+  useNodes,
   useStore,
 } from 'reactflow';
 import getEdgeParams from '../utils/get-edge-params';
 import { EdgeContent, HoveredPath } from './edge.styles';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { EdgeDataType } from '@app/common/interfaces/graph.interface';
+import GetStartNode from '../utils/get-start-node';
 
 export default function DefaultEdge({
   id,
@@ -34,15 +37,26 @@ export default function DefaultEdge({
   const globalSelected = useSelector(selectSelected());
   const displayLang = useSelector(selectDisplayLang());
   const highlighted = useSelector(selectHighlighted());
-  const { showAssociations, showAssociationRestrictions } = useSelector(
-    selectModelTools()
-  );
+  const nodes = useNodes();
+  const edges = useEdges();
+  const { showAssociations, showAssociationRestrictions, showById } =
+    useSelector(selectModelTools());
   const sourceNode = useStore(
     useCallback((store) => store.nodeInternals.get(source), [source])
   );
   const targetNode = useStore(
     useCallback((store) => store.nodeInternals.get(target), [target])
   );
+  const startNodeIsAttribute = useCallback(() => {
+    if (!sourceNode) {
+      return false;
+    }
+
+    return (
+      sourceNode?.type === 'attributeNode' ||
+      GetStartNode(sourceNode, nodes, edges)?.type === 'attributeNode'
+    );
+  }, [sourceNode, nodes, edges]);
 
   const { sx, sy, tx, ty } = getEdgeParams(
     sourceNode,
@@ -66,7 +80,10 @@ export default function DefaultEdge({
     dispatch(resetHovered());
   };
 
-  if (!showAssociations || !showAssociationRestrictions) {
+  if (
+    (!showAssociations || !showAssociationRestrictions) &&
+    !startNodeIsAttribute()
+  ) {
     return <></>;
   }
 
@@ -110,11 +127,18 @@ export default function DefaultEdge({
     </>
   );
 
-  function getLabel(label?: { [key: string]: string }) {
+  function getLabel(label?: { [key: string]: string } | string) {
+    if (typeof label === 'string') {
+      return label;
+    }
+
     if (!label || Object.keys(label).length < 1) {
       return undefined;
     }
 
+    if (showById) {
+      return `${data?.modelId}:${data?.identifier}`;
+    }
     return getLanguageVersion({
       data: label,
       lang: displayLang !== i18n.language ? displayLang : i18n.language,

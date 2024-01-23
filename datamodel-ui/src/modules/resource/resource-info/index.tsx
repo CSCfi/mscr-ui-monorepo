@@ -6,30 +6,36 @@ import {
   translateStatus,
 } from '@app/common/utils/translation-helpers';
 import { useTranslation } from 'next-i18next';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  ActionMenu,
+  ActionMenuDivider,
+  ActionMenuItem,
   Button,
   IconArrowLeft,
-  IconOptionsVertical,
   InlineAlert,
   Text,
-  Tooltip,
 } from 'suomifi-ui-components';
 import DrawerContent from 'yti-common-ui/drawer/drawer-content-wrapper';
 import StaticHeader from 'yti-common-ui/drawer/static-header';
-import Separator from 'yti-common-ui/separator';
-import { TooltipWrapper } from '@app/modules/model/model.styles';
 import DeleteModal from '@app/modules/delete-modal';
 import CommonViewContent from '@app/modules/common-view-content';
-import { StatusChip } from '@app/common/components/resource-list/resource-list.styles';
+import { StatusChip } from 'yti-common-ui/components/status-chip';
 import { useGetAwayListener } from '@app/common/utils/hooks/use-get-away-listener';
 import LocalCopyModal from '@app/modules/local-copy-modal';
 import { useSelector } from 'react-redux';
-import { selectDisplayLang } from '@app/common/components/model/model.slice';
+import {
+  selectDisplayGraphHasChanges,
+  selectDisplayLang,
+  selectGraphHasChanges,
+  setDisplayGraphHasChanges,
+} from '@app/common/components/model/model.slice';
 import ApplicationProfileTop from '../resource-form/components/application-profile-top';
 import { useTogglePropertyShapeMutation } from '@app/common/components/resource/resource.slice';
 import getApiError from '@app/common/utils/get-api-errors';
 import { RenameModal } from '@app/modules/rename-modal';
+import { useStoreDispatch } from '@app/store';
+import UnsavedAlertModal from '@app/modules/unsaved-alert-modal';
 
 interface CommonViewProps {
   data?: Resource;
@@ -61,13 +67,15 @@ export default function ResourceInfo({
   organizationIds,
 }: CommonViewProps) {
   const { t, i18n } = useTranslation('common');
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
   const displayLang = useSelector(selectDisplayLang());
   const hasPermission = HasPermission({
     actions: ['EDIT_ASSOCIATION', 'EDIT_ATTRIBUTE'],
     targetOrganization: organizationIds,
   });
+  const dispatch = useStoreDispatch();
+  const displayGraphHasChanges = useSelector(selectDisplayGraphHasChanges());
+  const graphHasChanges = useSelector(selectGraphHasChanges());
+  const [headerHeight, setHeaderHeight] = useState(hasPermission ? 117 : 55);
   const [showTooltip, setShowTooltip] = useState(false);
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [localCopyVisible, setLocalCopyVisible] = useState(false);
@@ -86,26 +94,32 @@ export default function ResourceInfo({
     }
   };
 
+  const handleIsEdit = () => {
+    if (graphHasChanges) {
+      dispatch(setDisplayGraphHasChanges(true));
+      return;
+    }
+
+    handleEdit();
+  };
+
   useEffect(() => {
     setExternalActive(inUse);
   }, [inUse]);
 
   useEffect(() => {
     if (toggleResult.isSuccess) {
-      setExternalEdit(false);
       handleRefetch();
     }
   }, [toggleResult, handleRefetch]);
 
-  useEffect(() => {
-    if (ref.current) {
-      setHeaderHeight(ref.current.clientHeight);
-    }
-  }, [ref]);
-
   return (
     <>
-      <StaticHeader ref={ref}>
+      <StaticHeader
+        ref={(node) => {
+          setHeaderHeight(node?.clientHeight ?? 50);
+        }}
+      >
         <div>
           <Button
             variant="secondaryNoBorder"
@@ -119,70 +133,50 @@ export default function ResourceInfo({
           </Button>
           {!disableEdit && hasPermission && data && !externalEdit && (
             <div>
-              <Button
-                variant="secondary"
-                iconRight={<IconOptionsVertical />}
-                style={{ height: 'min-content' }}
-                onClick={() => setShowTooltip(!showTooltip)}
-                id="actions-button"
-              >
-                {t('actions')}
-              </Button>
-              <TooltipWrapper id="actions-tooltip">
-                <Tooltip
-                  ariaCloseButtonLabelText=""
-                  ariaToggleButtonLabelText=""
-                  open={showTooltip}
-                  onCloseButtonClick={() => setShowTooltip(false)}
-                >
-                  {isPartOfCurrentModel ? (
-                    <>
-                      <Button
-                        variant="secondaryNoBorder"
-                        onClick={() => handleEdit()}
-                        id="edit-button"
+              <ActionMenu id="action-menu" buttonText={t('actions')}>
+                {isPartOfCurrentModel
+                  ? [
+                      <ActionMenuItem
+                        key="edit-button"
+                        onClick={() => handleIsEdit()}
                       >
                         {t('edit', { ns: 'admin' })}
-                      </Button>
-                      <Button
-                        variant="secondaryNoBorder"
+                      </ActionMenuItem>,
+                      <ActionMenuItem
+                        key="rename-button"
                         onClick={() => setRenameVisible(true)}
-                        id="rename-class-button"
                       >
                         {t('rename', { ns: 'admin' })}
-                      </Button>
-                      <Separator />
-                      <Button
-                        variant="secondaryNoBorder"
+                      </ActionMenuItem>,
+                      <ActionMenuDivider key="separator" />,
+                      <ActionMenuItem
+                        key="remove-button"
                         onClick={() => setDeleteVisible(true)}
-                        id="remove-button"
                       >
                         {t('remove', { ns: 'admin' })}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="secondaryNoBorder"
+                      </ActionMenuItem>,
+                    ]
+                  : applicationProfile
+                  ? [
+                      <ActionMenuItem
+                        key="external-edit-button"
                         onClick={() => {
                           setExternalActive(inUse);
                           setExternalEdit(true);
                         }}
-                        id="edit-button"
                       >
                         {t('edit', { ns: 'admin' })}
-                      </Button>
-                      <Button
-                        variant="secondaryNoBorder"
+                      </ActionMenuItem>,
+                      <ActionMenuItem
+                        key="create-local-copy-button"
                         onClick={() => setLocalCopyVisible(true)}
-                        id="local-copy-button"
                       >
                         {t('create-local-copy', { ns: 'admin' })}
-                      </Button>
-                    </>
-                  )}
-                </Tooltip>
-              </TooltipWrapper>
+                      </ActionMenuItem>,
+                    ]
+                  : []}
+              </ActionMenu>
+
               <LocalCopyModal
                 visible={localCopyVisible}
                 hide={() => setLocalCopyVisible(false)}
@@ -210,6 +204,10 @@ export default function ResourceInfo({
                 hide={() => setRenameVisible(false)}
                 handleReturn={handleShowResource}
               />
+              <UnsavedAlertModal
+                visible={displayGraphHasChanges}
+                handleFollowUp={() => handleEdit()}
+              />
             </div>
           )}
         </div>
@@ -223,7 +221,7 @@ export default function ResourceInfo({
                     lang: displayLang ?? i18n.language,
                   })}
               </Text>
-              <StatusChip $isValid={data && data.status === 'VALID'}>
+              <StatusChip status={data?.status}>
                 {data && translateStatus(data.status, t)}
               </StatusChip>
             </div>

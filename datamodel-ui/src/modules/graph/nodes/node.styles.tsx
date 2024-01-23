@@ -11,6 +11,7 @@ export const ClassNodeDiv = styled.div<{
   padding: ${(props) => props.theme.suomifi.spacing.xxs};
 
   min-width: 360px;
+  max-width: 560px;
   width: min-content;
 
   > div {
@@ -34,12 +35,15 @@ export const ClassNodeDiv = styled.div<{
         props.$appProfile ? props.theme.suomifi.colors.brandBase : '#86499c'};
     border-radius: 2px 2px 0px 0px;
     font-weight: 600;
+    max-width: 100%;
 
-    *:first-child {
-      flex-grow: 1;
+    padding: ${(props) => props.theme.suomifi.spacing.xxs};
+
+    div:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
-    height: ${(props) => (props.$appProfile ? '37px' : '27px')};
   }
 
   .react-flow__handle {
@@ -191,14 +195,29 @@ export const Resource = styled.div<{ $highlight?: boolean }>`
   gap: ${(props) => props.theme.suomifi.spacing.xs};
   align-items: center;
   white-space: nowrap;
+  min-width: 360px;
+  padding: 0px 10px;
 
   &:hover {
     background: ${(props) => props.theme.suomifi.colors.depthLight2};
   }
 
   .fi-icon {
+    min-height: 17px;
+    min-width: 17px;
     height: 17px;
     width: 17px;
+  }
+
+  > div {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .react-flow__handle {
+    display: none;
   }
 
   ${(props) =>
@@ -207,47 +226,6 @@ export const Resource = styled.div<{ $highlight?: boolean }>`
     border: 3px solid #FAAF00;
     margin: 0;
     `}
-`;
-
-export const TooltipWrapper = styled.div`
-  div {
-    width: 100%;
-  }
-
-  .fi-tooltip_toggle-button {
-    display: none;
-    visibility: hidden;
-  }
-
-  .fi-tooltip_content {
-    position: absolute;
-    padding: 1px;
-    margin: 0;
-    margin-top: 5px;
-    display: flex;
-    flex-direction: column;
-    width: max-content;
-    align-items: flex-start;
-
-    .fi-tooltip_close-button {
-      display: none;
-      visibility: hidden;
-    }
-  }
-
-  .fi-button {
-    color: ${(props) => props.theme.suomifi.colors.blackBase};
-    font-weight: 400;
-    background-color: ${(props) => props.theme.suomifi.colors.whiteBase};
-    border: 0;
-
-    white-space: nowrap;
-    width: 100%;
-    padding: 0 15px;
-
-    display: flex;
-    align-items: center;
-  }
 `;
 
 export const ResourceTechnicalName = styled.span`

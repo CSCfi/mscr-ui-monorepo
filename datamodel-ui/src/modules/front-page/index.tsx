@@ -30,7 +30,11 @@ import {
   TitleDescriptionWrapper,
 } from 'yti-common-ui/title/title.styles';
 import Pagination from 'yti-common-ui/pagination';
-import { translateModelType } from '@app/common/utils/translation-helpers';
+import {
+  translateModelType,
+  translateResourceType,
+  translateResultType,
+} from '@app/common/utils/translation-helpers';
 import ModelFormModal from '../model-form/model-form-modal';
 import { useGetLanguagesQuery } from '@app/common/components/code/code.slice';
 import { useGetCountQuery } from '@app/common/components/counts/counts.slice';
@@ -40,19 +44,18 @@ export default function FrontPage() {
   const { t, i18n } = useTranslation('common');
   const { isSmall } = useBreakpoints();
   const { urlState } = useUrlState();
-  const { data: serviceCategoriesData, refetch: refetchServiceCategoriesData } =
-    useGetServiceCategoriesQuery(i18n.language);
-  const { data: organizationsData, refetch: refetchOrganizationsData } =
-    useGetOrganizationsQuery(i18n.language);
-  const { data: languagesData, refetch: refetchLanguageData } =
-    useGetLanguagesQuery();
-  const { data: counts, refetch: refetchCountsData } =
-    useGetCountQuery(initialUrlState);
-  const { data: searchModels, refetch: refetchSearchModels } =
-    useGetSearchModelsQuery({
-      urlState,
-      lang: i18n.language,
-    });
+  const { data: serviceCategoriesData } = useGetServiceCategoriesQuery(
+    i18n.language
+  );
+  const { data: organizationsData } = useGetOrganizationsQuery({
+    sortLang: i18n.language,
+  });
+  const { data: languagesData } = useGetLanguagesQuery();
+  const { data: counts } = useGetCountQuery(initialUrlState);
+  const { data: searchModels } = useGetSearchModelsQuery({
+    urlState,
+    lang: i18n.language,
+  });
   const [showModal, setShowModal] = useState(false);
 
   const organizations = useMemo(() => {
@@ -109,12 +112,22 @@ export default function FrontPage() {
     return [...promoted, ...otherLanguages];
   }, [languagesData, counts]);
 
-  const data: SearchResultData[] = useMemo(() => {
+  const [data, extra]: [
+    SearchResultData[],
+    {
+      [key: string]: {
+        type: string;
+        label: string;
+        id: string;
+        uri: string;
+      }[];
+    }
+  ] = useMemo(() => {
     if (!searchModels || !organizationsData || !serviceCategoriesData) {
-      return [];
+      return [[], {}];
     }
 
-    return searchModels.responseObjects.map((object) => {
+    const modelResults = searchModels.responseObjects.map((object) => {
       const contributors: string[] = object.contributor
         .map((c) =>
           getLanguageVersion({
@@ -158,6 +171,47 @@ export default function FrontPage() {
         type: translateModelType(object.type, t),
       };
     });
+
+    const extra: {
+      [key: string]: { type: string; label: string; id: string; uri: string }[];
+    } = {};
+    searchModels.responseObjects.forEach((object) => {
+      const resources = object.matchingResources.map((resource) => {
+        const label = getLanguageVersion({
+          data: resource.label,
+          lang: i18n.language,
+          appendLocale: true,
+        });
+
+        const modelId = resource.curie.split(':')[0];
+        const versionPart = resource.fromVersion
+          ? `?ver=${resource.fromVersion}`
+          : '';
+        const resourceType =
+          resource.resourceType == 'ATTRIBUTE'
+            ? 'attribute'
+            : resource.resourceType == 'ASSOCIATION'
+            ? 'association'
+            : 'class';
+
+        const uri = `/model/${modelId}/${resourceType}/${resource.identifier}${versionPart}`;
+
+        return {
+          type: resource.resourceType,
+          label:
+            resource.highlights['label.fi.keyword']?.[0] ||
+            resource.highlights['label.fi']?.[0] ||
+            label,
+          id: resource.id,
+          uri: uri,
+        };
+      });
+      if (resources.length > 0) {
+        extra[object.id] = resources;
+      }
+    });
+
+    return [modelResults, extra];
   }, [
     searchModels,
     serviceCategoriesData,
@@ -166,20 +220,12 @@ export default function FrontPage() {
     t,
   ]);
 
-  const refetchInfo = () => {
-    refetchOrganizationsData();
-    refetchServiceCategoriesData();
-    refetchLanguageData();
-    refetchCountsData();
-    refetchSearchModels();
-  };
-
   return (
     <main id="main">
       <Title
         title={t('data-vocabularies')}
         noBreadcrumbs={true}
-        editButton={<ModelFormModal refetch={refetchInfo} />}
+        editButton={<ModelFormModal />}
         extra={
           <TitleDescriptionWrapper $isSmall={isSmall}>
             <Description id="page-description">
@@ -248,6 +294,13 @@ export default function FrontPage() {
               count: searchModels?.totalHitCount ?? 0,
             })}
             withDefaultStatuses={inUseStatusList}
+            extra={{
+              typedExpander: {
+                translateResultType: translateResourceType,
+                translateGroupType: translateResultType,
+                deepHits: extra,
+              },
+            }}
           />
           <Pagination
             maxPages={Math.ceil((searchModels?.totalHitCount ?? 1) / 50)}

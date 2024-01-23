@@ -24,4 +24,17 @@ export interface DataModel {
   version?: string;
   versionIri?: string;
   uri: string;
+  matchingResources: {
+    id: string;
+    uri: string;
+    label: {
+      [key: string]: string;
+    };
+    resourceType: string;
+    highlights: {
+      [key: string]: string[];
+    };
+    curie: string;
+    [key: string]: unknown;
+  }[];
 }
