@@ -1,3 +1,18 @@
+body {
+  font-family: 'Source Sans Pro', 'Helvetica Neue', 'Arial', sans-serif !important;
+}
+
+.row-heading {
+  font-size: 0.9rem;
+  font-weight: bold;
+  height: 40px;
+}
+
+.row-label {
+  font-size: 16px;
+  margin-left: 11px;
+}
+
 .fi-dropdown_popover {
   margin-top: 0px !important;
 }
@@ -9,6 +24,16 @@
   margin: 100px;
   width: 20% !important;
 }
+
+.node-mappings {
+  .fi-label {
+    display: none;
+  }
+  .row {
+    line-height: 2.2rem;
+  }
+}
+
 
 /* EDIT MAPPING MODAL */
 .edit-mapping-modal {
@@ -273,6 +298,10 @@
 
   .bg-light-blue {
     background: #d5e4f6;
+  }
+
+  .bg-lightest-blue {
+    background: #EAF2FA;
   }
 
   .bg-white {

@@ -56,33 +56,10 @@ import {useGetFrontendSchemaQuery} from "@app/common/components/schema/schema.sl
 import {useGetCrosswalkMappingFunctionsQuery} from "@app/common/components/crosswalk-functions/crosswalk-functions.slice";
 import {usePostSchemaFileMutation} from "@app/common/components/import/import.slice";
 import LoginModalView from "@app/common/components/login-modal";
+import FixedButtonFooter, {FooterTypes} from "@app/common/components/fixed-button-footer";
+import {activeSlice} from "@app/common/components/active/active.slice";
 
 export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) {
-
-    interface simpleNode {
-        name: string | undefined;
-        id: string;
-    }
-
-    const { data: mappingFunctions, isLoading: mappingFunctionsIsLoading } =
-      useGetCrosswalkMappingFunctionsQuery('');
-
-    const { data: mappingFilters, isLoading: mappingFiltersIsLoading } =
-      useGetCrosswalkMappingFunctionsQuery('FILTERS');
-
-    const {
-        data: getCrosswalkData,
-        isLoading: getCrosswalkDataIsLoading,
-        isSuccess: getCrosswalkDataIsSuccess,
-        isError: getCrosswalkDataIsError,
-        error: getCrosswalkDataError
-    } =
-      useGetCrosswalkQuery(crosswalkId);
-
-    const [patchCrosswalk,crosswalkPatchResponse] = usePatchCrosswalkMutation();
-    const [putMapping, putMappingResponse] = usePutMappingMutation();
-    const [deleteMapping, deleteMappingResponse] = useDeleteMappingMutation();
-    const [patchMapping, patchMappingResponse] = usePatchMappingMutation();
 
     const emptyTreeSelectionOld: RenderTreeOld = {
         idNumeric: 0,
@@ -156,18 +133,6 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
         children: '',
     }];
 
-    const fromTree = (nodes: any) => (
-      <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name} className='linked-tree-item'>
-          {Array.isArray(nodes.children)
-            ? nodes.children.map((node: any) => fromTree(node))
-            : null}
-      </TreeItem>
-    );
-
-    const emptyTreeTest = () => (
-      <TreeItem key="0" nodeId="0" label="test"></TreeItem>
-    );
-
     // STATE VARIABLES
     const inputData: RenderTree[] = [];
     const [isSourceDataFetched, setSourceDataFetched] = React.useState<boolean>(false);
@@ -206,7 +171,7 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
 
     const [crosswalksList, setCrosswalkList] = React.useState<string[]>([]);
 
-    const [isEditModeActive, setEditModeActive] = React.useState<boolean>(true);
+    const [isEditModeActive, setEditModeActive] = React.useState<boolean>(false);
     const [isJointPatchOperation, setJointPatchOperation] = React.useState<boolean>(true);
 
     const [crosswalkPublished, setCrosswalkPublished] = React.useState<boolean>(true);
@@ -217,16 +182,58 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
     const [lastPatchMappingPid, setLastPatchMappingPid] = React.useState<string>('');
     const [lastDeleteMappingPid, setLastDeleteMappingPid] = React.useState<string>('');
 
+    const [patchCrosswalk,crosswalkPatchResponse] = usePatchCrosswalkMutation();
+    const [putMapping, putMappingResponse] = usePutMappingMutation();
+    const [deleteMapping, deleteMappingResponse] = useDeleteMappingMutation();
+    const [patchMapping, patchMappingResponse] = usePatchMappingMutation();
+
+    interface simpleNode {
+        name: string | undefined;
+        id: string;
+    }
+
+    const { data: mappingFunctions, isLoading: mappingFunctionsIsLoading } =
+      useGetCrosswalkMappingFunctionsQuery('');
+
+    const { data: mappingFilters, isLoading: mappingFiltersIsLoading } =
+      useGetCrosswalkMappingFunctionsQuery('FILTERS');
+
+    const {
+        data: getCrosswalkData,
+        isLoading: getCrosswalkDataIsLoading,
+        isSuccess: getCrosswalkDataIsSuccess,
+        isError: getCrosswalkDataIsError,
+        error: getCrosswalkDataError,
+        refetch: refetchCrosswalkData,
+    } =
+      useGetCrosswalkQuery(crosswalkId);
+
+
+
+    const fromTree = (nodes: any) => (
+      <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name} className='linked-tree-item'>
+          {Array.isArray(nodes.children)
+            ? nodes.children.map((node: any) => fromTree(node))
+            : null}
+      </TreeItem>
+    );
+
+    const emptyTreeTest = () => (
+      <TreeItem key="0" nodeId="0" label="test"></TreeItem>
+    );
+
     if (crosswalkPatchResponse.isSuccess) {
         if (!crosswalkPublished && crosswalkPatchResponse?.originalArgs?.payload?.state === 'PUBLISHED') {
             setCrosswalkPublished(true);
             setPublishNotificationVisible(true);
             setEditModeActive(false);
-            setSelectedTab(0);
             setLastPatchCrosswalkId(crosswalkPatchResponse.requestId);
+            refetchCrosswalkData();
+            setSelectedTab(0);
         } else if(!saveNotificationVisible && (lastPatchCrosswalkId !== crosswalkPatchResponse.requestId)) {
             // Operation is regular patch without publishing (save)
             setLastPatchCrosswalkId(crosswalkPatchResponse.requestId);
+            refetchCrosswalkData();
             setSaveNotificationVisible(true);
         }
     }
@@ -395,14 +402,6 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
                 setLastPatchMappingPid(response.data.pid);
             }
         }
-    }
-
-    function saveCrosswalk() {
-        let testPayload = {
-            sourceSchema: sourceSchemaUrn,
-            targetSchema: targetSchemaUrn,
-        }
-        patchCrosswalk({ payload: testPayload, pid: crosswalkId[0] });
     }
 
     function publishCrosswalk() {
@@ -911,24 +910,33 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
         }
     };
 
-    const performConfirmModalAction = (actionName: string) => {
-        if (actionName === 'save') {
-            setSaveConfirmModalOpen(false);
-            //setEditModeActive(false);
-            saveCrosswalk();
-        } else if (actionName === 'publish') {
-            setPublishConfirmModalOpen(false);
-            publishCrosswalk();
-        } else if (actionName === 'removeMapping') {
-        } else {
-            // This is needed for modal close logic
-            setSaveConfirmModalOpen(false);
-            setPublishConfirmModalOpen(false);
+    const performCallbackFromFooter = (action: any) => {
+        if (action === 'setEditModeActive') {
+            setEditModeActive(true);
         }
-    };
+        if (action === 'setEditModeInactive') {
+            setEditModeActive(false);
+        }
+        if (action === 'publish') {
+            publishCrosswalk();
+        }
+    }
 
-    const performMetadataAndFilesAction = (action: any, event: any, crosswalkConnection: any) => {
-        if (action === 'save') {
+    const performMetadataAndFilesAction = (properties: any, action: string) => {
+        if (action === 'selectFromSourceTree') {
+            setSelectedTab(1);
+            clearTreeSearch(true);
+            selectFromTree(properties, false);
+        }
+        if (action === 'selectFromTargetTree') {
+            setSelectedTab(1);
+            clearTreeSearch(true);
+            selectFromTree(properties, true);
+        }
+        if (action === 'saveChanges') {
+            const obj = Object.assign({}, ...properties)
+            setEditModeActive(false);
+            patchCrosswalk({ payload: obj, pid: crosswalkId[0] });
         }
     };
 
@@ -986,15 +994,15 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
           <Box className='mb-3' sx={{borderBottom: 1, borderColor: 'divider'}}>
               <Tabs value={selectedTab} onChange={changeTab} aria-label="Category selection">
                   <Tab label="Metadata & files" {...a11yProps(0)} />
-                  <Tab label="Crosswalks" {...a11yProps(1)} />
+                  <Tab label="Crosswalk" {...a11yProps(1)} />
                   <Tab label="Version history" {...a11yProps(2)} />
               </Tabs>
           </Box>
 
           {selectedTab === 0 && isSourceDataFetched && isTargetDataFetched && getCrosswalkData &&
             <>
-                <MetadataAndFiles crosswalks={connectedCrosswalksNew} data={getCrosswalkData}
-                                  performMetadataAndFilesAction={performMetadataAndFilesAction}/>
+                <MetadataAndFiles crosswalkData={getCrosswalkData}
+                                  performMetadataAndFilesAction={performMetadataAndFilesAction} nodeMappings={nodeMappings} crosswalkId={crosswalkId}/>
             </>
           }
           {/*            <CustomTabPanel value={selectedTab} index={0}>
@@ -1019,7 +1027,7 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
               >
               </Notification>)}
               {/*  LEFT COLUMN */}
-              <div className={(isEditModeActive && selectedTab === 1) ? 'col-12' : 'd-none'}>
+              <div className={(selectedTab === 1) ? 'col-12' : 'd-none'}>
                   {isSourceDataFetched && isTargetDataFetched &&
                     <>
                         <div className='row gx-0'>
@@ -1089,7 +1097,7 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
 
                             {/*  MID BUTTONS */}
                             <div className='col-2 px-4 mid-buttons'>
-                                {!crosswalkPublished &&
+                                {!crosswalkPublished && isEditModeActive &&
                                   <Sbutton className='link-button' disabled={(linkingError.length > 1)}
                                            title={(linkingError.length > 1 ? linkingError : 'Link selected nodes')}
                                            onClick={() => {
@@ -1177,7 +1185,6 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
               </div>
               {/*  BOTTOM COLUMN */}
               {selectedTab === 1 && <>
-
                   <div className='col-12 px-4 mt-4'>
                       <h2>Mappings</h2>
                       <div className='joint-listing-accordion-wrap my-3'>
@@ -1189,28 +1196,8 @@ export default function CrosswalkEditor({crosswalkId}: { crosswalkId: string }) 
                           </Box>
                       </div>
                   </div>
+                  <FixedButtonFooter isEditModeActive={true} footerType={FooterTypes.CROSSWALK_EDITOR} performFooterActionCallback={performCallbackFromFooter} isPublished={crosswalkPublished}></FixedButtonFooter>
               </>}
-          </div>
-          <ConfirmModal isVisible={isSaveConfirmModalOpen} actionName={'save'} actionText={'Save'} cancelText={'Cancel'} performConfirmModalAction={performConfirmModalAction} heading={'Confirmation'} text1={'Do you want to save changes.'}/>
-          <ConfirmModal isVisible={isPublishConfirmModalOpen} actionName={'publish'} actionText={'Publish'} cancelText={'Cancel'} performConfirmModalAction={performConfirmModalAction} heading={'Confirmation'} text1={'Do you want to publish the crosswalk.'} text2={'After publishing, you cannot make changes to mappings in crosswalk.'}/>
-          <div className='fixed-footer'>
-              <div className='row'>
-                  <div className='col-10'>
-                  </div>
-                  <div className='col-2 d-flex flex-row justify-content-end'>
-                      <Sbutton hidden={isEditModeActive || (crosswalkPublished && selectedTab !== 0)} onClick={() => {
-                          setEditModeActive(true);
-                      }}>Edit</Sbutton>
-
-                      <Sbutton hidden={!isEditModeActive || crosswalkPublished} variant="secondary" onClick={() => {
-                          setPublishConfirmModalOpen(true);
-                      }}>Publish</Sbutton>
-
-                      <Sbutton hidden={!isEditModeActive || (crosswalkPublished && selectedTab !== 0)} onClick={() => {
-                          setSaveConfirmModalOpen(true);
-                      }}>Save</Sbutton>
-                  </div>
-              </div>
           </div>
       </>}
       </>
