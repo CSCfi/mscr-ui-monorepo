@@ -35,7 +35,7 @@ export default function IndexPage(props: IndexPageProps) {
           title={t('terminology-site-title')}
           description={t('terminology-search-info')}
         />
-
+        <div>{props.user}</div>
         <TerminologySearch />
       </Layout>
     </CommonContextProvider>
