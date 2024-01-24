@@ -5,7 +5,6 @@ export const TerminologyDataInitialState: NewTerminologyInfo = {
   contact: '',
   languages: [
         {
-          "en",
           uniqueItemId: "en",
           title: 'en',
           description: '',
