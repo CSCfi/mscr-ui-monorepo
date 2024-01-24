@@ -39,10 +39,13 @@ export default function InfoManual({
   const [terminologyData, setTerminologyData] = useState<NewTerminologyInfo>(
     initialData ? initialData : TerminologyDataInitialState
   );
+  /*
   const { data: languages } = useGetCodesQuery({
     registry: 'interoperabilityplatform',
     codeScheme: 'languagecodes',
   });
+  */
+  const languages = { results: []};
   const [languageList, setLanguageList] = useState<LanguageBlockType[]>([]);
 
   useEffect(() => {
@@ -84,7 +87,7 @@ export default function InfoManual({
   useEffect(() => {
     const selectedLangCodes =
       initialData?.languages.map((d) => d.uniqueItemId) ?? [];
-
+    /*
     const langResult = languages?.results.map((r) => {
       const labelText = `${
         r.prefLabel[i18n.language]
@@ -111,7 +114,16 @@ export default function InfoManual({
         };
       }
     });
-
+    */
+    const langResults = [
+{
+          labelText: 'en',
+          uniqueItemId: 'en',
+          title: 'en',
+          description: '',
+          selected: true,
+        }  
+    ];
     if (langResult) {
       const promotedOrder = ['fi', 'sv', 'en'];
       const promoted: LanguageBlockType[] = [];
