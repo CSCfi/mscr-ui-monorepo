@@ -60,7 +60,8 @@ export function createCommonGetServerSideProps<
           reduxKey: 'loginApi',
           functionKey: 'getAuthenticatedUser',
         });
-
+        console.log('create getserversideprops');
+        console.log(user)
         if (!user || user.anonymous) {
           store.dispatch(setLogin(anonymousUser));
         } else {
