@@ -12,7 +12,7 @@ export default function useUser({
   initialData?: User;
 } = {}) {
   const { data: user, mutate: mutateUser } = useSWR<User>(
-    '/api/auth/user',
+    '/vocabularies/api/auth/user',
     (url) => fetch(url).then((r) => r.json()),
     initialData === null ? {} : { fallbackData: initialData }
   );
