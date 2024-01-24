@@ -60,13 +60,13 @@ export const loginApi = createApi({
   endpoints: (builder) => ({
     getAuthenticatedUser: builder.query<User, void>({
       query: () => ({
-        url: '/user',
+        url: '/authenticated-user',
         method: 'GET',
       }),
     }),
     getAuthenticatedUserMut: builder.mutation<User, void>({
       query: () => ({
-        url: '/user',
+        url: '/authenticated-user',
         method: 'GET',
       }),
     }),
