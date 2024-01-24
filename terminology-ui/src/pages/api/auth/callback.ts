@@ -9,7 +9,7 @@ export default withIronSessionApiRoute(
 
     // user will be stored here after we verify it from authenticated-user
     let user: User | null = null;
-    console.log(user);
+    
     // collect cookies from request here, so we can re-use the shibboleth cookie
     const cookies: { [key: string]: string } = {};
 
@@ -40,7 +40,7 @@ export default withIronSessionApiRoute(
       const apiPath = new URL(apiBase).pathname;
       const fetchUrl =
         proxyUrl + apiPath + '/api/v1/frontend/authenticated-user';
-
+    console.log(fetchUrl);
       // Shibboleth configuration requires X-Forwarded-For to allow access with
       // the _shibsession cookie. Otherwise the "consistentAddress" setting will
       // invalidate the session.
@@ -70,6 +70,7 @@ export default withIronSessionApiRoute(
       });
       // should receive a proper user if correctly authenticated
       user = response.data;
+      console.log(user);
       if (user && user.anonymous) {
         console.warn(
           'User from response appears to be anonymous, login may have failed'
