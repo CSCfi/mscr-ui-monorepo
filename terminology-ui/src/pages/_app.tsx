@@ -22,6 +22,7 @@ function App({ Component, pageProps }: AppProps) {
   const dispatch = useStoreDispatch();
 
   useEffect(() => {
+    console.log(login);
     if (!login.anonymous) {
       window.localStorage.setItem('user-signed', 'true');
     } else if (login.anonymous && window.localStorage.getItem('user-signed')) {
