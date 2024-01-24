@@ -74,6 +74,7 @@ export const loginApi = createApi({
 });
 
 export function setLogin(userData: User): AppThunk {
+  console.log(userData);
   return (dispatch) => dispatch(loginSlice.actions.setLogin(userData));
 }
 
