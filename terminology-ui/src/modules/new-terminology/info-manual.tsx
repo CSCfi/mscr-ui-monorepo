@@ -115,7 +115,7 @@ export default function InfoManual({
       }
     });
     */
-    const langResults = [
+    const langResult = [
 {
           labelText: 'en',
           uniqueItemId: 'en',
