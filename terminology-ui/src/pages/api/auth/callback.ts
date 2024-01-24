@@ -9,7 +9,7 @@ export default withIronSessionApiRoute(
 
     // user will be stored here after we verify it from authenticated-user
     let user: User | null = null;
-
+    console.log(user)
     // collect cookies from request here, so we can re-use the shibboleth cookie
     const cookies: { [key: string]: string } = {};
 
