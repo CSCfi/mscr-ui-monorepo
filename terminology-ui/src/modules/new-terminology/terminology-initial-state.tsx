@@ -4,13 +4,13 @@ import { v4 } from 'uuid';
 export const TerminologyDataInitialState: NewTerminologyInfo = {
   contact: '',
   languages: [
-        {
-          labelText: 'en',
-          uniqueItemId: 'en',
-          title: 'en',
-          description: '',
-          selected: true,
-        }    
+    {
+      labelText: 'en',
+      uniqueItemId: 'en',
+      title: 'en',
+      description: '',
+      selected: true,
+    },
   ],
   infoDomains: [],
   contributors: [],

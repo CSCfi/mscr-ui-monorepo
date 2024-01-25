@@ -27,7 +27,7 @@ interface IndexPageProps extends CommonContextState {
 export default function IndexPage(props: IndexPageProps) {
   const { t } = useTranslation('common');
   console.log('index page');
-  console.log(props.user);
+  console.log(props.fakeableUsers);
   return (
     <CommonContextProvider value={props}>
       <Layout user={props.user} fakeableUsers={props.fakeableUsers}>
@@ -36,7 +36,7 @@ export default function IndexPage(props: IndexPageProps) {
           title={t('terminology-site-title')}
           description={t('terminology-search-info')}
         />
-        
+
         <TerminologySearch />
       </Layout>
     </CommonContextProvider>

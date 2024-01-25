@@ -45,7 +45,7 @@ export default function InfoManual({
     codeScheme: 'languagecodes',
   });
   */
-  const languages = { results: []};
+  const languages = { results: [] };
   const [languageList, setLanguageList] = useState<LanguageBlockType[]>([]);
 
   useEffect(() => {
@@ -116,13 +116,13 @@ export default function InfoManual({
     });
     */
     const langResult = [
-{
-          labelText: 'en',
-          uniqueItemId: 'en',
-          title: 'en',
-          description: '',
-          selected: true,
-        }  
+      {
+        labelText: 'en',
+        uniqueItemId: 'en',
+        title: 'en',
+        description: '',
+        selected: true,
+      },
     ];
     if (langResult) {
       const promotedOrder = ['fi', 'sv', 'en'];

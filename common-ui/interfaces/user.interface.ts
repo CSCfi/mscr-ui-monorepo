@@ -20,7 +20,7 @@ export interface User {
 }
 
 export const anonymousUser: User = {
-  anonymous: true,
+  anonymous: false,
   email: '',
   firstName: '',
   lastName: '',
