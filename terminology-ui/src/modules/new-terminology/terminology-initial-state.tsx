@@ -11,6 +11,13 @@ export const TerminologyDataInitialState: NewTerminologyInfo = {
       description: '',
       selected: true,
     },
+    {
+      labelText: 'fi',
+      uniqueItemId: 'fi',
+      title: 'fi',
+      description: '',
+      selected: true,
+    },
   ],
   infoDomains: [],
   contributors: [],

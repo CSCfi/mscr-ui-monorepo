@@ -17,6 +17,7 @@ import LanguageSelector, {
   LanguageBlockType,
 } from 'yti-common-ui/form/language-selector';
 import { useGetCodesQuery } from '@app/common/components/codelist/codelist.slice';
+import { LanguageBlock } from 'yti-common-ui/form/language-selector.styles';
 
 interface InfoManualProps {
   setIsValid: (valid: boolean) => void;
@@ -46,12 +47,21 @@ export default function InfoManual({
   });
   */
   const languages = { results: [] };
-  const [languageList, setLanguageList] = useState<LanguageBlockType[]>([]);
+  const [languageList] = useState<LanguageBlockType[]>([
+    {
+      labelText: 'en',
+      uniqueItemId: 'en',
+      title: '',
+      description: '',
+      selected: true,
+    },
+  ]);
 
   useEffect(() => {
     if (!terminologyData) {
       return;
     }
+    console.log('coming here');
 
     let valid = true;
 
@@ -84,68 +94,13 @@ export default function InfoManual({
     setManualData(terminologyData);
   }, [terminologyData, setIsValid, setManualData, languages]);
 
-  useEffect(() => {
-    const selectedLangCodes =
-      initialData?.languages.map((d) => d.uniqueItemId) ?? [];
-    /*
-    const langResult = languages?.results.map((r) => {
-      const labelText = `${
-        r.prefLabel[i18n.language]
-      } ${r.codeValue.toUpperCase()}`;
-
-      if (selectedLangCodes.includes(r.codeValue)) {
-        const selectedLang = initialData?.languages?.find(
-          (d) => d.uniqueItemId === r.codeValue
-        );
-        return {
-          labelText,
-          uniqueItemId: r.codeValue,
-          title: selectedLang?.title ?? '',
-          description: selectedLang?.description ?? '',
-          selected: true,
-        };
-      } else {
-        return {
-          labelText,
-          uniqueItemId: r.codeValue,
-          title: '',
-          description: '',
-          selected: false,
-        };
-      }
-    });
-    */
-    const langResult = [
-      {
-        labelText: 'en',
-        uniqueItemId: 'en',
-        title: 'en',
-        description: '',
-        selected: true,
-      },
-    ];
-    if (langResult) {
-      const promotedOrder = ['fi', 'sv', 'en'];
-      const promoted: LanguageBlockType[] = [];
-      const otherLanguages = langResult.reduce((langList, lang) => {
-        promotedOrder.includes(lang.uniqueItemId)
-          ? promoted.push(lang)
-          : langList.push(lang);
-        return langList;
-      }, [] as LanguageBlockType[]);
-
-      promoted.sort(
-        (a, b) =>
-          promotedOrder.indexOf(a.uniqueItemId) -
-          promotedOrder.indexOf(b.uniqueItemId)
-      );
-      setLanguageList([...promoted, ...otherLanguages]);
-    }
-  }, [languages, i18n, initialData]);
-
   const handleUpdate = ({ key, data }: UpdateTerminology) => {
     setTerminologyData((values) => ({ ...values, [key]: data }));
     onChange();
+  };
+
+  const setLanguageList = () => {
+    console.log(languageList);
   };
 
   return (
@@ -157,7 +112,7 @@ export default function InfoManual({
         hintText={t('information-description-languages-hint-text')}
         visualPlaceholder={t('select-information-description-languages')}
         isWide={true}
-        defaultSelectedItems={initialData?.languages}
+        defaultSelectedItems={languageList}
         setLanguages={(value) => {
           const selectedItems = value.filter((v) => v.selected);
           const selectedIds = selectedItems.map((i) => i.uniqueItemId);
@@ -179,7 +134,7 @@ export default function InfoManual({
             };
           });
 
-          setLanguageList(updatedList);
+          setLanguageList();
           handleUpdate({
             key: 'languages',
             data: selectedItems,
