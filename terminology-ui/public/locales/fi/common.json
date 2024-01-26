@@ -76,7 +76,6 @@
   "link-opens-new-window-external": "Avaa uuden ikkunan sivulle",
   "loading": "Ladataan",
   "logged-out": "Olet kirjautunut ulos palvelusta.",
-  "move-to-former": "Siirry aiempaan",
   "name": "",
   "navigate-to-homepage": "Siirry etusivulle",
   "navigated-to": "Siirrytty sivulle",
@@ -189,7 +188,6 @@
     "terminologyical-vocabulary": "Terminologinen sanasto",
     "undefined": "Sanaston tyyppiä ei ole määritetty"
   },
-  "to-terminology-tool": "Sanastot-työkaluun",
   "try-again": "Yritä uudestaan",
   "value-is-not-allowed": "\"{{value}}\" ei sallittu",
   "version": "",

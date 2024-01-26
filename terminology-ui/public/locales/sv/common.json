@@ -76,7 +76,6 @@
   "link-opens-new-window-external": "Öppnar ett nytt fönster på sidan",
   "loading": "Laddas",
   "logged-out": "Du har loggat ut från tjänsten.",
-  "move-to-former": "Gå tillbaka till den gamla versionen",
   "name": "",
   "navigate-to-homepage": "Gå till hemsidan",
   "navigated-to": "Navigerad på sidan",
@@ -189,7 +188,6 @@
     "terminologyical-vocabulary": "Terminologisk ordlista",
     "undefined": "Ordlistans typ har inte definierats"
   },
-  "to-terminology-tool": "Till Ordlistor -verktyget",
   "try-again": "Försök igen",
   "value-is-not-allowed": "\"{{value}}\" ej tillåtet",
   "version": "",

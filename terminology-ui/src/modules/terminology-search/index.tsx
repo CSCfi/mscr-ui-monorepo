@@ -193,13 +193,6 @@ export default function TerminologySearch() {
               </Description>
               <NewTerminology />
             </TitleDescriptionWrapper>
-            <Paragraph>
-              {t('move-to-former')}{' '}
-              <Link href="https://sanastot.beta.yti.cloud.dvv.fi/" passHref>
-                <SuomiFiLink href="">{t('to-terminology-tool')}</SuomiFiLink>
-              </Link>
-              .
-            </Paragraph>
           </>
         }
       />
