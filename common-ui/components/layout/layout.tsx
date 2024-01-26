@@ -87,11 +87,11 @@ export default function Layout({
 
           <FooterContainer>
             <MarginContainer $breakpoint={breakpoint}>
-              <Footer
+              {/* <Footer
                 t={t}
                 feedbackSubject={feedbackSubject}
                 versionInfo={publicRuntimeConfig?.versionInfo}
-              />
+              /> */}
             </MarginContainer>
           </FooterContainer>
         </SiteContainer>

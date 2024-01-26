@@ -85,7 +85,7 @@ export default function DesktopNavigation({
           </ClickOutsideListener>
         )}
       </NavigationItem>
-      <NavigationItem
+      {/* <NavigationItem
         id="top-navigation-site-information"
         className="top-navigation-li"
         active={router.pathname === '/site-information'}
@@ -95,7 +95,7 @@ export default function DesktopNavigation({
             {t('site-information')}
           </SuomiFiLink>
         </Link>
-      </NavigationItem>
+      </NavigationItem> */}
       {isLoggedIn && (
         <NavigationItem
           active={router.pathname === '/own-information'}

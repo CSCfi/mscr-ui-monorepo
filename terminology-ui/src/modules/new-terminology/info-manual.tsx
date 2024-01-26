@@ -61,7 +61,7 @@ export default function InfoManual({
     if (!terminologyData) {
       return;
     }
-    console.log('coming here');
+    console.log(terminologyData);
 
     let valid = true;
 
@@ -95,6 +95,8 @@ export default function InfoManual({
   }, [terminologyData, setIsValid, setManualData, languages]);
 
   const handleUpdate = ({ key, data }: UpdateTerminology) => {
+    console.log('after update' + key);
+
     setTerminologyData((values) => ({ ...values, [key]: data }));
     onChange();
   };
@@ -158,12 +160,12 @@ export default function InfoManual({
       <Paragraph marginBottomSpacing="m">
         <Text variant="bold">{t('terminology-other-information')}</Text>
       </Paragraph>
-      <OrganizationSelector
+      {/* <OrganizationSelector
         disabled={disabled}
         update={handleUpdate}
         userPosted={userPosted}
         initialData={initialData}
-      />
+      /> */}
       <TypeSelector
         disabled={disabled}
         update={handleUpdate}
@@ -209,7 +211,7 @@ export default function InfoManual({
         }}
       />
 
-      <TallerSeparator />
+      {/* <TallerSeparator /> */}
       <ContactInfo
         disabled={disabled}
         update={handleUpdate}

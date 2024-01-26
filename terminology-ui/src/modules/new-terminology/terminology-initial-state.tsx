@@ -7,20 +7,27 @@ export const TerminologyDataInitialState: NewTerminologyInfo = {
     {
       labelText: 'en',
       uniqueItemId: 'en',
-      title: 'en',
-      description: '',
-      selected: true,
-    },
-    {
-      labelText: 'fi',
-      uniqueItemId: 'fi',
-      title: 'fi',
+      title: '',
       description: '',
       selected: true,
     },
   ],
-  infoDomains: [],
-  contributors: [],
+  infoDomains: [
+    {
+      groupId: '7f4cb68f-31f6-4bf9-b699-9d72dd110c4c',
+      labelText: 'Communications',
+      name: 'Communications',
+      uniqueItemId: '',
+    },
+  ],
+  contributors: [
+    {
+      labelText: 'contributor',
+      name: 'mscr',
+      organizationId: '7d3a3c00-5a6b-489b-a3ed-63bb58c26a63',
+      uniqueItemId: '7d3a3c00-5a6b-489b-a3ed-63bb58c26a63',
+    },
+  ],
   prefix: [v4().slice(0, 8), true],
   type: 'TERMINOLOGICAL_VOCABULARY',
 };
