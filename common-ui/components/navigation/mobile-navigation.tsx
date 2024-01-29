@@ -33,21 +33,6 @@ export default function MobileNavigation({
         <MobileMenuItem>
           <Text>{t('site-services')}</Text>
         </MobileMenuItem>
-        <MobileMenuItem $inset>
-          <Link href="/">{t('terminology-title')}</Link>
-        </MobileMenuItem>
-        <MobileMenuItem $inset>
-          <Link href="/">{t('codelist-title')}</Link>
-        </MobileMenuItem>
-        <MobileMenuItem $inset>
-          <Link href="/">{t('datamodel-title')}</Link>
-        </MobileMenuItem>
-        <MobileMenuItem $inset>
-          <Link href="/">{t('comments-title')}</Link>
-        </MobileMenuItem>
-        <MobileMenuItem $active={router.pathname === '/site-information'}>
-          <Link href="/site-information">{t('site-information')}</Link>
-        </MobileMenuItem>
         {isLoggedIn && (
           <MobileMenuItem $active={router.pathname === '/own-information'}>
             <Link className="main" href="/own-information">
