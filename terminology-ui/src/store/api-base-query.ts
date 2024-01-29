@@ -9,7 +9,7 @@ export const getTerminologyApiBaseQuery = (
   axiosBaseQuery({
     baseUrl: process.env.TERMINOLOGY_API_URL
       ? `${process.env.TERMINOLOGY_API_URL}/api/v1/frontend`
-      : '/terminology-api/api/v1/frontend',
+      : '/vocabularies/terminology-api/api/v1/frontend',
 
     // prepareHeaders is used to take the JSESSIONID stored in session
     // and provide it as a cookie for API calls
@@ -103,7 +103,7 @@ export const getMessagingApiBaseQuery = (
   axiosBaseQuery({
     baseUrl: process.env.MESSAGING_API_URL
       ? `${process.env.MESSAGING_API_URL}/api/v1`
-      : '/messaging-api/api/v1',
+      : '/vocabularies/messaging-api/api/v1',
 
     // prepareHeaders is used to take the JSESSIONID stored in session
     // and provide it as a cookie for API calls
@@ -193,5 +193,5 @@ export const getCodeListApiBaseQuery = () =>
   axiosBaseQuery({
     baseUrl: process.env.CODELIST_API_URL
       ? `${process.env.CODELIST_API_URL}/api/v1`
-      : '/codelist-api/api/v1',
+      : '/vocabularies/codelist-api/api/v1',
   });
