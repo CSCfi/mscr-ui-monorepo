@@ -135,7 +135,7 @@ module.exports = (phase, { defaultConfig }) => {
           {
             source: '/terminology-api/:path*',
             destination:
-              'http://mscr-auth-proxy.mscr-test.svc/terminology-api/:path*',
+              'http://yti-terminology-api:9103/terminology-api/:path*',
           },
           {
             source: '/messaging-api/:path*',
