@@ -29,6 +29,7 @@ interface ConceptPageProps extends CommonContextState {
   conceptDescription: string;
   conceptTitle: string;
   vocabularyTitle: string;
+  vocabularyURI: string;
 }
 
 export default function ConceptPage(props: ConceptPageProps) {
@@ -51,7 +52,11 @@ export default function ConceptPage(props: ConceptPageProps) {
           path={asPath}
         />
 
-        <Concept terminologyId={terminologyId} conceptId={conceptId} />
+        <Concept
+          terminologyId={terminologyId}
+          conceptId={conceptId}
+          terminologyURI={props.vocabularyURI}
+        />
       </Layout>
     </CommonContextProvider>
   );
@@ -121,6 +126,7 @@ export const getServerSideProps = createCommonGetServerSideProps(
         conceptDescription: conceptDescription,
         conceptTitle: conceptTitle,
         vocabularyTitle: vocabularyTitle,
+        vocabularyURI: vocabularyData?.uri,
       },
     };
   }

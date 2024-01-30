@@ -47,9 +47,14 @@ import { Status } from 'yti-common-ui/search-results/result-card.styles';
 export interface ConceptProps {
   terminologyId: string;
   conceptId: string;
+  terminologyURI: string;
 }
 
-export default function Concept({ terminologyId, conceptId }: ConceptProps) {
+export default function Concept({
+  terminologyId,
+  conceptId,
+  terminologyURI,
+}: ConceptProps) {
   const { t, i18n } = useTranslation('concept');
   const { breakpoint } = useBreakpoints();
   const dispatch = useStoreDispatch();
@@ -245,7 +250,9 @@ export default function Concept({ terminologyId, conceptId }: ConceptProps) {
             <FormattedDate date={concept?.lastModifiedDate} />
             {concept?.lastModifiedBy && `, ${concept.lastModifiedBy}`}
           </BasicBlock>
-          <BasicBlock title="URI">{concept?.uri}</BasicBlock>
+          <BasicBlock title="URI">
+            {terminologyURI}@concept={concept?.id}
+          </BasicBlock>
 
           <Separator isLarge />
 

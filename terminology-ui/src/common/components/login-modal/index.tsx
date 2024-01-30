@@ -57,7 +57,7 @@ export default function LoginModalView({
 
   function login(e: MouseEvent | KeyboardEvent) {
     e.preventDefault();
-    window.location.href = `/api/auth/login?target=/${
+    window.location.href = `/api/auth/login?target=/vocabularies/${
       i18n.language ?? 'fi'
     }${encodeURIComponent(asPath)}`;
   }
