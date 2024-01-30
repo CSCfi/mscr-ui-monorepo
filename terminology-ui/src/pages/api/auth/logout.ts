@@ -19,7 +19,7 @@ export default withIronSessionApiRoute(
     ]);
 
     req.session.destroy();
-    res.redirect(target);
+    res.redirect('/vocabularies' + target);
   },
   {
     ...userCookieOptions,
