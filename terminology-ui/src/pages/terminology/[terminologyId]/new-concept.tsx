@@ -30,7 +30,7 @@ export default function NewConcept(props: NewConceptPageProps) {
     <CommonContextProvider value={props}>
       <Layout user={props.user} fakeableUsers={props.fakeableUsers}>
         <PageHead
-          baseUrl="https://sanastot.suomi.fi"
+          baseUrl=""
           title={t('new-concept-title')}
           siteTitle="Yhteentoimivuusalusta"
         />

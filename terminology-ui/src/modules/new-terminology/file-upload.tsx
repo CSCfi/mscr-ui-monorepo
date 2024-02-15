@@ -82,12 +82,12 @@ export default function FileUpload({
                   <>
                     <Paragraph>
                       {t('import-incorrect-excel-file-1.concept-import')}{' '}
-                      <ExternalLink
+                      {/*   <ExternalLink
                         href="https://wiki.dvv.fi/pages/viewpage.action?pageId=21783347"
                         labelNewWindow={t('site-open-link-new-window')}
                       >
                         {t('import-incorrect-excel-file-link')}
-                      </ExternalLink>
+                      </ExternalLink> */}
                     </Paragraph>
                     <br />
                     <Paragraph>

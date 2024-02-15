@@ -93,17 +93,7 @@ export default function ConceptImportModal({
         {!startFileUpload ? (
           <>
             <ImportDescriptionBlock>
-              <Paragraph>
-                {t('import-concepts-description-1')}{' '}
-                <ExternalLink
-                  href="https://wiki.dvv.fi/pages/viewpage.action?pageId=21783347"
-                  labelNewWindow={t('link-opens-new-window-external', {
-                    ns: 'common',
-                  })}
-                >
-                  {t('from-terminology-manual')}
-                </ExternalLink>
-              </Paragraph>
+              <Paragraph>{t('import-concepts-description-1')} </Paragraph>
               <Paragraph>{t('import-concepts-description-2')}</Paragraph>
             </ImportDescriptionBlock>
 
