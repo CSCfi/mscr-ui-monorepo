@@ -46,45 +46,6 @@ export default function DesktopNavigation({
           </SuomiFiLink>
         </Link>
       </NavigationItem>
-      <NavigationItem
-        id="top-navigation-services"
-        className="top-navigation-li"
-      >
-        <SuomiFiLink className="main" href="" onClick={handleDropdown}>
-          {t('site-tools')}
-          {open ? (
-            <IconChevronUp color={theme.suomifi.colors.highlightBase} />
-          ) : (
-            <IconChevronDown color={theme.suomifi.colors.highlightBase} />
-          )}
-        </SuomiFiLink>
-        {open && (
-          <ClickOutsideListener onClickOutside={() => setOpen(false)}>
-            <NavigationDropdownWrapper id="top-navigation-dropdown">
-              <NavigationDropdownList>
-                <NavigationDropdownItem className="top-navigation-dropdown-li">
-                  <SuomiFiLink href="/">{t('terminology-title')}</SuomiFiLink>
-                </NavigationDropdownItem>
-                <NavigationDropdownItem className="top-navigation-dropdown-li">
-                  <SuomiFiLink href="https://koodistot.suomi.fi/">
-                    {t('codelist-title')}
-                  </SuomiFiLink>
-                </NavigationDropdownItem>
-                <NavigationDropdownItem className="top-navigation-dropdown-li">
-                  <SuomiFiLink href="https://tietomallit.suomi.fi/">
-                    {t('datamodel-title')}
-                  </SuomiFiLink>
-                </NavigationDropdownItem>
-                <NavigationDropdownItem className="top-navigation-dropdown-li">
-                  <SuomiFiLink href="/crosswalk">
-                    Metadata Schema Crosswalk Registration
-                  </SuomiFiLink>
-                </NavigationDropdownItem>
-              </NavigationDropdownList>
-            </NavigationDropdownWrapper>
-          </ClickOutsideListener>
-        )}
-      </NavigationItem>
       {/* <NavigationItem
         id="top-navigation-site-information"
         className="top-navigation-li"
