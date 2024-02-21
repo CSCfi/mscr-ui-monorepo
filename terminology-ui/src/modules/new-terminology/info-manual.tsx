@@ -3,7 +3,6 @@ import { Paragraph, Text } from 'suomifi-ui-components';
 import ContactInfo from '@app/common/components/terminology-components/contact-info';
 import InformationDomainsSelector from '@app/common/components/terminology-components/information-domains-selector';
 import { TallerSeparator } from './new-terminology.styles';
-import OrganizationSelector from '@app/common/components/terminology-components/organization-selector';
 import Prefix from 'yti-common-ui/form/prefix';
 import TypeSelector from '@app/common/components/terminology-components/type-selector';
 import { NewTerminologyInfo } from '@app/common/interfaces/new-terminology-info';
@@ -16,8 +15,6 @@ import { useGetIfNamespaceInUseMutation } from '@app/common/components/vocabular
 import LanguageSelector, {
   LanguageBlockType,
 } from 'yti-common-ui/form/language-selector';
-import { useGetCodesQuery } from '@app/common/components/codelist/codelist.slice';
-import { LanguageBlock } from 'yti-common-ui/form/language-selector.styles';
 
 interface InfoManualProps {
   setIsValid: (valid: boolean) => void;
@@ -47,7 +44,7 @@ export default function InfoManual({
   });
   */
   const languages = { results: [] };
-  const [languageList] = useState<LanguageBlockType[]>([
+  const [languageList, setLanguageList] = useState<LanguageBlockType[]>([
     {
       labelText: 'en',
       uniqueItemId: 'en',
@@ -96,18 +93,12 @@ export default function InfoManual({
 
   const handleUpdate = ({ key, data }: UpdateTerminology) => {
     console.log('after update' + key);
-
     setTerminologyData((values) => ({ ...values, [key]: data }));
     onChange();
   };
 
-  const setLanguageList = () => {
-    console.log(languageList);
-  };
-
   return (
     <form>
-      {/* <TallerSeparator /> */}
       <LanguageSelector
         items={languageList}
         labelText={t('information-description-languages')}
@@ -136,7 +127,7 @@ export default function InfoManual({
             };
           });
 
-          setLanguageList();
+          setLanguageList(updatedList);
           handleUpdate({
             key: 'languages',
             data: selectedItems,
@@ -156,36 +147,13 @@ export default function InfoManual({
         noItemsText={''}
         disabled={disabled}
       />
-      <TallerSeparator />
-      <Paragraph marginBottomSpacing="m">
-        <Text variant="bold">{t('terminology-other-information')}</Text>
-      </Paragraph>
-      {/* <OrganizationSelector
+
+      {/*  <InformationDomainsSelector
         disabled={disabled}
         update={handleUpdate}
         userPosted={userPosted}
         initialData={initialData}
       /> */}
-      <TypeSelector
-        disabled={disabled}
-        update={handleUpdate}
-        defaultValue={initialData?.type}
-      />
-
-      {initialData && (
-        <StatusSelector
-          update={handleUpdate}
-          userPosted={userPosted}
-          defaultValue={initialData.status}
-        />
-      )}
-
-      <InformationDomainsSelector
-        disabled={disabled}
-        update={handleUpdate}
-        userPosted={userPosted}
-        initialData={initialData}
-      />
 
       <Prefix
         prefix={terminologyData.prefix[0]}
@@ -212,12 +180,12 @@ export default function InfoManual({
       />
 
       {/* <TallerSeparator /> */}
-      <ContactInfo
+      {/*   <ContactInfo
         disabled={disabled}
         update={handleUpdate}
         userPosted={userPosted}
         defaultValue={initialData?.contact}
-      />
+      /> */}
     </form>
   );
 }

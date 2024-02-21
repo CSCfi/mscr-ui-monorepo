@@ -15,9 +15,9 @@ export const TerminologyDataInitialState: NewTerminologyInfo = {
   infoDomains: [
     {
       groupId: '7f4cb68f-31f6-4bf9-b699-9d72dd110c4c',
-      labelText: 'Communications',
-      name: 'Communications',
-      uniqueItemId: '',
+      labelText: 'Consumer matters',
+      name: 'Consumer matters',
+      uniqueItemId: 'f98ed822-18e3-3fa0-b415-d3452c2c64a1',
     },
   ],
   contributors: [
