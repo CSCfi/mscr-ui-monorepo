@@ -15,6 +15,9 @@ import {
 } from '@mui/material';
 import router from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
+import GenericTable from "@app/common/components/generic-table";
+import * as React from "react";
+import {DownloadType} from "@app/modules/crosswalk-editor/tabs/metadata-and-files/files-component";
 
 export interface SchemaListProps {
   items: Partial<Schema>[];
@@ -31,7 +34,6 @@ export default function SchemaList({ items }: SchemaListProps) {
     items = []; // initialize empty array
     return <div>{'There is no Schemas to show'}</div>;
   }
-
   function handleClick(pid: string): void {
     // will go the schema detail page
     if (pid) {

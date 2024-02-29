@@ -1,4 +1,5 @@
 import { useTranslation } from 'next-i18next';
+import * as React from 'react';
 import { useMemo } from 'react';
 import {
   SchemaFileData,
@@ -19,6 +20,7 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
+import MetadataFilesTable from '@app/common/components/metadata-files-table';
 
 export default function MetadataAndFiles({
   schemaDetails,
@@ -30,6 +32,20 @@ export default function MetadataAndFiles({
   const { t } = useTranslation('common');
   const router = useRouter();
   const lang = router.locale ?? '';
+  let schemaFilesTableRows = [];
+
+  if (schemaFiles) {
+    schemaFilesTableRows = schemaFiles.map((item) => {
+      const test = {
+        filename: item.filename,
+        id: item.fileID,
+        format: item.contentType,
+        size: item.size,
+      };
+      return test;
+    });
+    console.log('files table', schemaFiles, schemaFilesTableRows);
+  }
 
   if (schemaDetails?.fileMetadata) {
     // console.log(schemaDetails.fileMetadata);
@@ -89,6 +105,43 @@ export default function MetadataAndFiles({
     };
   }, [schemaDetails, lang]);
 
+  function generateDownloadUrl(
+    filePid: string,
+    fileId: string,
+    fileType: DownloadType,
+  ) {
+    const BASEURL = '/datamodel-api/v2';
+    switch (fileType) {
+      case DownloadType.ORIGINAL_SCHEMA: {
+        return (
+          BASEURL + '/schema/' + filePid + '/files/' + fileId + '?download=true'
+        );
+      }
+      default: {
+        return '';
+      }
+    }
+  }
+
+  async function getData2(pid: string, fileId: string) {
+    const res = await fetch(
+      '/datamodel-api/v2/schema/' +
+        pid +
+        '/files/' +
+        fileId +
+        '/?download=true',
+    );
+    if (!res.ok) {
+      //throw new Error('Failed to fetch data');
+    }
+    return res.json();
+  }
+
+  console.log(
+    'getdata',
+    getData2('urn:IAMNOTAPID:930d8fe5-99c3-4ab7-9acb-24b63e4a040f', '41'),
+  );
+
   return (
     <>
       <Heading variant="h2">{t('metadata.metadata')}</Heading>
@@ -118,7 +171,9 @@ export default function MetadataAndFiles({
           </Grid>
 
           <Grid item xs={2}>
-            <DescriptionListTitle>{t('metadata.version-label')}</DescriptionListTitle>
+            <DescriptionListTitle>
+              {t('metadata.version-label')}
+            </DescriptionListTitle>
           </Grid>
           <Grid item xs={10}>
             <dd>{schemaDisplay.schemaVersionLabel}</dd>
@@ -132,7 +187,9 @@ export default function MetadataAndFiles({
           </Grid>
 
           <Grid item xs={2}>
-            <DescriptionListTitle>{t('metadata.modified')}</DescriptionListTitle>
+            <DescriptionListTitle>
+              {t('metadata.modified')}
+            </DescriptionListTitle>
           </Grid>
           <Grid item xs={10}>
             <dd>{schemaDisplay.schemaModified}</dd>
@@ -162,7 +219,9 @@ export default function MetadataAndFiles({
           </Grid>
 
           <Grid item xs={2}>
-            <DescriptionListTitle>{t('metadata.namespace')}</DescriptionListTitle>
+            <DescriptionListTitle>
+              {t('metadata.namespace')}
+            </DescriptionListTitle>
           </Grid>
           <Grid item xs={10}>
             <dd>{schemaDisplay.schemaNamespace}</dd>
@@ -202,6 +261,9 @@ export default function MetadataAndFiles({
           </TableBody>
         </Table>
       </TableContainer>
+      <MetadataFilesTable
+        filesRowInput={schemaFiles}
+      ></MetadataFilesTable>
     </>
   );
 }

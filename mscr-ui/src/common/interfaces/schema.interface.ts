@@ -57,3 +57,10 @@ export interface SchemaFormType {
   filedata?: any;
   state: State;
 }
+
+export interface FilesRowInput {
+  filename: string;
+  fileID: string;
+  contentType: string;
+  size: string;
+}
