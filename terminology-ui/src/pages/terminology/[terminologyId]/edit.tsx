@@ -34,9 +34,9 @@ export default function EditTerminology(props: EditTerminologyPageProps) {
     <CommonContextProvider value={props}>
       <Layout user={props.user} fakeableUsers={props.fakeableUsers}>
         <PageHead
-          baseUrl="https://sanastot.suomi.fi"
+          baseUrl="https://mscr-test.rahtiapp.fi/vocabularies"
           title={t('edit-terminology')}
-          siteTitle="Yhteentoimivuusalusta"
+          siteTitle="vocubulary Tools"
         />
 
         <EditVocabulary terminologyId={terminologyId} />

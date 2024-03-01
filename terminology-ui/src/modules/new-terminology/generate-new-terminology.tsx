@@ -38,6 +38,7 @@ export default function generateNewTerminology({
   postData.createdDate = createdDate ? createdDate : now.toISOString();
   postData.lastModifiedDate = now.toISOString();
 
+  // Not removing it now as need to check if it breaks the post
   postData.properties.contact = [
     {
       lang: '',

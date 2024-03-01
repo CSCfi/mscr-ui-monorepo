@@ -12,9 +12,9 @@ export default function Custom500() {
     <CommonContextProvider value={initialCommonContextState}>
       <ErrorLayout matomo={<Matomo />}>
         <PageHead
-          baseUrl="https://sanastot.suomi.fi"
+          baseUrl="https://mscr-test.rahtiapp.fi/vocabularies"
           title="Error"
-          siteTitle="Yhteentoimivuusalusta"
+          siteTitle="Vocubulary Tools"
           description="An error occured"
         />
 
