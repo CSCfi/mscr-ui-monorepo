@@ -10,7 +10,7 @@ describe('generate-initial-data', () => {
     const returned = generateInitialData('fi', mockTranslations, dataSmall);
 
     const expected = {
-      contact: 'yhteentoimivuus@dvv.fi',
+      contact: 'yttss@hshshs.fi',
       languages: [
         {
           description: 'kuvaus',

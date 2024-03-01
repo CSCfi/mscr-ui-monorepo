@@ -166,7 +166,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
           )}
         </BasicBlock>
 
-        {contact && (
+        {/* {contact && (
           <BasicBlock title={t('contact')}>
             <ExternalLink
               href={`mailto:${
@@ -181,7 +181,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
               {contact}
             </ExternalLink>
           </BasicBlock>
-        )}
+        )} */}
 
         {HasPermission({
           actions: 'EDIT_TERMINOLOGY',

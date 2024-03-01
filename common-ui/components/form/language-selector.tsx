@@ -94,7 +94,7 @@ export default function LanguageSelector(
 
   return (
     <>
-      <MultiSelect
+      {/* <MultiSelect
         items={props.items}
         chipListVisible={true}
         labelText={props.labelText}
@@ -116,7 +116,7 @@ export default function LanguageSelector(
         status={props.status}
         disabled={props.disabled}
         id="language-selector"
-      />
+      /> */}
 
       {selectedItems.map((item, idx) => (
         <LanguageBlock
@@ -125,9 +125,9 @@ export default function LanguageSelector(
           key={`${item.uniqueItemId}-${idx}`}
           id={`language-block-${item.uniqueItemId}`}
         >
-          <Paragraph marginBottomSpacing="m">
+          {/*  <Paragraph marginBottomSpacing="m">
             <Text variant="bold">{item.labelText}</Text>
-          </Paragraph>
+          </Paragraph> */}
           <NameInput
             labelText={props.translations.textInput}
             className={'name-input'}

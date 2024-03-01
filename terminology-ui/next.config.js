@@ -13,7 +13,6 @@ module.exports = (phase, { defaultConfig }) => {
   }
 
   let config = {
-    basePath: '/vocabularies',
     experimental: {
       scrollRestoration: true,
     },

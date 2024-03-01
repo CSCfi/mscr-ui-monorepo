@@ -256,7 +256,7 @@ export default function Concept({
 
           <Separator isLarge />
 
-          <BasicBlock
+          {/* <BasicBlock
             extra={
               <ExternalLink
                 href={`mailto:${
@@ -273,7 +273,7 @@ export default function Concept({
             }
           >
             {t('feedback-label')}
-          </BasicBlock>
+          </BasicBlock> */}
         </MainContent>
         <ConceptSidebar concept={concept} />
       </PageContent>

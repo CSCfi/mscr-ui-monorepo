@@ -13,9 +13,9 @@ export default function Custom404() {
     <CommonContextProvider value={initialCommonContextState}>
       <ErrorLayout matomo={<Matomo />}>
         <PageHead
-          baseUrl="https://sanastot.suomi.fi"
+          baseUrl="https://mscr-test.rahtiapp.fi/vocabularies"
           title="Error"
-          siteTitle="Yhteentoimivuusalusta"
+          siteTitle="Vocubulary Tool"
           description="An error occured"
         />
 

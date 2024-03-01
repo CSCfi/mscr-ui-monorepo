@@ -127,18 +127,18 @@ export default function Prefix({ update, userPosted, disabled }: PrefixProps) {
           disabled={disabled}
         />
       )}
-      <Paragraph>
+      {/*  <Paragraph>
         <Text variant="bold" smallScreen>
           {t('url-preview')}
         </Text>
-      </Paragraph>
-      <Paragraph>
+      </Paragraph> */}
+      {/*   <Paragraph>
         <Text smallScreen>
           {URI}
           {prefix}
           {prefix && '/'}
         </Text>
-      </Paragraph>
+      </Paragraph> */}
     </BlankFieldset>
   );
 }
