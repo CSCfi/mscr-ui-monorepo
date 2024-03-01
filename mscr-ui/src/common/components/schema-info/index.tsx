@@ -5,19 +5,21 @@ import { SearchInput } from 'suomifi-ui-components';
 import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
-import SchemaTree from '@app/modules/crosswalk-editor/tabs/edit-crosswalk/schema-tree';
-import NodeInfo from '@app/modules/crosswalk-editor/tabs/crosswalk-info/node-info';
+import SchemaTree from '@app/common/components/schema-info/schema-tree';
+import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
 import { cloneDeep } from 'lodash';
+import {generateTreeFromJson} from "@app/common/components/schema-info/schema-tree/schema-tree-renderer";
+import {useGetFrontendSchemaQuery} from "@app/common/components/schema/schema.slice";
 
 const inputData: RenderTree[] = [];
 
 export default function SchemaInfo(props: {
-  treeDataInput: RenderTree[];
-  updateTreeNodeSelectionsOutput: any;
-  isSourceTree: boolean;
-  treeSelection: string[];
+  updateTreeNodeSelectionsOutput?: any;
+  isSourceTree?: boolean;
+  treeSelection?: string[];
   caption: string;
+  schemaUrn: string;
 }) {
   const emptyTreeSelection: RenderTree = {
     elementPath: '',
@@ -28,6 +30,14 @@ export default function SchemaInfo(props: {
     properties: undefined,
     children: [],
   };
+
+  const {
+    data: getSchemaData,
+    isLoading: getSchemaDataIsLoading,
+    isSuccess: getSchemaDataIsSuccess,
+    isError: getSchemaDataIsError,
+    error: getSchemaDataError,
+  } = useGetFrontendSchemaQuery(props.schemaUrn);
 
   const [treeDataOriginal, setTreeDataOriginal] =
     React.useState<RenderTree[]>(inputData);
@@ -45,6 +55,21 @@ export default function SchemaInfo(props: {
   const [isTreeDataFetched, setTreeDataFetched] =
     React.useState<boolean>(false);
 
+  useEffect(() => {
+    if (getSchemaData?.content) {
+      generateTreeFromJson(getSchemaData).then((res) => {
+        if (res) {
+          // Expand tree when data is loaded
+          setExpanded();
+          setTreeDataOriginal(cloneDeep(res));
+          setTreeData(res);
+          setTreeDataFetched(true);
+          //refetchOriginalSourceSchemaData();
+        }
+      });
+    }
+  }, [getSchemaDataIsSuccess, getSchemaData]);
+
   // Expand tree when data is loaded
   useEffect(() => {
     setExpanded();
@@ -55,13 +80,6 @@ export default function SchemaInfo(props: {
     expandAndSelectNodes(props.treeSelection);
   }, [props.treeSelection]);
 
-  // Expand tree when data is loaded
-  useEffect(() => {
-    setExpanded();
-    setTreeDataOriginal(cloneDeep(props.treeDataInput));
-    setTreeData(props.treeDataInput);
-    setTreeDataFetched(true);
-  }, [props.treeDataInput]);
 
   useEffect(() => {
     // Update selections for node info and parent component for mappings

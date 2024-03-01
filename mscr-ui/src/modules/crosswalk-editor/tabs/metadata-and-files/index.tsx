@@ -34,8 +34,6 @@ export enum ConfirmModalTexts {
 
 export default function MetadataAndFiles(props: {
   crosswalkData: any;
-  sourceSchemaData: any;
-  targetSchemaData: any;
   performMetadataAndFilesAction: any;
   nodeMappings: NodeMapping[];
   crosswalkId: string;

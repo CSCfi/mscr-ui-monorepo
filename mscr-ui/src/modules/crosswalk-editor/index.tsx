@@ -14,7 +14,7 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import JointListingAccordion from '@app/modules/crosswalk-editor/joint-listing-accordion';
 import MetadataAndFiles from '@app/modules/crosswalk-editor/tabs/metadata-and-files';
-import { generateTreeFromJson } from '../crosswalk-editor/schema-mockup';
+import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
 
 import {
   CrosswalkConnectionNew,
@@ -36,7 +36,7 @@ import { useGetCrosswalkMappingFunctionsQuery } from '@app/common/components/cro
 import { createTheme, ThemeProvider } from '@mui/material';
 import HasPermission from '@app/common/utils/has-permission';
 import VersionHistory from '@app/common/components/version-history';
-import SchemaInfo from '@app/modules/crosswalk-editor/tabs/edit-crosswalk/schema-info';
+import SchemaInfo from '@app/common/components/schema-info';
 
 export default function CrosswalkEditor({
   crosswalkId,
@@ -80,24 +80,8 @@ export default function CrosswalkEditor({
   };
 
   // STATE VARIABLES
-  const inputData: RenderTree[] = [];
-  const [isSourceDataFetched, setSourceDataFetched] =
-    React.useState<boolean>(false);
-  const [isTargetDataFetched, setTargetDataFetched] =
-    React.useState<boolean>(false);
-
   const [sourceSchemaUrn, setSourceSchemaUrn] = React.useState<string>('');
   const [targetSchemaUrn, setTargetSchemaUrn] = React.useState<string>('');
-
-  const [sourceTreeDataOriginal, setSourceTreeDataOriginal] =
-    React.useState<RenderTree[]>(inputData);
-  const [sourceTreeData, setSourceTreeData] =
-    React.useState<RenderTree[]>(inputData);
-
-  const [targetTreeDataOriginal, setTargetTreeDataOriginal] =
-    React.useState<RenderTree[]>(inputData);
-  const [targetTreeData, setTargetTreeData] =
-    React.useState<RenderTree[]>(inputData);
 
   const [selectedSourceNodes, setSelectedSourceNodes] = React.useState<
     RenderTree[]
@@ -230,53 +214,12 @@ export default function CrosswalkEditor({
   }, [getCrosswalkData]);
 
   const {
-    data: getSourceSchemaData,
-    isLoading: getSourceSchemaDataIsLoading,
-    isSuccess: getSourceSchemaDataIsSuccess,
-    isError: getSourceSchemaDataIsError,
-    error: getSourceSchemaDataError,
-  } = useGetFrontendSchemaQuery(sourceSchemaUrn);
-
-  const {
-    data: getTargetSchemaData,
-    isLoading: getTargetSchemaDataIsLoading,
-    isSuccess: getTargetSchemaDataIsSuccess,
-    isError: getTargetSchemaDataIsError,
-    error: getTargetSchemaDataError,
-  } = useGetFrontendSchemaQuery(targetSchemaUrn);
-
-  const {
     data: mappingsFromBackend,
     isLoading: getMappingsDataIsLoading,
     isSuccess: getMappingsDataIsSuccess,
     isError: getMappingsIsError,
     error: getMappingsError,
   } = useGetMappingsQuery(crosswalkId[0]);
-
-  useEffect(() => {
-    if (getSourceSchemaData?.content) {
-      generateTreeFromJson(getSourceSchemaData).then((res) => {
-        if (res) {
-          setSourceTreeDataOriginal(cloneDeep(res));
-          setSourceTreeData(res);
-          setSourceDataFetched(true);
-          //refetchOriginalSourceSchemaData();
-        }
-      });
-    }
-  }, [getSourceSchemaDataIsSuccess, getSourceSchemaData]);
-
-  useEffect(() => {
-    if (getTargetSchemaData?.content) {
-      generateTreeFromJson(getTargetSchemaData).then((res) => {
-        if (res) {
-          setTargetTreeDataOriginal(cloneDeep(res));
-          setTargetTreeData(res);
-          setTargetDataFetched(true);
-        }
-      });
-    }
-  }, [getTargetSchemaDataIsSuccess, getTargetSchemaData]);
 
   useEffect(() => {
     if (mappingsFromBackend) {
@@ -372,67 +315,16 @@ export default function CrosswalkEditor({
       setJointPatchOperation(false);
       setJointToBeEdited(jointsToBeAdded[jointsToBeAdded.length - 1]);
     } else {
-      const sourceNodeIds: string[] = [];
-      if (mappingToBeEdited) {
-        mappingToBeEdited.source.forEach((item) => {
-          sourceNodeIds.push(item.id);
-        });
-      }
 
-      const targetNodeIds: string[] = [];
-      if (mappingToBeEdited) {
-        mappingToBeEdited.target.forEach((item) => {
-          targetNodeIds.push(item.id);
-        });
-      }
+      // TODO: fix finding CrosswalkConnectionNew from mappings to be edited
 
-      const sourceNodes = getTreeNodesByIds(sourceNodeIds, true);
-      const targetNodes = getTreeNodesByIds(targetNodeIds, false);
-
-      const jointsToBeEdited: CrosswalkConnectionNew[] = [];
-      sourceNodes.forEach((sourceNode) => {
-        const joint: CrosswalkConnectionNew = {
-          source: sourceNode,
-          target: targetNodes[0],
-          id: mappingToBeEdited?.pid ? mappingToBeEdited.pid : '',
-          description: '',
-          isSelected: true,
-          isDraft: true,
-          sourceJsonPath: undefined,
-          targetJsonPath: undefined,
-          sourcePredicate: undefined,
-          sourceProcessing: undefined,
-          targetPredicate: undefined,
-          targetProcessing: undefined,
-        };
-        jointsToBeEdited.push(joint);
-      });
-      setJointPatchOperation(true);
-      setJointToBeEdited(jointsToBeEdited[jointsToBeEdited.length - 1]);
+      //setJointPatchOperation(true);
+      //setJointToBeEdited(...);
     }
   }
 
   function removeJoint(jointPid: any) {
     deleteMapping(jointPid);
-  }
-
-  // Used to generate data for mappings modal
-  function getTreeNodesByIds(nodeIds: string[], isSourceTree: boolean) {
-    if (isSourceTree) {
-      const foundSourceNodes: RenderTree[] = [];
-      return findNodesFromTree(
-        sourceTreeDataOriginal,
-        nodeIds,
-        foundSourceNodes,
-      );
-    } else {
-      const foundTargetNodes: RenderTree[] = [];
-      return findNodesFromTree(
-        targetTreeDataOriginal,
-        nodeIds,
-        foundTargetNodes,
-      );
-    }
   }
 
   // Used to tree filtering
@@ -451,6 +343,14 @@ export default function CrosswalkEditor({
       }
     });
     return results;
+  }
+
+  // Used to tree filtering
+  function findNodesFromMappings(
+    itemsToFind: string[],
+  )
+  {
+    console.log('nodeMappings - items to find', nodeMappings, itemsToFind);
   }
 
   // Called from accordion
@@ -608,14 +508,10 @@ export default function CrosswalkEditor({
             </Box>
 
             {selectedTab === 0 &&
-              isSourceDataFetched &&
-              isTargetDataFetched &&
               getCrosswalkData && (
               <>
                 <MetadataAndFiles
                   crosswalkData={getCrosswalkData}
-                  sourceSchemaData={getSourceSchemaData}
-                  targetSchemaData={getTargetSchemaData}
                   performMetadataAndFilesAction={
                     performMetadataAndFilesAction
                   }
@@ -678,20 +574,20 @@ export default function CrosswalkEditor({
 
               {/*  LEFT COLUMN */}
               <div className={selectedTab === 1 ? 'col-12' : 'd-none'}>
-                {isSourceDataFetched && isTargetDataFetched && (
+
                   <>
                     <div className="row gx-0"></div>
                     <div className="row gx-0">
                       {/*  SOURCE TREE */}
                       <div className="col-5 ps-4">
                         <SchemaInfo
-                          treeDataInput={sourceTreeData}
                           updateTreeNodeSelectionsOutput={
                             performCallbackFromSchemaInfo
                           }
                           isSourceTree={true}
                           treeSelection={sourceTreeSelection}
                           caption={'Filter from source schema'}
+                          schemaUrn={sourceSchemaUrn}
                         ></SchemaInfo>
                       </div>
 
@@ -726,18 +622,18 @@ export default function CrosswalkEditor({
                       {/*  TARGET TREE */}
                       <div className="col-5 pe-4">
                         <SchemaInfo
-                          treeDataInput={targetTreeData}
                           updateTreeNodeSelectionsOutput={
                             performCallbackFromSchemaInfo
                           }
                           isSourceTree={false}
                           treeSelection={targetTreeSelection}
                           caption={'Filter from target schema'}
+                          schemaUrn={targetSchemaUrn}
                         ></SchemaInfo>
                       </div>
                     </div>
                   </>
-                )}
+
                 {jointToBeEdited && (
                   <>
                     <NodeMappingsModal
