@@ -15,6 +15,7 @@ import FileDropArea from 'yti-common-ui/file-drop-area';
 import { createErrorMessage, ExcelError } from '../import/excel.error';
 import {
   usePostImportNTRFMutation,
+  usePostImportSimpleSKOSMutation,
   usePostSimpleImportExcelMutation,
 } from '../import/import.slice';
 import { useBreakpoints } from 'yti-common-ui/media-query';
@@ -43,10 +44,12 @@ export default function ConceptImportModal({
   const [userPosted, setUserPosted] = useState(false);
   const [startFileUpload, setStartFileUpload] = useState(false);
   const [error, setError] = useState<ExcelError | undefined>(undefined);
-  const [fileType, setFileType] = useState<'xlsx' | 'xml' | null>();
+  const [fileType, setFileType] = useState<'xlsx' | 'xml' | 'ttl' | null>();
   const [postSimpleImportExcel, simpleImportExcel] =
     usePostSimpleImportExcelMutation();
   const [postImportNTRF, importNTRF] = usePostImportNTRFMutation();
+  const [postImportSimpleSKOS, importSimpleSKOS] =
+    usePostImportSimpleSKOSMutation();
 
   const handleClose = useCallback(() => {
     setStartFileUpload(false);
@@ -69,6 +72,9 @@ export default function ConceptImportModal({
       } else if (fileData.name.includes('.xml')) {
         setFileType('xml');
         postImportNTRF({ terminologyId: terminologyId, file: formData });
+      } else if (fileData.name.includes('.ttl')) {
+        setFileType('ttl');
+        postImportSimpleSKOS({ terminologyId: terminologyId, file: formData });
       }
     }
   };
@@ -100,17 +106,17 @@ export default function ConceptImportModal({
             <FileDropArea
               setFileData={setFileData}
               setIsValid={setIsValid}
-              validFileTypes={['xlsx', 'xml']}
+              validFileTypes={['xlsx', 'xml', 'ttl']}
               translateFileUploadError={translateFileUploadError}
             />
           </>
         ) : (
           <FileUpload
             importResponseData={
-              fileType === 'xlsx' ? simpleImportExcel.data : importNTRF.data
+              fileType === 'xml' ? importNTRF.data : simpleImportExcel.data
             }
             importResponseStatus={
-              fileType === 'xlsx' ? simpleImportExcel.status : importNTRF.status
+              fileType === 'xml' ? importNTRF.status : simpleImportExcel.status
             }
             handlePost={handlePost}
             handleClose={handleClose}

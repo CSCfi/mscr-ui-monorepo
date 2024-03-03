@@ -53,6 +53,16 @@ export const importApi = createApi({
         data: file,
       }),
     }),
+    postImportSimpleSKOS: builder.mutation<
+      ImportResponse,
+      { terminologyId: string; file: FormData }
+    >({
+      query: (props) => ({
+        url: `/import/simpleSKOS/${props.terminologyId}`,
+        method: 'POST',
+        data: props.file,
+      }),
+    }),
   }),
 });
 
@@ -62,4 +72,5 @@ export const {
   usePostSimpleImportExcelMutation,
   usePostImportNTRFMutation,
   usePostImportJsonMutation,
+  usePostImportSimpleSKOSMutation,
 } = importApi;
