@@ -55,10 +55,14 @@ export default function ConceptImportModal({
     setStartFileUpload(false);
     setVisible(false);
     setUserPosted(false);
-    if (simpleImportExcel.isSuccess || importNTRF.isSuccess) {
+    if (
+      simpleImportExcel.isSuccess ||
+      importNTRF.isSuccess ||
+      importSimpleSKOS.isSuccess
+    ) {
       refetch();
     }
-  }, [setVisible, refetch, simpleImportExcel, importNTRF]);
+  }, [setVisible, refetch, simpleImportExcel, importNTRF, importSimpleSKOS]);
 
   const handlePost = () => {
     if (fileData) {
@@ -84,6 +88,31 @@ export default function ConceptImportModal({
       setError(createErrorMessage(simpleImportExcel.error));
     }
   }, [simpleImportExcel]);
+
+  const getImportResponseData = () => {
+    if (fileType === 'xml') {
+      return importNTRF.data;
+    }
+    if (fileType === 'xlsx') {
+      return simpleImportExcel.data;
+    }
+    if (fileType === 'ttl') {
+      return importSimpleSKOS.data;
+    }
+  };
+
+  const getImportResponseStatus = () => {
+    if (fileType === 'xml') {
+      return importNTRF.status;
+    }
+    if (fileType === 'xlsx') {
+      return simpleImportExcel.status;
+    }
+    if (fileType === 'ttl') {
+      return importSimpleSKOS.status;
+    }
+    return 'SUCCESS';
+  };
 
   return (
     <Modal
@@ -112,12 +141,8 @@ export default function ConceptImportModal({
           </>
         ) : (
           <FileUpload
-            importResponseData={
-              fileType === 'xml' ? importNTRF.data : simpleImportExcel.data
-            }
-            importResponseStatus={
-              fileType === 'xml' ? importNTRF.status : simpleImportExcel.status
-            }
+            importResponseData={getImportResponseData()}
+            importResponseStatus={getImportResponseStatus()}
             handlePost={handlePost}
             handleClose={handleClose}
             errorInfo={error}
