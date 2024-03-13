@@ -10,6 +10,17 @@ export enum Format {
   Mscr = 'MSCR',
 }
 
+export enum FileExtensions {
+  Jsonschema = 'json',
+  Csv = 'csv',
+  Skosrdf = 'ttl',
+  Pdf = 'pdf',
+  Xml = 'xml',
+  Xsd = 'xsd',
+}
+
+['json', 'csv', 'pdf', 'ttl', 'xml', 'xsd']
+
 export const formatsAvailableForCrosswalkCreation: Format[] = [
   Format.Jsonschema,
   Format.Csv,
@@ -20,4 +31,8 @@ export const formatsAvailableForCrosswalkCreation: Format[] = [
 
 export const formatsAvailableForCrosswalkRegistration: Format[] = [
   Format.Xslt, Format.Csv, Format.Pdf,
+];
+
+export const fileExtensionsAvailableForSchemaRegistration: FileExtensions[] = [
+  FileExtensions.Jsonschema, FileExtensions.Csv, FileExtensions.Skosrdf, FileExtensions.Pdf, FileExtensions.Xml, FileExtensions.Xsd
 ];

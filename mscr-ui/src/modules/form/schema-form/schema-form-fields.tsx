@@ -34,7 +34,7 @@ SchemaFormProps) {
       {renderSchemaFormat()}
       {renderLanguages()}
       {/*!editMode && renderContributors()*/}
-      {renderStaus()}
+      {renderStatus()}
       {/*editMode && renderContributors()*/}
     </ModelFormContainer>
   );
@@ -105,7 +105,7 @@ SchemaFormProps) {
     );
   }
 
-  function renderStaus() {
+  function renderStatus() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <Dropdown
