@@ -1,6 +1,7 @@
-import { SchemaFormType } from '@app/common/interfaces/schema.interface';
-import { useTranslation } from 'next-i18next';
+import {SchemaFormType} from '@app/common/interfaces/schema.interface';
+import {useTranslation} from 'next-i18next';
 import {Format} from "@app/common/interfaces/format.interface";
+import {State} from "@app/common/interfaces/state.interface";
 
 // Here we need initial schema form data defined in SchemaFormType
 export function useInitialSchemaForm(): SchemaFormType {
@@ -33,6 +34,6 @@ export function useInitialSchemaForm(): SchemaFormType {
       },
     ],
     organizations: [],
-    state: 'DRAFT',
+    state: State.Draft,
   };
 }
