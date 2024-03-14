@@ -6,16 +6,18 @@ import {
   IconRemove,
   InlineAlert,
   Paragraph,
-  Text,
+  Text, TextInput,
 } from 'suomifi-ui-components';
 import {
-  FileBlock,
+  FileBlock, FileBlockWrapper,
   FileInfo,
   FileInfoBlock,
   FileInfoStaticIcon,
   FileRemoveButton,
-  FileWrapper,
+  FileWrapper, UploadCircleIcon, WideTextInput,
 } from './file-drop-area.styles';
+import * as React from 'react';
+import {CircleIcon, UploadIcon} from "mscr-ui/src/common/components/shared-icons";
 
 interface FileDropAreaProps {
   setIsValid: (valid: boolean) => void;
@@ -24,8 +26,10 @@ interface FileDropAreaProps {
   translateFileUploadError: (
     error: 'none' | 'upload-error' | 'incorrect-file-type',
     fileTypes: string[],
-    t: TFunction
+    t: TFunction,
   ) => string | undefined;
+  setFileUri?: (uri: string | null) => void;
+  isSchemaUpload?: boolean;
 }
 
 export default function FileDropArea({
@@ -33,6 +37,8 @@ export default function FileDropArea({
   setFileData,
   validFileTypes,
   translateFileUploadError,
+  setFileUri,
+  isSchemaUpload,
 }: FileDropAreaProps) {
   const { t } = useTranslation('admin');
   const input = useRef<HTMLInputElement>(null);
@@ -40,6 +46,7 @@ export default function FileDropArea({
   const [alert, setAlert] = useState<
     'none' | 'upload-error' | 'incorrect-file-type'
   >('none');
+  const [fileUriField, setFileUriField] = useState<string>('');
 
   useEffect(() => {
     if (file) {
@@ -49,6 +56,13 @@ export default function FileDropArea({
       setIsValid(false);
     }
   }, [file, setIsValid, setFileData]);
+
+  useEffect(() => {
+    if (setFileUri && fileUriField.length > 0) {
+      console.log('SET FILE URI');
+      setFileUri(fileUriField);
+    }
+  }, [fileUriField]);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -115,75 +129,101 @@ export default function FileDropArea({
       onDrop={(e) => handleDrop(e)}
       onDragOver={(e) => e.preventDefault()}
     >
-      <FileBlock padding="m" id="file-drop-block">
-        <Paragraph marginBottomSpacing="xxs">
-          <Text variant="bold" smallScreen>
-            {t('add-or-drag-a-new-file-here')}
-          </Text>
-        </Paragraph>
-        <Paragraph marginBottomSpacing="l">
-          <Text smallScreen>
-            {t('allowed-file-formats')} {validFileTypes.join(', ')}
-          </Text>
-        </Paragraph>
-        {file === null ? (
+      <Text>{t('register-schema-file-required')}</Text>
+      <Text>{t('register-schema-supported-file-formats') + validFileTypes.slice(0, validFileTypes.length - 1).join(', ').toUpperCase() + ' ' + t('and') + (' ') + validFileTypes.slice(validFileTypes.length - 1).toString().toUpperCase() + ('.')}</Text>
+      <div>
+      <FileBlockWrapper>
+        {isSchemaUpload && (
           <>
-            <input
-              type="file"
-              ref={input}
-              accept={validFileTypes.map((type) => `.${type}`).join(',')}
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                handleUpload(e);
-              }}
-            />
-            <Button
-              icon={<IconPlus />}
-              variant="secondary"
-              onClick={() => {
-                input.current && input.current.click();
-              }}
-              id="add-file-button"
-            >
-              {t('add-file')}
-            </Button>
+            <Paragraph marginBottomSpacing="xxs">
+              <WideTextInput
+                labelText={t('register-schema-file-uri-reference')}
+                onChange={(value) => setFileUriField(value?.toString() ?? '')}
+                value={fileUriField}
+              />
+            </Paragraph>
+            <Text smallScreen>
+              {'OR'}
+            </Text>
           </>
-        ) : (
-          <FileInfoBlock>
-            <FileInfo>
-              <FileInfoStaticIcon />
-              <div>
-                <Paragraph>
-                  <Text color={'highlightBase'} variant={'bold'}>
-                    {file.name}
-                  </Text>
-                </Paragraph>
-                <Paragraph>
-                  <Text color={'depthDark1'}>
-                    {(file.size / 1000).toFixed(1)} KB
-                  </Text>
-                </Paragraph>
-                <Paragraph>
-                  <Text variant={'bold'}>{t('file-added')}</Text>
-                </Paragraph>
-              </div>
-            </FileInfo>
-            <FileRemoveButton
-              variant="secondaryNoBorder"
-              icon={<IconRemove />}
-              onClick={() => setFile(null)}
-              id="remove-file-button"
-            >
-              {t('remove')}
-            </FileRemoveButton>
-          </FileInfoBlock>
         )}
-      </FileBlock>
+        <Paragraph marginBottomSpacing="l"></Paragraph>
+
+        <FileBlock padding="m" id="file-drop-block">
+          <Paragraph marginBottomSpacing="l">
+          </Paragraph>
+          {file === null ? (
+            <>
+              <CircleIcon></CircleIcon>
+              <UploadIcon></UploadIcon>
+              <Paragraph marginBottomSpacing="xxs">
+                <Text variant="bold" smallScreen>
+                  {t('drag-files-to-upload')}
+                </Text>
+              </Paragraph>
+              <input
+                type="file"
+                ref={input}
+                accept={validFileTypes.map((type) => `.${type}`).join(',')}
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  handleUpload(e);
+                }}
+              />
+              <Text smallScreen>
+                {'OR'}
+              </Text>
+
+              <Button
+                className={'mt-2'}
+                variant="secondary"
+                onClick={() => {
+                  input.current && input.current.click();
+                }}
+                id="add-file-button"
+              >
+                {'Browse files'}
+              </Button>
+            </>
+          ) : (
+            <FileInfoBlock>
+              <FileInfo>
+                <FileInfoStaticIcon />
+                <div>
+                  <Paragraph>
+                    <Text color={'highlightBase'} variant={'bold'}>
+                      {file.name}
+                    </Text>
+                  </Paragraph>
+                  <Paragraph>
+                    <Text color={'depthDark1'}>
+                      {(file.size / 1000).toFixed(1)} KB
+                    </Text>
+                  </Paragraph>
+                  <Paragraph>
+                    <Text variant={'bold'}>{t('file-added')}</Text>
+                  </Paragraph>
+                </div>
+              </FileInfo>
+              <FileRemoveButton
+                variant="secondaryNoBorder"
+                icon={<IconRemove />}
+                onClick={() => setFile(null)}
+                id="remove-file-button"
+              >
+                {t('remove')}
+              </FileRemoveButton>
+            </FileInfoBlock>
+          )}
+        </FileBlock>
+      </FileBlockWrapper>
+      </div>
       {alert !== 'none' && (
         <InlineAlert status="error">
           {translateFileUploadError(alert, validFileTypes, t)}
         </InlineAlert>
       )}
     </FileWrapper>
+
   );
 }

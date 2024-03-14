@@ -1,9 +1,26 @@
 import styled from 'styled-components';
-import { Block, Button, IconFileGeneric } from 'suomifi-ui-components';
+import {Block, Button, IconFileGeneric, TextInput} from 'suomifi-ui-components';
+import {UploadIcon} from 'mscr-ui/src/common/components/shared-icons';
 
 export const FileBlock = styled(Block)`
-  background-color: ${(props) => props.theme.suomifi.colors.highlightLight4};
+  background-color: ${(props) => props.theme.suomifi.colors.highlightLight3};
   border: 1px dashed ${(props) => props.theme.suomifi.colors.highlightLight1};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  input { width: 100% !important; }
+  border-radius: 2px;
+  svg:first-of-type {margin: 0px 0px -62px 0px};
+  svg {margin: 0px 0px 35px 0px};
+`;
+
+export const WideTextInput = styled(TextInput)`
+  width: 100%;
+`;
+
+export const FileBlockWrapper = styled(Block)`
+  border: 1px solid ${(props) => props.theme.suomifi.colors.depthLight1};
+  padding: 15px;
 `;
 
 export const FileInfo = styled.div`

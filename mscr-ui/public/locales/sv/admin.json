@@ -1,7 +1,5 @@
 {
   "add-class": "",
-  "add-or-drag-a-new-file-here": "",
-  "allowed-file-formats": "",
   "and": "",
   "association-missing-general": "",
   "association-missing-identifier": "",
@@ -77,6 +75,7 @@
   },
   "description": "",
   "download-failed": "",
+  "drag-files-to-upload": "",
   "edit-concept-error": {
     "default": "",
     "diagrams": "",

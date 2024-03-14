@@ -1,7 +1,5 @@
 {
   "add-class": "Lisää luokka",
-  "add-or-drag-a-new-file-here": "",
-  "allowed-file-formats": "",
   "and": "",
   "association-missing-general": "Assosisaation kaikkia tietoja ei ole määritelty",
   "association-missing-identifier": "Assosisaation yksilöivää tunnusta ei ole määritelty",
@@ -77,6 +75,7 @@
   },
   "description": "Kuvaus",
   "download-failed": "",
+  "drag-files-to-upload": "",
   "edit-concept-error": {
     "default": "",
     "diagrams": "",
