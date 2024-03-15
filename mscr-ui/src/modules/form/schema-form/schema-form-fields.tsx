@@ -56,6 +56,7 @@ SchemaFormProps) {
           <DropdownItem value={'JSONSCHEMA'}>{'JSON'}</DropdownItem>
           <DropdownItem value={'CSV'}>{'CSV'}</DropdownItem>
           <DropdownItem value={'PDF'}>{'PDF'}</DropdownItem>
+          <DropdownItem value={'RDF'}>{'RDF'}</DropdownItem>
           <DropdownItem value={'SKOSRDF'}>{'SKOSRDF'}</DropdownItem>
           <DropdownItem value={'XSD'}>{'XSD'}</DropdownItem>
           <DropdownItem value={'XML'}>{'XML'}</DropdownItem>
