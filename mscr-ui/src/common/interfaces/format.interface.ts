@@ -7,6 +7,7 @@ export enum Format {
   Xslt = 'XSLT',
   Shacl = 'SHACL',
   Mscr = 'MSCR',
+  Rdfs = 'RDFS'
 }
 
 export enum FileExtensions {
