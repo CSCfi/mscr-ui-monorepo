@@ -15,8 +15,6 @@ export enum FileExtensions {
   Skosrdf = 'ttl',
   Pdf = 'pdf',
   Xsd = 'xsd',
-  Rdf = 'rdf',
-  Rdfs = 'rdfs',
 }
 
 export const formatsAvailableForCrosswalkCreation: Format[] = [
@@ -31,6 +29,15 @@ export const formatsAvailableForCrosswalkRegistration: Format[] = [
   Format.Xslt, Format.Csv, Format.Pdf,
 ];
 
+export const formatsAvailableForSchemaRegistration: Format[] = [
+  Format.Csv,
+  Format.Jsonschema,
+  Format.Pdf,
+  Format.Rdfs,
+  Format.Skosrdf,
+  Format.Xsd,
+];
+
 export const fileExtensionsAvailableForSchemaRegistration: FileExtensions[] = [
-  FileExtensions.Jsonschema, FileExtensions.Csv, FileExtensions.Rdf, FileExtensions.Rdfs, FileExtensions.Skosrdf, FileExtensions.Pdf, FileExtensions.Xsd
+  FileExtensions.Jsonschema, FileExtensions.Csv, FileExtensions.Skosrdf, FileExtensions.Pdf, FileExtensions.Xsd
 ];

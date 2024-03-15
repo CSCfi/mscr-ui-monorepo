@@ -5,7 +5,11 @@ import { ModelFormContainer } from '../form.styles';
 import LanguageSelector from 'yti-common-ui/components/form/language-selector';
 import { FormErrors } from './validate-schema-form';
 import { SchemaFormType } from '@app/common/interfaces/schema.interface';
-import { Format } from '@app/common/interfaces/format.interface';
+import {
+  Format,
+  formatsAvailableForCrosswalkRegistration,
+  formatsAvailableForSchemaRegistration
+} from '@app/common/interfaces/format.interface';
 import { State } from '@app/common/interfaces/state.interface';
 import MscrLanguageSelector from '@app/common/components/language-selector/mscr-language-selector';
 
@@ -53,15 +57,9 @@ SchemaFormProps) {
             })
           }
         >
-          <DropdownItem value={'JSONSCHEMA'}>{'JSON'}</DropdownItem>
-          <DropdownItem value={'CSV'}>{'CSV'}</DropdownItem>
-          <DropdownItem value={'PDF'}>{'PDF'}</DropdownItem>
-          <DropdownItem value={'RDF'}>{'RDF'}</DropdownItem>
-          <DropdownItem value={'RDFS'}>{'RDFS'}</DropdownItem>
-          <DropdownItem value={'SKOSRDF'}>{'SKOSRDF'}</DropdownItem>
-          <DropdownItem value={'XSD'}>{'XSD'}</DropdownItem>
-          <DropdownItem value={'XML'}>{'XML'}</DropdownItem>
-	  <DropdownItem value={'SHACL'}>{'SHACL'}</DropdownItem>
+          {formatsAvailableForSchemaRegistration.map((format) => (
+            <DropdownItem key={format} value={format}>{format}</DropdownItem>
+          ))}
         </Dropdown>
       </div>
     );
