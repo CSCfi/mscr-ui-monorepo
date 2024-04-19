@@ -1,18 +1,18 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import TreeItem from '@mui/lab/TreeItem';
-import { useEffect } from 'react';
+import {useEffect} from 'react';
 import {
   Notification,
   Button as Sbutton,
   ActionMenuItem,
   ActionMenu,
-  Text
+  Text, Checkbox
 } from 'suomifi-ui-components';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import JointListingAccordion from '@app/modules/crosswalk-editor/joint-listing-accordion';
+import MappingsAccordion from '@app/modules/crosswalk-editor/mappings-accordion';
 import MetadataAndFiles from '@app/modules/crosswalk-editor/tabs/metadata-and-files';
 
 import {
@@ -30,19 +30,21 @@ import {
   useGetMappingsQuery,
   useGetCrosswalkWithRevisionsQuery,
 } from '@app/common/components/crosswalk/crosswalk.slice';
-import { useGetCrosswalkMappingFunctionsQuery } from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
-import { createTheme, ThemeProvider } from '@mui/material';
+import {
+  useGetCrosswalkMappingFunctionsQuery
+} from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
+import {createTheme, ThemeProvider} from '@mui/material';
 import HasPermission from '@app/common/utils/has-permission';
 import VersionHistory from '@app/common/components/version-history';
 import SchemaInfo from '@app/common/components/schema-info';
 import {useTranslation} from 'next-i18next';
-import { State } from '@app/common/interfaces/state.interface';
+import {State} from '@app/common/interfaces/state.interface';
 import MetadataStub from '@app/modules/form/metadata-form/metadata-stub';
-import { Type } from '@app/common/interfaces/search.interface';
+import {Type} from '@app/common/interfaces/search.interface';
 
 export default function CrosswalkEditor({
-  crosswalkId,
-}: {
+                                          crosswalkId,
+                                        }: {
   crosswalkId: string;
 }) {
   const theme = createTheme({
@@ -56,7 +58,7 @@ export default function CrosswalkEditor({
     },
   });
 
-  const { t } = useTranslation('common');
+  const {t} = useTranslation('common');
 
   const emptyTreeSelection: RenderTree = {
     elementPath: '',
@@ -65,14 +67,16 @@ export default function CrosswalkEditor({
     id: '',
     visualTreeId: '',
     properties: undefined,
+    uri: '',
     children: [],
+    qname: ''
   };
 
   const crosswalkConnectionNewInit: CrosswalkConnectionNew = {
     source: emptyTreeSelection,
     target: emptyTreeSelection,
     id: '0',
-    description: '',
+    notes: '',
     isSelected: false,
     isDraft: false,
     sourceJsonPath: undefined,
@@ -87,12 +91,8 @@ export default function CrosswalkEditor({
   const [sourceSchemaUrn, setSourceSchemaUrn] = React.useState<string>('');
   const [targetSchemaUrn, setTargetSchemaUrn] = React.useState<string>('');
 
-  const [selectedSourceNodes, setSelectedSourceNodes] = React.useState<
-    RenderTree[]
-  >([]);
-  const [selectedTargetNodes, setSelectedTargetNodes] = React.useState<
-    RenderTree[]
-  >([]);
+  const [selectedSourceNodes, setSelectedSourceNodes] = React.useState<RenderTree[]>([]);
+  const [selectedTargetNodes, setSelectedTargetNodes] = React.useState<RenderTree[]>([]);
   const [patchSourceNodes, setPatchSourceNodes] = React.useState<RenderTree[]>([
     emptyTreeSelection,
   ]);
@@ -103,9 +103,7 @@ export default function CrosswalkEditor({
 
   const [nodeMappings, setNodeMappings] = React.useState<NodeMapping[]>([]);
 
-  const [jointToBeEdited, setJointToBeEdited] = React.useState<
-    CrosswalkConnectionNew | undefined
-  >(undefined);
+  const [jointToBeEdited, setJointToBeEdited] = React.useState<CrosswalkConnectionNew | undefined>(undefined);
 
   const [linkingError, setLinkingError] = React.useState<string>('');
   const [selectedTab, setSelectedTab] = React.useState(1);
@@ -125,30 +123,27 @@ export default function CrosswalkEditor({
   const [lastPatchCrosswalkId, setLastPatchCrosswalkId] =
     React.useState<string>('');
   const [lastPutMappingPid, setLastPutMappingPid] = React.useState<string>('');
-  const [lastPatchMappingPid, setLastPatchMappingPid] =
+  const [lastPatchMappingReqId, setLastPatchMappingReqId] =
     React.useState<string>('');
   const [lastDeleteMappingPid, setLastDeleteMappingPid] =
     React.useState<string>('');
+  const [showAttributeNames, setShowAttributeNames] = React.useState(true);
 
   const [patchCrosswalk, crosswalkPatchResponse] = usePatchCrosswalkMutation();
   const [putMapping, putMappingResponse] = usePutMappingMutation();
   const [deleteMapping, deleteMappingResponse] = useDeleteMappingMutation();
   const [patchMapping, patchMappingResponse] = usePatchMappingMutation();
 
-  const [sourceTreeSelection, setSourceTreeSelection] = React.useState<
-    string[]
-  >([]);
+  const [sourceTreeSelection, setSourceTreeSelection] = React.useState<string[]>([]);
 
-  const [targetTreeSelection, setTargetTreeSelection] = React.useState<
-    string[]
-  >([]);
+  const [targetTreeSelection, setTargetTreeSelection] = React.useState<string[]>([]);
 
   const {
     data: mappingFunctions,
     isLoading: mappingFunctionsIsLoading,
   } = useGetCrosswalkMappingFunctionsQuery('');
 
-  const { data: mappingFilters, isLoading: mappingFiltersIsLoading } =
+  const {data: mappingFilters, isLoading: mappingFiltersIsLoading} =
     useGetCrosswalkMappingFunctionsQuery('FILTERS');
 
   const {
@@ -160,7 +155,7 @@ export default function CrosswalkEditor({
     refetch: refetchCrosswalkData,
   } = useGetCrosswalkWithRevisionsQuery(crosswalkId);
 
-  const hasEditRights = HasPermission({ actions: ['EDIT_CROSSWALK_MAPPINGS'],owner:getCrosswalkData?.owner });
+  const hasEditRights = HasPermission({actions: ['EDIT_CROSSWALK_MAPPINGS'], owner: getCrosswalkData?.owner});
 
   const fromTree = (nodes: any) => (
     <TreeItem
@@ -241,6 +236,7 @@ export default function CrosswalkEditor({
     isSuccess: getMappingsDataIsSuccess,
     isError: getMappingsIsError,
     error: getMappingsError,
+    refetch: refetchMappings,
   } = useGetMappingsQuery(crosswalkId);
 
   useEffect(() => {
@@ -259,9 +255,9 @@ export default function CrosswalkEditor({
   }
 
   if (patchMappingResponse.isSuccess) {
-    //TODO: add success and error notification?
-    // if (lastPatchMappingPid !== patchMappingResponse.data.pid) {
-    // }
+    if (lastPatchMappingReqId !== patchMappingResponse.requestId) {
+      addMappingToAccordion(patchMappingResponse, false);
+    }
   }
 
   if (deleteMappingResponse.isSuccess) {
@@ -294,7 +290,17 @@ export default function CrosswalkEditor({
         setLastPutMappingPid(response.data.pid);
       } else {
         // This is needed in the future for showing success or error status
-        setLastPatchMappingPid(response.data.pid);
+        setLastPatchMappingReqId(response.requestId);
+        const patchedMapping = patchMappingResponse.data as NodeMapping;
+
+        const filteredMappings = [
+          ...nodeMappings.filter((item) => {
+            return item.pid !== patchMappingResponse?.originalArgs?.pid;
+          }),
+        ];
+        setNodeMappings((mappings) => {
+          return [patchedMapping, ...filteredMappings];
+        });
       }
     }
   }
@@ -307,7 +313,6 @@ export default function CrosswalkEditor({
         source: sourceNode,
         target: selectedTargetNodes[0],
         id: '',
-        description: '',
         isSelected: true,
         isDraft: true,
         sourceJsonPath: undefined,
@@ -316,6 +321,7 @@ export default function CrosswalkEditor({
         sourceProcessing: undefined,
         targetPredicate: undefined,
         targetProcessing: undefined,
+        notes: undefined,
       };
       jointsToBeAdded.push(joint);
     });
@@ -327,13 +333,16 @@ export default function CrosswalkEditor({
     targetNodes: RenderTree[],
     patchPid: string,
   ) {
+
+    const originalMapping: NodeMapping[] = nodeMappings.filter(item => item.pid === patchPid);
+
     const jointsToBeAdded: CrosswalkConnectionNew[] = [];
     sourceNodes.forEach((sourceNode) => {
       const joint: CrosswalkConnectionNew = {
         source: sourceNode,
         target: targetNodes[0],
         id: patchPid,
-        description: '',
+        notes: originalMapping.length > 0 ? originalMapping[0].notes : '',
         isSelected: true,
         isDraft: true,
         sourceJsonPath: undefined,
@@ -404,12 +413,12 @@ export default function CrosswalkEditor({
     } else if (action === 'selectFromTargetTree') {
       selectFromTreeByNodeMapping(joint, false);
       scrollToTop();
-    } else if (action === 'openJointDetails') {
+    } else if (action === 'openMappingDetails') {
       setIsJointPatchOperation(true);
       setPatchPid(joint.pid ? joint.pid : '');
       selectFromTreeByNodeMapping(joint, true);
       selectFromTreeByNodeMapping(joint, false);
-    } else if (action === 'removeJoint') {
+    } else if (action === 'removeMapping') {
       removeJoint(joint.pid);
     }
   };
@@ -444,7 +453,7 @@ export default function CrosswalkEditor({
     }
     if (action === 'addJoint') {
       setNodeMappingsModalOpen(false);
-      putMapping({ payload: mappingPayload, pid: crosswalkId });
+      putMapping({payload: mappingPayload, pid: crosswalkId});
       const sourceIds: string[] = [];
       const targetIds: string[] = [];
       mappingPayload.source.forEach((node: { id: string }) =>
@@ -459,7 +468,7 @@ export default function CrosswalkEditor({
     if (action === 'save') {
       setIsJointPatchOperation(false);
       setNodeMappingsModalOpen(false);
-      patchMapping({ payload: mappingPayload, pid: patchPid });
+      patchMapping({payload: mappingPayload, pid: patchPid});
     }
   };
 
@@ -470,7 +479,7 @@ export default function CrosswalkEditor({
   }
 
   function CustomTabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
+    const {children, value, index, ...other} = props;
 
     return (
       <div
@@ -481,7 +490,7 @@ export default function CrosswalkEditor({
         {...other}
       >
         {value === index && (
-          <Box sx={{ p: 3 }}>
+          <Box sx={{p: 3}}>
             <Typography>{children}</Typography>
           </Box>
         )}
@@ -511,7 +520,7 @@ export default function CrosswalkEditor({
   };
 
   if (getCrosswalkDataIsError) {
-    console.log('Error: ', getCrosswalkDataError);
+    // console.log('Error: ', getCrosswalkDataError);
   }
 
   if (getCrosswalkDataIsError) {
@@ -531,7 +540,7 @@ export default function CrosswalkEditor({
           <>
             <Box
               className="mb-3"
-              sx={{ borderBottom: 1, borderColor: 'divider' }}
+              sx={{borderBottom: 1, borderColor: 'divider'}}
             >
               <Tabs
                 value={selectedTab}
@@ -581,7 +590,7 @@ export default function CrosswalkEditor({
               <div
                 className={
                   selectedTab === 1
-                    ? 'col-2 d-flex justify-content-end flex-row pe-4 pb-2'
+                    ? 'col-2 d-flex justify-content-end flex-row pe-3 pb-2'
                     : 'd-none'
                 }
               >
@@ -604,9 +613,8 @@ export default function CrosswalkEditor({
               </div>
 
               {/*  LEFT COLUMN */}
-              <div className={selectedTab === 1 ? 'col-12' : 'd-none'}>
+              <div className={selectedTab === 1 ? 'col-12 mx-2' : 'd-none'}>
                 <>
-                  <div className="row gx-0"></div>
                   <div className="row gx-0">
                     {/*  SOURCE TREE */}
                     <div className="col-5">
@@ -650,7 +658,7 @@ export default function CrosswalkEditor({
                     </div>
 
                     {/*  TARGET TREE */}
-                    <div className="col-5 pe-4">
+                    <div className="col-5 pe-2">
                       <SchemaInfo
                         updateTreeNodeSelectionsOutput={
                           performCallbackFromSchemaInfo
@@ -685,30 +693,45 @@ export default function CrosswalkEditor({
               {/*  BOTTOM COLUMN */}
               {selectedTab === 1 && (
                 <>
-                  <div className="col-12 px-4 mt-4">
-                    <h2>Mappings</h2>
+                  <div className="col-12 mt-4">
+                    <div className='d-flex justify-content-between'>
+                      <div><h2 className='mb-0'>Mappings</h2></div>
+
+                      <div className='align-self-end pe-1'>
+{/*                        // TODO: this can be shown when attribute qnames are available for accordion. Those are temporarily replaced with attribute ids.
+                        <Checkbox
+                          checked={showAttributeNames}
+                          onClick={(newState) => {
+                            setShowAttributeNames(newState.checkboxState);
+                          }}
+                        >Show node titles
+                        </Checkbox>*/}
+                      </div>
+                    </div>
+
                     <div className="joint-listing-accordion-wrap my-3">
                       <Box
                         className="mb-4"
-                        sx={{ height: 640, flexGrow: 1, overflowY: 'auto' }}
+                        sx={{height: 640, flexGrow: 1, overflowY: 'auto'}}
                       >
-                        <JointListingAccordion
+                        <MappingsAccordion
                           nodeMappings={nodeMappings}
                           viewOnlyMode={false}
                           isEditModeActive={
                             isEditModeActive && !crosswalkPublished
                           }
+                          showAttributeNames={showAttributeNames}
                           performAccordionAction={
                             performCallbackFromAccordionAction
                           }
-                        ></JointListingAccordion>
+                        ></MappingsAccordion>
                       </Box>
                     </div>
                   </div>
                 </>
               )}
               {selectedTab === 2 && (
-                <VersionHistory revisions={getCrosswalkData.revisions} />
+                <VersionHistory revisions={getCrosswalkData.revisions}/>
               )}
             </div>
           </>
@@ -717,7 +740,7 @@ export default function CrosswalkEditor({
             <>
               <Box
                 className="mb-3"
-                sx={{ borderBottom: 1, borderColor: 'divider' }}
+                sx={{borderBottom: 1, borderColor: 'divider'}}
               >
                 <Tabs value={0} aria-label={t('tabs.label')}>
                   <Tab label={t('tabs.metadata-stub')} {...a11yProps(0)} />
@@ -725,7 +748,7 @@ export default function CrosswalkEditor({
               </Box>
 
               {getCrosswalkData && (
-                <MetadataStub metadata={getCrosswalkData} type={Type.Crosswalk} />
+                <MetadataStub metadata={getCrosswalkData} type={Type.Crosswalk}/>
               )}
             </>
           )

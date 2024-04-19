@@ -124,6 +124,8 @@
   "language-input-text": "Crosswalk name",
   "language-swedish-with-suffix": "Swedish SV",
   "missing-description": "Description hasn't been set",
+  "missing-file": "You need to add file or URI of the file to register",
+  "missing-format": "",
   "missing-general": "Model is missing information",
   "missing-information-domain": "Information domain hasn't been set",
   "missing-language-title": "Title is missing in language",

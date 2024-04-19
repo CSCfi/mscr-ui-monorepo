@@ -110,12 +110,17 @@
   "library": "",
   "library-variant": "",
   "link-opens-new-window-external": "",
+  "mappings-accordion": {
+    "clear": "Clear",
+    "filter-from-mappings": "Filter from mappings"
+  },
   "metadata": {
     "contact": "Contact",
     "created": "Created",
     "crosswalk-details": "Crosswalk details",
     "description": "Description",
     "file": {
+      "download-file": "File",
       "format": "Format",
       "label": "Files",
       "name": "Filename",
@@ -330,6 +335,7 @@
     "personal": "Personal workspace",
     "pid": "PID",
     "schemas": "Schemas",
-    "state": "State"
+    "state": "State",
+    "view": "View"
   }
 }

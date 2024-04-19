@@ -110,12 +110,17 @@
   "library": "",
   "library-variant": "",
   "link-opens-new-window-external": "",
+  "mappings-accordion": {
+    "clear": "",
+    "filter-from-mappings": ""
+  },
   "metadata": {
     "contact": "",
     "created": "",
     "crosswalk-details": "",
     "description": "",
     "file": {
+      "download-file": "",
       "format": "",
       "label": "",
       "name": "",
@@ -330,6 +335,7 @@
     "personal": "",
     "pid": "",
     "schemas": "",
-    "state": ""
+    "state": "",
+    "view": ""
   }
 }
