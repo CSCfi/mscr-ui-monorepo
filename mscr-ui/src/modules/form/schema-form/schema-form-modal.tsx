@@ -27,6 +27,7 @@ import getErrors from '@app/common/utils/get-errors';
 import {fileExtensionsAvailableForSchemaRegistration} from '@app/common/interfaces/format.interface';
 import FileDropAreaMscr from '@app/common/components/file-drop-area-mscr';
 import * as React from 'react';
+import SpinnerOverlay, {SpinnerType, delay} from "@app/common/components/spinner-overlay";
 
 interface SchemaFormModalProps {
   refetch: () => void;
@@ -37,10 +38,10 @@ interface SchemaFormModalProps {
 // For the time being, using as schema metadata form, Need to update the props accordingly
 
 export default function SchemaFormModal({
-  refetch,
-  groupContent,
-  pid,
-}: SchemaFormModalProps) {
+                                          refetch,
+                                          groupContent,
+                                          pid,
+                                        }: SchemaFormModalProps) {
   const { t } = useTranslation('admin');
   const { isSmall } = useBreakpoints();
   const router = useRouter();
@@ -58,6 +59,7 @@ export default function SchemaFormModal({
   const [userPosted, setUserPosted] = useState(false);
   // Why are we using a mutation here? Why is that even implemented as a mutation, when the method is GET?
   const [putSchemaFull, resultSchemaFull] = usePutSchemaFullMutation();
+  const [submitAnimationVisible, setSubmitAnimationVisible] = useState<boolean>(false);
 
   const handleOpen = () => {
     setSkip(false);
@@ -74,17 +76,23 @@ export default function SchemaFormModal({
   }, [schemaFormInitialData]);
 
   useEffect(() => {
-    if (userPosted && resultSchemaFull.isSuccess) {
+    if (userPosted && resultSchemaFull.isSuccess && !submitAnimationVisible) {
       //Get the pid from the result
       handleClose();
-      if (resultSchemaFull && resultSchemaFull.data.pid) {
+      if (resultSchemaFull && resultSchemaFull.data.pid && !submitAnimationVisible) {
         router.push(`/schema/${resultSchemaFull.data.pid}`);
       }
 
       // After post route to  saved schema get by PID
       // Later we should show the created schema in the list
     }
-  }, [resultSchemaFull, refetch, userPosted, handleClose, router, formData]);
+  }, [resultSchemaFull, refetch, userPosted, handleClose, router, formData, submitAnimationVisible]);
+
+  const spinnerDelay = async () => {
+    setSubmitAnimationVisible(true);
+    await delay(2000);
+    return Promise.resolve();
+  };
 
   const handleSubmit = () => {
     setUserPosted(true);
@@ -105,15 +113,21 @@ export default function SchemaFormModal({
         pid,
         authenticatedUser
       );
+
       const schemaFormData = new FormData();
       schemaFormData.append('metadata', JSON.stringify(payload));
       if (fileUri && fileUri.length > 0) {
         schemaFormData.append('contentURL', fileUri);
         putSchemaFull(schemaFormData);
+        Promise.all([spinnerDelay(), putSchemaFull(schemaFormData)]).then((values) => {
+          setSubmitAnimationVisible(false);
+        });
       }
       else if (fileData) {
         schemaFormData.append('file', fileData);
-        putSchemaFull(schemaFormData);
+        Promise.all([spinnerDelay(), putSchemaFull(schemaFormData)]).then((values) => {
+          setSubmitAnimationVisible(false);
+        });
       } else {
         return;
       }
@@ -148,15 +162,14 @@ export default function SchemaFormModal({
 
   function renderButton() {
     return (
-       <Button
-            variant="secondary"
-            icon={<IconPlus />}
-            style={{ height: 'min-content' }}
-            onClick={() => handleOpen()}
-          >
-            {t('register-schema')}
-          </Button>
-      
+      <Button
+        variant="secondary"
+        icon={<IconPlus />}
+        style={{ height: 'min-content' }}
+        onClick={() => handleOpen()}
+      >
+        {t('register-schema')}
+      </Button>
     );
   }
 
@@ -169,14 +182,14 @@ export default function SchemaFormModal({
         </div>
       ) : (
         !groupContent ? (
-            <div>
-              {renderButton()}
+          <div>
+            {renderButton()}
           </div>
         ) : (
-              <div/>
+          <div/>
         ))}
-        
-      
+
+
       <Modal
         appElementId="__next"
         visible={visible}
@@ -184,27 +197,36 @@ export default function SchemaFormModal({
         variant={isSmall ? 'smallScreen' : 'default'}
       >
         <ModalContent>
-          <ModalTitle>{t('register-schema')}</ModalTitle>
-          <Text>{t('register-schema-file-required') + ' '}</Text>
-          <Text>{t('register-schema-supported-file-formats') + fileExtensionsAvailableForSchemaRegistration.slice(0, fileExtensionsAvailableForSchemaRegistration.length - 1).join(', ').toUpperCase() + ' ' + t('and') + (' ') + fileExtensionsAvailableForSchemaRegistration.slice(fileExtensionsAvailableForSchemaRegistration.length - 1).toString().toUpperCase() + ('.')}</Text>
-          <FileDropAreaMscr
-            setFileData={setFileData}
-            setIsValid={setIsValid}
-            validFileTypes={fileExtensionsAvailableForSchemaRegistration}
-            translateFileUploadError={translateFileUploadError}
-            isSchemaUpload={true}
-            setFileUri={setFileUri}/>
-          <br></br>
+          <>
+            {submitAnimationVisible && (<SpinnerOverlay animationVisible={submitAnimationVisible} type={SpinnerType.SchemaRegistrationModal}></SpinnerOverlay>
+            )}
+          </>
+          <div>
+            <div>
+            </div>
+            <ModalTitle>{t('register-schema')}</ModalTitle>
+            <Text>{t('register-schema-file-required') + ' '}</Text>
+            <Text>{t('register-schema-supported-file-formats') + fileExtensionsAvailableForSchemaRegistration.slice(0, fileExtensionsAvailableForSchemaRegistration.length - 1).join(', ').toUpperCase() + ' ' + t('and') + (' ') + fileExtensionsAvailableForSchemaRegistration.slice(fileExtensionsAvailableForSchemaRegistration.length - 1).toString().toUpperCase() + ('.')}</Text>
+            <FileDropAreaMscr
+              setFileData={setFileData}
+              setIsValid={setIsValid}
+              validFileTypes={fileExtensionsAvailableForSchemaRegistration}
+              translateFileUploadError={translateFileUploadError}
+              isSchemaUpload={true}
+              setFileUri={setFileUri}
+              disabled={submitAnimationVisible}
+            />
+            <br></br>
 
-          <SchemaFormFields
-            formData={formData}
-            setFormData={setFormData}
-            userPosted={userPosted}
-            disabled={authenticatedUser && authenticatedUser.anonymous}
-            errors={userPosted ? errors : undefined}
-          />
-          <Separator></Separator>
-
+            <SchemaFormFields
+              formData={formData}
+              setFormData={setFormData}
+              userPosted={userPosted}
+              disabled={authenticatedUser && authenticatedUser.anonymous || submitAnimationVisible}
+              errors={userPosted ? errors : undefined}
+            />
+            <Separator></Separator>
+          </div>
         </ModalContent>
         <ModalFooter>
           {authenticatedUser && authenticatedUser.anonymous && (
@@ -212,14 +234,14 @@ export default function SchemaFormModal({
               {t('error-unauthenticated')}
             </InlineAlert>
           )}
-          {userPosted && (
+          {userPosted && !submitAnimationVisible && (
             <FormFooterAlert
               labelText={'Something went wrong'}
               alerts={gatherErrorMessages()}
             />
           )}
 
-          <Button onClick={() => handleSubmit()}>{t('register-schema')}</Button>
+          <Button disabled={submitAnimationVisible} onClick={() => handleSubmit()}>{t('register-schema')}</Button>
           <Button variant="secondary" onClick={() => handleClose()}>
             {t('cancel')}
           </Button>
