@@ -18,6 +18,7 @@ import {
   formatsAvailableForCrosswalkCreation,
   formatsAvailableForCrosswalkRegistration,
 } from '@app/common/interfaces/format.interface';
+import {WideDropdown} from "@app/modules/form/crosswalk-form/crosswalk-form.styles";
 
 interface RegisterCrosswalkFormProps {
   formData: CrosswalkFormType;
@@ -53,34 +54,52 @@ export default function CrosswalkFormFields({
           {formatsAvailableForCrosswalkCreation.join(', ')}
         </Text>
       )}
-      {!createNew && renderCrosswalkFormat()}
       {renderLanguages()}
-      {!createNew && renderState()}
+      {!createNew && renderCrosswalkFormatAndState()}
     </ModelFormContainer>
   );
 
-  function renderCrosswalkFormat() {
+  function renderCrosswalkFormatAndState() {
     // may be load the formats from an array
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <Dropdown
-          labelText={'Format'}
-          defaultValue={formData.format ?? ''}
-          visualPlaceholder={'Select Crosswalk File Format'}
-          onChange={(e: Format) =>
-            setFormData({
+      <>
+        <div className='row'>
+        <div className='col-6'>
+          <WideDropdown
+            labelText={'Format'}
+            defaultValue={formData.format ?? ''}
+            visualPlaceholder={'Select Crosswalk File Format'}
+            onChange={(e: Format) => setFormData({
               ...formData,
               format: e,
-            })
-          }
-        >
-          {formatsAvailableForCrosswalkRegistration.map((format) => (
-            <DropdownItem key={format} value={format}>
-              {format}
-            </DropdownItem>
-          ))}
-        </Dropdown>
-      </div>
+            })}
+          >
+            {formatsAvailableForCrosswalkRegistration.map((format) => (
+              <DropdownItem key={format} value={format}>
+                {format}
+              </DropdownItem>
+            ))}
+          </WideDropdown>
+        </div>
+        <div className='col-6'>
+          <WideDropdown
+            labelText={'State'}
+            visualPlaceholder={'Select state'}
+            defaultValue={formData.state ?? ''}
+            onChange={(e: State) => setFormData({
+              ...formData,
+              state: e,
+            })}
+          >
+            {possibleStatesAtRegistration.map((state) => (
+              <DropdownItem key={state} value={state}>
+                {state}
+              </DropdownItem>
+            ))}
+          </WideDropdown>
+        </div>
+        </div>
+      </>
     );
   }
 
@@ -119,30 +138,6 @@ export default function CrosswalkFormFields({
             (lang) => lang.selected
           )}
         />
-      </div>
-    );
-  }
-
-  function renderState() {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <Dropdown
-          labelText={'State'}
-          visualPlaceholder={'Select state'}
-          defaultValue={formData.state ?? ''}
-          onChange={(e: State) =>
-            setFormData({
-              ...formData,
-              state: e,
-            })
-          }
-        >
-          {possibleStatesAtRegistration.map((state) => (
-            <DropdownItem key={state} value={state}>
-              {state}
-            </DropdownItem>
-          ))}
-        </Dropdown>
       </div>
     );
   }
