@@ -7,9 +7,9 @@ import { MSCRError } from '../interfaces/error.interface';
 export default function getApiError(
   error: AxiosBaseQueryError | SerializedError
 ): MSCRError {
-
+  console.log(typeof  error, error);
   const mscrError: MSCRError = {};
-  mscrError.staus = '';
+  mscrError.status = '';
   mscrError.message = '';
   // console.log(error);
 
@@ -19,21 +19,21 @@ export default function getApiError(
     error.data !== null
   ) {
     if ('status' in error.data && typeof error.data.status === 'string') {
-      mscrError.staus = error.data.status ?? 'GENERAL_ERROR';
+      mscrError.status = error.data.status ?? 'GENERAL_ERROR';
       // console.log(error.data.status);
     } else if(('status' in error.data && typeof error.data.status === 'number') ) {
-      mscrError.staus = error.data.status.toString();
+      mscrError.status = error.data.status.toString();
     }
     if ('message' in error.data && typeof error.data.message === 'string') {
-      mscrError.message = error.data.message ?? 'Unexpected error occured';
+      mscrError.message = error.data.message ?? 'Unexpected error occurred';
     }
     if ('title' in error.data && typeof error.data.title === 'string') {
-      mscrError.message = error.data.title ?? 'Unexpected error occured';
+      mscrError.message = error.data.title ?? 'Unexpected error occurred';
     }
     if ('detail' in error.data && typeof error.data.detail === 'string') {
       mscrError.detail = error.data.detail ?? 'Server Error';
     }
   }
-
+  console.log('errori', mscrError);
   return mscrError;
 }

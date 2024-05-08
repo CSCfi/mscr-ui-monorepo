@@ -1,5 +1,5 @@
-import { useGetAuthenticatedUserQuery } from '@app/common/components/login/login.slice';
-import { useCallback, useEffect, useState } from 'react';
+import {useGetAuthenticatedUserQuery} from '@app/common/components/login/login.slice';
+import {useCallback, useEffect, useState} from 'react';
 import {
   Button,
   IconPlus,
@@ -9,16 +9,16 @@ import {
   ModalFooter,
   ModalTitle,
 } from 'suomifi-ui-components';
-import { useBreakpoints } from 'yti-common-ui/components/media-query';
-import { FormErrors, validateCrosswalkForm } from './validate-crosswalk-form';
+import {useBreakpoints} from 'yti-common-ui/components/media-query';
+import {FormErrors, validateCrosswalkForm} from './validate-crosswalk-form';
 import FormFooterAlert from 'yti-common-ui/components/form-footer-alert';
-import { translateFileUploadError } from '@app/common/utils/translation-helpers';
-import { useTranslation } from 'next-i18next';
+import {translateFileUploadError} from '@app/common/utils/translation-helpers';
+import {useTranslation} from 'next-i18next';
 import generateCrosswalkPayload from './generate-crosswalk-payload';
 import getApiError from '@app/common/utils/getApiErrors';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 import HasPermission from '@app/common/utils/has-permission';
-import { useInitialCrosswalkForm } from '@app/common/utils/hooks/use-initial-crosswalk-form';
+import {useInitialCrosswalkForm} from '@app/common/utils/hooks/use-initial-crosswalk-form';
 import {
   usePutCrosswalkFullMutation,
   usePutCrosswalkMutation,
@@ -26,14 +26,17 @@ import {
 import CrosswalkForm from './crosswalk-form-fields';
 import getErrors from '@app/common/utils/get-errors';
 import FileDropAreaMscr from '@app/common/components/file-drop-area-mscr';
-import {fileExtensionsAvailableForCrosswalkRegistrationAttachments} from "@app/common/interfaces/format.interface";
+import {
+  fileExtensionsAvailableForCrosswalkRegistrationAttachments,
+  fileExtensionsAvailableForSchemaRegistration
+} from "@app/common/interfaces/format.interface";
 import SpinnerOverlay, {delay, SpinnerType} from "@app/common/components/spinner-overlay";
 
 interface CrosswalkFormModalProps {
   refetch: () => void;
   createNew?: boolean;
   groupContent: boolean;
-  pid?:string
+  pid?: string
 }
 
 // For the time being, using as schema metadata form, Need to update the props accordingly
@@ -44,8 +47,8 @@ export default function CrosswalkFormModal({
                                              groupContent,
                                              pid
                                            }: CrosswalkFormModalProps) {
-  const { t } = useTranslation('admin');
-  const { isSmall } = useBreakpoints();
+  const {t} = useTranslation('admin');
+  const {isSmall} = useBreakpoints();
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [crosswalkFormInitialData] = useState(useInitialCrosswalkForm());
@@ -53,7 +56,7 @@ export default function CrosswalkFormModal({
   const [errors, setErrors] = useState<FormErrors>();
   const [userPosted, setUserPosted] = useState(false);
   const [skip, setSkip] = useState(true);
-  const { data: authenticatedUser } = useGetAuthenticatedUserQuery(undefined, {
+  const {data: authenticatedUser} = useGetAuthenticatedUserQuery(undefined, {
     skip,
   });
   const [putCrosswalkFull, registerCrosswalkResult] =
@@ -61,6 +64,7 @@ export default function CrosswalkFormModal({
   const [putCrosswalk, newCrosswalkResult] = usePutCrosswalkMutation();
   const [, setIsValid] = useState(false);
   const [fileData, setFileData] = useState<File | null>();
+  const [fileUri, setFileUri] = useState<string | null>();
   const [submitAnimationVisible, setSubmitAnimationVisible] = useState<boolean>(false);
 
 
@@ -75,6 +79,7 @@ export default function CrosswalkFormModal({
     setUserPosted(false);
     setFormData(crosswalkFormInitialData);
     setFileData(null);
+    setFileUri(null);
   }, [crosswalkFormInitialData]);
 
   useEffect(() => {
@@ -101,6 +106,14 @@ export default function CrosswalkFormModal({
     return Promise.resolve();
   };
 
+  function isFormValid() {
+    if (errors) {
+      return !Object.values(errors).includes(true);
+    } else {
+      return false;
+    }
+  }
+
   const handleSubmit = () => {
     scrollToModalTop();
     setUserPosted(true);
@@ -118,17 +131,21 @@ export default function CrosswalkFormModal({
       groupContent,
       pid,
       authenticatedUser);
-    // console.log('payload: ', payload);
-    if (!createNew && fileData) {
-      const crosswalkFormData = new FormData();
-      crosswalkFormData.append('metadata', JSON.stringify(payload));
-      crosswalkFormData.append('file', fileData);
+    const crosswalkFormData = new FormData();
+    crosswalkFormData.append('metadata', JSON.stringify(payload));
 
+    if (isFormValid() && !createNew && fileUri && fileUri.length > 0) {
+      crosswalkFormData.append('contentURL', fileUri);
+      Promise.all([spinnerDelay(), putCrosswalkFull(crosswalkFormData)]).then((values) => {
+        setSubmitAnimationVisible(false);
+      });
+    } else if (isFormValid() && !createNew && fileData) {
+      crosswalkFormData.append('file', fileData);
       Promise.all([spinnerDelay(), putCrosswalkFull(crosswalkFormData)]).then((values) => {
         setSubmitAnimationVisible(false);
       });
 
-    } else if (createNew) {
+    } else if (isFormValid() && createNew) {
       Promise.all([spinnerDelay(), putCrosswalk(payload)]).then((values) => {
         setSubmitAnimationVisible(false);
       });
@@ -151,8 +168,10 @@ export default function CrosswalkFormModal({
     const inputErrors = getErrors(t, errors);
     const result = createNew ? newCrosswalkResult : registerCrosswalkResult;
     if (result.isError) {
-      const errorMessage = getApiError(result.error);
-      return [...inputErrors, errorMessage];
+      const errorObject = getApiError(result.error);
+      if (errorObject.status && errorObject.message) {
+        inputErrors.push(`${errorObject.status}: ${errorObject.message}`);
+      }
     }
     return inputErrors;
   }
@@ -161,8 +180,8 @@ export default function CrosswalkFormModal({
     return (
       <Button
         variant="secondary"
-        icon={<IconPlus />}
-        style={{ height: 'min-content' }}
+        icon={<IconPlus/>}
+        style={{height: 'min-content'}}
         onClick={() => handleOpen()}
       >
         {createNew ? t('crosswalk-form.create') : t('crosswalk-form.register')}
@@ -170,7 +189,7 @@ export default function CrosswalkFormModal({
     )
   }
 
-  function scrollToModalTop(){
+  function scrollToModalTop() {
     const modalTop = document.getElementById('modalTop');
     if (modalTop) {
       modalTop.scrollIntoView();
@@ -179,7 +198,7 @@ export default function CrosswalkFormModal({
 
   return (
     <>
-      {groupContent && HasPermission({ actions: ['CREATE_CROSSWALK'],targetOrganization:pid }) ? (
+      {groupContent && HasPermission({actions: ['CREATE_CROSSWALK'], targetOrganization: pid}) ? (
         <div>
           {renderButton()}
         </div>
@@ -199,7 +218,8 @@ export default function CrosswalkFormModal({
       >
         <ModalContent>
           <>
-            <SpinnerOverlay animationVisible={submitAnimationVisible} type={createNew ? SpinnerType.CrosswalkCreationModal : SpinnerType.CrosswalkRegistrationModal}></SpinnerOverlay>
+            <SpinnerOverlay animationVisible={submitAnimationVisible}
+                            type={createNew ? SpinnerType.CrosswalkCreationModal : SpinnerType.CrosswalkRegistrationModal}></SpinnerOverlay>
           </>
           <div id={'modalTop'}></div>
           <ModalTitle>
@@ -226,6 +246,8 @@ export default function CrosswalkFormModal({
               setIsValid={setIsValid}
               validFileTypes={fileExtensionsAvailableForCrosswalkRegistrationAttachments}
               translateFileUploadError={translateFileUploadError}
+              isSchemaUpload={true}
+              setFileUri={setFileUri}
               disabled={submitAnimationVisible}
             />
           )}

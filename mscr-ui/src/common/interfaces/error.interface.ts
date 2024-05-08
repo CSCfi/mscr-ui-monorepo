@@ -1,5 +1,5 @@
 export interface MSCRError{
-    staus?: string,
+    status?: string,
     message?: string,
     detail?: string;
 }

@@ -137,6 +137,7 @@
   "missing-target-schema": "",
   "modified": "",
   "optional": "",
+  "register-crosswalk-file-uri-reference": "",
   "register-schema": "",
   "register-schema-file-required": "",
   "register-schema-file-uri-reference": "",

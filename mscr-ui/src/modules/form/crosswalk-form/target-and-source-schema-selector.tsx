@@ -1,4 +1,4 @@
-import {Dropdown, DropdownItem, SingleSelect} from 'suomifi-ui-components';
+import { DropdownItem } from 'suomifi-ui-components';
 import { CrosswalkFormType } from '@app/common/interfaces/crosswalk.interface';
 import * as React from 'react';
 import { useGetPublicSchemasQuery } from '@app/common/components/schema/schema.slice';
@@ -12,7 +12,7 @@ import {
   formatsAvailableForCrosswalkCreation,
   formatsAvailableForCrosswalkRegistration
 } from '@app/common/interfaces/format.interface';
-import {WideDropdown, WideSingleSelect} from "@app/modules/form/crosswalk-form/crosswalk-form.styles";
+import {CrosswalkModal, WideDropdown, WideSingleSelect} from "@app/modules/form/crosswalk-form/crosswalk-form.styles";
 
 interface CrosswalkFormProps {
   formData: CrosswalkFormType;
@@ -51,13 +51,17 @@ export default function TargetAndSourceSchemaSelector({
   const [targetSchemas, setTargetSchemas] = useState(
     Array<SelectableSchema>()
   );
-  const [selectedSourceWorkspace, setSelectedSourceWorkspace] = useState<string>('all');
-  const [selectedTargetWorkspace, setSelectedTargetWorkspace] = useState<string>('all');
+
+  const workspaceValuesInit: SelectableWorkspace[] = [];
+  const [workspaceValues, setWorkspaceValues] = useState<SelectableWorkspace[]>(workspaceValuesInit);
+
+  const [selectedSourceWorkspace, setSelectedSourceWorkspace] = useState<string>('');
+  const [selectedTargetWorkspace, setSelectedTargetWorkspace] = useState<string>('');
 
   const router = useRouter();
   const lang = router.locale ?? '';
 
-  const workspaceValues: SelectableWorkspace[] = [
+  const workspaceValuesPersonalCrosswalks: SelectableWorkspace[] = [
     {
       labelText: 'All',
       uniqueItemId: 'all',
@@ -65,6 +69,13 @@ export default function TargetAndSourceSchemaSelector({
     {
       labelText: 'Personal workspace',
       uniqueItemId: 'personalWorkspace',
+    },
+  ];
+
+  const workspaceValuesGroupCrosswalks: SelectableWorkspace[] = [
+    {
+      labelText: 'All',
+      uniqueItemId: 'all',
     },
     {
       labelText: 'Group workspace',
@@ -86,6 +97,12 @@ export default function TargetAndSourceSchemaSelector({
     setSourceSchemas(fetchedSchemas);
     setTargetSchemas(fetchedSchemas);
     setDataLoaded(true);
+
+    if (router.asPath.includes('personal')) {
+      setWorkspaceValues([...workspaceValuesPersonalCrosswalks]);
+    } else {
+      setWorkspaceValues([...workspaceValuesGroupCrosswalks]);
+    }
   }, [data?.hits.hits, isSuccess, lang]);
 
   useEffect(() => {
@@ -132,12 +149,12 @@ export default function TargetAndSourceSchemaSelector({
 
   return (
     <ModelFormContainer>
-      <div className="crosswalk-selection-modal">
+      <CrosswalkModal>
         {dataLoaded && (
           <>
-            <div className="row">
+            <div className="row mt-2">
               <div className="col-6">
-                <div className='mb-4'>
+                <div className='mb-3'>
                   <WideDropdown
                     labelText={'Source schema workspace'}
                     defaultValue={'all'}
@@ -173,7 +190,7 @@ export default function TargetAndSourceSchemaSelector({
               </div>
 
               <div className="col-6">
-                <div className='mb-4'>
+                <div className='mb-3'>
                   <WideDropdown
                     labelText={'Target schema workspace'}
                     defaultValue={'all'}
@@ -210,7 +227,7 @@ export default function TargetAndSourceSchemaSelector({
             </div>
           </>
         )}
-      </div>
+      </CrosswalkModal>
     </ModelFormContainer>
   );
 }

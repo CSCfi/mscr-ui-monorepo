@@ -119,13 +119,13 @@ export default function SchemaFormModal({
       schemaFormData.append('metadata', JSON.stringify(payload));
       if (fileUri && fileUri.length > 0) {
         schemaFormData.append('contentURL', fileUri);
-        Promise.all([spinnerDelay(), putSchemaFull(schemaFormData)]).then((values) => {
+        Promise.allSettled([spinnerDelay(), putSchemaFull(schemaFormData)]).then((values) => {
           setSubmitAnimationVisible(false);
         });
       }
       else if (fileData) {
         schemaFormData.append('file', fileData);
-        Promise.all([spinnerDelay(), putSchemaFull(schemaFormData)]).then((values) => {
+        Promise.allSettled([spinnerDelay(), putSchemaFull(schemaFormData)]).then((values) => {
           setSubmitAnimationVisible(false);
         });
       } else {
@@ -160,8 +160,8 @@ export default function SchemaFormModal({
       const errorObject = getApiError(resultSchemaFull.error);
       let errorMessage = '';
 
-      if (errorObject.staus && errorObject.message) {
-        errorMessage = `${errorObject.staus}: ${errorObject.message}`;
+      if (errorObject.status && errorObject.message) {
+        errorMessage = `${errorObject.status}: ${errorObject.message}`;
         return errorMessage;
       }
     }
