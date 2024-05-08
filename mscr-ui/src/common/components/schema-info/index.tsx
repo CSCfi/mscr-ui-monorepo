@@ -13,6 +13,7 @@ import { generateTreeFromJson } from '@app/common/components/schema-info/schema-
 import { useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
 import {
+  CheckboxWrapper,
   ExpandButtonWrapper,
   NodeInfoWrapper,
   SchemaHeading,
@@ -21,6 +22,7 @@ import {
 } from '@app/common/components/schema-info/schema-info.styles';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
+import Tooltip from '@mui/material/Tooltip';
 
 export default function SchemaInfo(props: {
   updateTreeNodeSelectionsOutput?: (
@@ -271,25 +273,28 @@ export default function SchemaInfo(props: {
 
   return (
     <>
-      <div className='row d-flex justify-content-between mb-2'>
-        <div className='col-8'>
-          <SchemaHeading variant='h2'>
-            {getSchemaData?.metadata.label
-              ? getLanguageVersion({
-                data: getSchemaData.metadata.label,
-                lang,
-              })
-              : t('schema-tree.no-label')}
-          </SchemaHeading>
-        </div>
-        <div className='col-4 d-flex flex-row justify-content-end align-self-end my-1 pe-3'>
-          <Checkbox
-            checked={showAttributeNames}
-            onClick={(newState) => {
-              setShowAttributeNames(newState.checkboxState);
-            }}
-          >Show node titles
-          </Checkbox>
+      <div className="row d-flex mb-4">
+        <div className="col-12">
+          <Tooltip
+            title={
+              getSchemaData?.metadata.label
+                ? getLanguageVersion({
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
+                : t('schema-tree.no-label')
+            }
+            placement="bottom-start"
+          >
+            <SchemaHeading variant="h2">
+              {getSchemaData?.metadata.label
+                ? getLanguageVersion({
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
+                : t('schema-tree.no-label')}
+            </SchemaHeading>
+          </Tooltip>
         </div>
       </div>
 
@@ -332,9 +337,9 @@ export default function SchemaInfo(props: {
           </div>
           <div>
             <Box
-              className="px-3"
+              className="px-3 d-flex"
               sx={{
-                height: 436,
+                height: 460,
                 flexGrow: 1,
                 maxWidth: 700,
                 overflowY: 'auto',
@@ -357,6 +362,16 @@ export default function SchemaInfo(props: {
             treeData={selectedTreeNodes}
             // performNodeInfoAction={performNodeInfoAction}
           ></NodeInfo>
+          <CheckboxWrapper>
+            <Checkbox
+              checked={showAttributeNames}
+              onClick={(newState) => {
+                setShowAttributeNames(newState.checkboxState);
+              }}
+            >
+              Show node titles
+            </Checkbox>
+          </CheckboxWrapper>
         </NodeInfoWrapper>
       </TreeviewWrapper>
     </>
