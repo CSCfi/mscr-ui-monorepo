@@ -53,9 +53,14 @@
   "crosswalk-form": {
     "create": "",
     "createTitle": "",
+    "file-required": "",
     "format-note": "",
     "register": "",
-    "registerTitle": ""
+    "register-revision": "",
+    "registerTitle": "",
+    "revision": "",
+    "supported-file-formats": "",
+    "version-label": ""
   },
   "data-model": "Tietomalli",
   "data-models-added-to-this-model": "Tähän tietomalliin lisätyt tietomallit",
@@ -137,9 +142,11 @@
   "missing-target-schema": "Kohdeskeemaa ei ole määritelty",
   "modified": "Muokattu",
   "optional": "valinnainen",
+  "register-crosswalk-file-uri-reference": "",
   "register-schema": "",
   "register-schema-file-required": "",
   "register-schema-file-uri-reference": "",
+  "register-schema-revision": "",
   "register-schema-supported-file-formats": "",
   "remove": "Poista",
   "remove-modal": {

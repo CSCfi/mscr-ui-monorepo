@@ -5,6 +5,8 @@ export enum SpinnerType {
   CrosswalkRegistrationModal = 'crosswalk-registration-modal',
   CrosswalkCreationModal = 'crosswalk-creation-modal',
   SchemaTree = 'schema-tree',
+  SchemaRevisionModal = 'schema-revision-modal',
+  CrosswalkRevisionModal = 'crosswalk-revision-modal',
 }
 
 export const delay = async (ms) => {

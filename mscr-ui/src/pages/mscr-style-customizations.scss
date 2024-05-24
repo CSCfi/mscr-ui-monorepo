@@ -61,6 +61,10 @@ body {
   }
 }
 
+.h-0 {
+  height: 0px;
+}
+
 .modal-busy-overlay {
   display: flex;
   position: fixed;
@@ -130,6 +134,7 @@ body {
       height: calc(100% - 70vh);
     }
   }
+
   &.schema-tree {
     position: absolute;
     width: auto;
@@ -137,6 +142,42 @@ body {
     max-width: 160px;
     padding: 0px;
     margin-top: 74px;
+
+  &.crosswalk-revision-modal {
+    height: calc(100% - 44vh);
+    @media screen and (min-height: 600px) {
+      height: calc(100% - 40vh);
+    }
+    @media screen and (min-height: 650px) {
+      height: calc(100% - 40vh);
+    }
+    @media screen and (min-height: 800px) {
+      height: calc(100% - 53vh);
+    }
+    @media screen and (min-height: 950px) {
+      height: calc(100% - 58vh);
+    }
+    @media screen and (min-height: 1150px) {
+      height: calc(100% - 65vh);
+    }
+  }
+  &.schema-revision-modal {
+    height: calc(100% - 48vh);
+    @media screen and (min-height: 600px) {
+      height: calc(100% - 39vh);
+    }
+    @media screen and (min-height: 650px) {
+      height: calc(100% - 36vh);
+    }
+    @media screen and (min-height: 800px) {
+      height: calc(100% - 30vh);
+    }
+    @media screen and (min-height: 1000px) {
+      height: calc(100% - 30vh);
+    }
+    @media screen and (min-height: 1150px) {
+      height: calc(100% - 41vh);
+    }
   }
 }
 
@@ -303,21 +344,5 @@ body {
 
   .selected-row {
     background: #eaf2fa;
-  }
-
-  /* CROSSWALK SELECTION */
-  .crosswalk-selection-modal {
-    font-size: 0.85rem;
-
-    .source-select-dropdown {
-      width: 100% !important;
-    }
-
-    .source-select-info-box {
-      margin-top: 15px;
-      padding: 5px;
-      width: 100%;
-      background: #e2f1fd;
-    }
   }
 }
