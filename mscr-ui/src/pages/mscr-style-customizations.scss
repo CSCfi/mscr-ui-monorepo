@@ -2,6 +2,33 @@ body {
   font-family: 'Source Sans Pro', 'Helvetica Neue', 'Arial', sans-serif !important;
 }
 
+@keyframes fadeInAnimation
+{
+  0%
+  {
+    opacity: 0;
+  }
+
+  100%
+  {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutAnimation
+{
+  0%
+  {
+    opacity: 1;
+  }
+
+  100%
+  {
+    opacity: 0;
+  }
+}
+
+
 .fi-dropdown_popover {
   margin-top: 0px !important;
 }
@@ -29,6 +56,7 @@ body {
 }
 
 .empty-mappings-table {
+  display: flex;
   font-size: 0.9rem;
   height: 200px;
   padding: 20px;
@@ -58,10 +86,6 @@ body {
     min-width: 69px;
     margin: 20px 15px 10px 10px;
   }
-}
-
-.h-0 {
-  height: 0px;
 }
 
 .modal-busy-overlay {
@@ -132,6 +156,24 @@ body {
     @media screen and (min-height: 1150px) {
       height: calc(100% - 70vh);
     }
+  }
+  &.schema-tree-single {
+    position: absolute;
+    width: auto;
+    height: 260px;
+    max-width: 160px;
+    padding: 0px;
+    margin-top: 150px;
+    margin-left: 33%;
+  }
+  &.schema-tree-double {
+    position: absolute;
+    width: auto;
+    height: 260px;
+    max-width: 160px;
+    padding: 0px;
+    margin-top: 150px;
+    margin-left: 16.5%;
   }
   &.crosswalk-revision-modal {
     height: calc(100% - 44vh);
@@ -278,7 +320,7 @@ body {
     .MuiTableRow-root:not(.accordion-row) {
       box-shadow: none;
       border-left-width: 0;
-      proder-right-width: 0;
+      border-right-width: 0;
       border-bottom: 3px solid #d8e3f4;
     }
   }
@@ -335,4 +377,24 @@ body {
   .selected-row {
     background: #eaf2fa;
   }
+}
+
+.sidebar-animate-fadein {
+  animation: fadeInAnimation ease 1700ms;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+.sidebar-animate-fadeout {
+  animation: fadeOutAnimation ease 400ms;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+.w-0 {
+  width: 0px;
+}
+
+.w-100 {
+  width: 100%;
 }
