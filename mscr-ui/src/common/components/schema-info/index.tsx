@@ -137,6 +137,8 @@ export default function SchemaInfo(props: {
   }
 
   // Used to tree filtering
+
+  //TODO: fix algorithm to recursive form to gather nodes from subtrees
   function findNodesFromTree(
     tree: RenderTree[],
     itemsToFind: string[],
@@ -145,10 +147,9 @@ export default function SchemaInfo(props: {
     tree.forEach((item: RenderTree) => {
       if (itemsToFind.includes(item.id)) {
         results.push(item);
-      } else {
-        if (item.children && item.children.length > 0) {
-          return findNodesFromTree(item.children, itemsToFind, results);
-        }
+      }
+      if (item.children && item.children.length > 0) {
+        return findNodesFromTree(item.children, itemsToFind, results);
       }
     });
     return results;

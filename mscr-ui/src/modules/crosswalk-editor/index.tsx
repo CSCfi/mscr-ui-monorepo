@@ -46,6 +46,7 @@ import {
 import { setNotification } from '@app/common/components/notifications/notifications.slice';
 import { useStoreDispatch } from '@app/store';
 import OperationalizeModal from '../operationalize-modal';
+import {asArray} from "@app/common/utils/hooks/use-url-state";
 
 export default function CrosswalkEditor({
   crosswalkId,
@@ -99,7 +100,7 @@ export default function CrosswalkEditor({
   const [nodeMappings, setNodeMappings] = React.useState<NodeMapping[]>([]);
 
   const [jointToBeEdited, setJointToBeEdited] = React.useState<
-    CrosswalkConnectionNew | undefined
+    CrosswalkConnectionNew[] | undefined
   >(undefined);
 
   const [linkingError, setLinkingError] = React.useState<string>('');
@@ -255,7 +256,7 @@ export default function CrosswalkEditor({
 
   function addMappingToAccordion(response: any, isPutOperation: boolean) {
     if (jointToBeEdited) {
-      jointToBeEdited.id = response.data.pid;
+      jointToBeEdited[0].id = response.data.pid;
 
       if (isPutOperation) {
         const newMapping = response.data as NodeMapping;
@@ -283,6 +284,7 @@ export default function CrosswalkEditor({
   function addJointButtonClick() {
     setIsJointPatchOperation(false);
     const jointsToBeAdded: CrosswalkConnectionNew[] = [];
+    console.log('selectedSourceNodes', selectedSourceNodes);
     selectedSourceNodes.forEach((sourceNode) => {
       const joint: CrosswalkConnectionNew = {
         source: sourceNode,
@@ -298,10 +300,11 @@ export default function CrosswalkEditor({
         targetProcessing: undefined,
         notes: undefined,
         predicate: '',
+        processing: '',
       };
       jointsToBeAdded.push(joint);
     });
-    setJointToBeEdited(jointsToBeAdded[jointsToBeAdded.length - 1]);
+    setJointToBeEdited(jointsToBeAdded);
   }
 
   function generateJointToBeEdited(
@@ -314,9 +317,11 @@ export default function CrosswalkEditor({
     );
 
     const jointsToBeAdded: CrosswalkConnectionNew[] = [];
-    sourceNodes.forEach((sourceNode) => {
+
+    for (let i = 0; i < sourceNodes.length; i +=1) {
       const joint: CrosswalkConnectionNew = {
-        source: sourceNode,
+        processing: undefined,
+        source: sourceNodes[i],
         target: targetNodes[0],
         id: patchPid,
         notes: originalMapping.length > 0 ? originalMapping[0].notes : '',
@@ -327,13 +332,13 @@ export default function CrosswalkEditor({
         sourceJsonPath: undefined,
         targetJsonPath: undefined,
         sourcePredicate: undefined,
-        sourceProcessing: undefined,
+        sourceProcessing: originalMapping.length > 0 ? originalMapping[0].source[i]?.processing : undefined,
         targetPredicate: undefined,
-        targetProcessing: undefined,
+        targetProcessing: undefined
       };
       jointsToBeAdded.push(joint);
-    });
-    return jointsToBeAdded[0];
+    };
+    return jointsToBeAdded;
   }
 
   function removeJoint(jointPid: any) {
@@ -378,7 +383,7 @@ export default function CrosswalkEditor({
   const performCallbackFromAccordionAction = (
     joint: NodeMapping,
     action: string,
-    value: string
+    nodeId?: string
   ) => {
     if (action === 'remove') {
       removeJoint(joint);
@@ -386,10 +391,18 @@ export default function CrosswalkEditor({
       // TODO: implement add notes from accordion if needed?
       //joint.notes = value;
       //updateJointData(joint);
-    } else if (action === 'selectFromSourceTree') {
+    } else if (action === 'selectFromSourceTreeByMapping') {
+      console.log('by mapping');
       selectFromTreeByNodeMapping(joint, true);
       scrollToTop();
-    } else if (action === 'selectFromTargetTree') {
+    } else if (action === 'selectFromSourceTreeById') {
+      console.log('by id');
+      if (nodeId) {
+        setSourceTreeSelection([nodeId]);
+      }
+      scrollToTop();
+    }
+    else if (action === 'selectFromTargetTreeByMapping') {
       selectFromTreeByNodeMapping(joint, false);
       scrollToTop();
     } else if (action === 'openMappingDetails') {
@@ -441,6 +454,7 @@ export default function CrosswalkEditor({
     mappingPayload: any,
     patchPid: string
   ) => {
+    console.log('mapping action', mappingPayload);
     if (action === 'closeModal') {
       setIsJointPatchOperation(false);
       setNodeMappingsModalOpen(false);
@@ -661,7 +675,7 @@ export default function CrosswalkEditor({
                 {jointToBeEdited && (
                   <>
                     <NodeMappingsModal
-                      selectedCrosswalk={jointToBeEdited}
+                      nodeSelections={jointToBeEdited}
                       performMappingsModalAction={
                         performCallbackFromMappingsModal
                       }
