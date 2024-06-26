@@ -14,11 +14,21 @@ import {styled} from '@mui/material';
 import TableCell, {tableCellClasses} from '@mui/material/TableCell';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
-import {Button as Sbutton, Dropdown, DropdownItem, SearchInput, Textarea, TextInput} from 'suomifi-ui-components';
+import {
+  Button as Sbutton,
+  Dropdown,
+  DropdownItem,
+  SearchInput,
+  Textarea,
+  TextInput,
+} from 'suomifi-ui-components';
 import Button from '@mui/material/Button';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import CheckIcon from '@mui/icons-material/Check';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import ArrowCircleUp from '@mui/icons-material/ArrowCircleUp';
+import ArrowCircleDown from '@mui/icons-material/ArrowCircleDown';
+import Tooltip from '@mui/material/Tooltip';
 
 import {
   CrosswalkConnectionNew,
@@ -32,6 +42,7 @@ import {SearchWrapper} from "@app/modules/crosswalk-editor/mappings-accordion/ma
 import {
   Button as SButton,
 } from 'suomifi-ui-components';
+import {getLanguageVersion} from "@app/common/utils/get-language-version";
 
 
 const StyledCollapse = styled(Collapse)({
@@ -85,6 +96,21 @@ const StyledTableFoldRow = styled(TableRow)(({theme}) => ({
   },
 }));
 
+const StyledArrowCircleUp = styled(ArrowCircleUp)({
+  fontSize: '1.4rem',
+  color: '#3D6DB6',
+  cursor: 'pointer',
+  padding: '0px 12px 0px 15px'
+});
+
+const StyledArrowCircleDown = styled(ArrowCircleDown)({
+  fontSize: '1.4rem',
+  color: '#3D6DB6',
+  cursor: 'pointer',
+  padding: '0px 12px 0px 15px'
+});
+
+
 function Row(props: {
   row: NodeListingRow;
   mappingFunctions: any;
@@ -103,11 +129,41 @@ function Row(props: {
     setOpen(false);
   }
 
+  function moveNodeDown(id: string) {
+
+  }
+
+  console.log('props.rowCount', props.rowCount)
   return (
     <>
       <StyledTableRow className="row">
-        <StyledTableCell className="col-9 px-4">
-          <div className=''>{props.row.name}</div>
+        <StyledTableCell className="col-9 d-flex flex-row justify-content-start">
+
+          <div
+            className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center d-none ms-4'}>
+            <div>
+              <Tooltip
+                title={'Order node up'}
+                placement="left"
+              >
+                <StyledArrowCircleUp className={props.index !== 0 ? '' : 'd-none'}
+                                     onClick={() => props.callBackFunction('moveNodeUp', props.row.id)}></StyledArrowCircleUp>
+              </Tooltip>
+            </div>
+            <div className="">
+              {props.index !== props.rowCount - 1 && props.rowCount > 1 &&
+                  <Tooltip
+                      title={'Order node down'}
+                      placement="left"
+                  >
+                      <StyledArrowCircleDown
+                          onClick={() => props.callBackFunction('moveNodeDown', props.row.id)}></StyledArrowCircleDown>
+                  </Tooltip>
+              }
+            </div>
+          </div>
+
+          <div className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center ms-3'}>{props.row.name}</div>
         </StyledTableCell>
 
         {/*                <StyledTableCell className='fw-bold' style={{width: '10%'}}>
@@ -119,16 +175,21 @@ function Row(props: {
 
         <StyledTableButtonCell className="col-3 fw-bold">
           <div>
-                <IconButton
-                    aria-label="expand row"
-                    size="small"
-                    onClick={(e) => {
-                      setOpen(!open);
-                      e.stopPropagation();
-                    }}
-                >
-                  {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
-                </IconButton>
+            <Tooltip
+              title={open ? 'Hide details' : 'Show details'}
+              placement="right"
+            >
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={(e) => {
+                  setOpen(!open);
+                  e.stopPropagation();
+                }}
+              >
+                {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
+              </IconButton>
+            </Tooltip>
           </div>
         </StyledTableButtonCell>
       </StyledTableRow>
@@ -141,61 +202,63 @@ function Row(props: {
             unmountOnExit
           >
             <div className="row">
-                <div className="col-10">
-                  <div className="mx-3 mt-1 mb-2 d-flex flex-column">
-                      <p>
-                        <span className="fw-bold">Type: </span>
-                        {props?.row?.type ?? ''}
-                      </p>
-                      <p>
-                        <span className="fw-bold">Description: </span>
-                        {props?.row?.description?.length > 0 ? props?.row?.description : 'N/A'}
-                      </p>
+              <div className="col-12">
+                <div className="mx-3 mt-1 mb-2 d-flex flex-column">
+                  <p>
+                    <span className="fw-bold">Type: </span>
+                    {props?.row?.type ?? ''}
+                  </p>
+                  <p>
+                    <span className="fw-bold">Description: </span>
+                    {props?.row?.description?.length > 0 ? props?.row?.description : 'N/A'}
+                  </p>
 
-                    {props.isSourceAccordion &&
-                        <><Dropdown className='mt-2 node-info-dropdown'
-                                    labelText="Source operation"
-                                    visualPlaceholder="Operation not selected"
-                                    value={props.row?.sourceProcessingSelection}
-                                    onChange={(newValue) => props.callBackFunction('updateSourceOperation', props.row.id, newValue, props.row.id)}
-                        >
-                          {props?.mappingFunctions?.map((rt) => (
-                            <DropdownItem key={rt.uri} value={rt.uri}>
-                              {rt.name}
-                            </DropdownItem>
-                          ))}
-                        </Dropdown>
-                            <div><TextInput
-                                onChange={(newValue) => props.callBackFunction('updateSourceOperationValue', props.row.id, newValue)}
-                                visualPlaceholder="Operation value"
-                            /></div>
+                  {props.isSourceAccordion &&
+                      <><Dropdown className='mt-2 node-info-dropdown'
+                                  labelText="Source operation"
+                                  visualPlaceholder="Operation not selected"
+                                  value={props.row?.sourceProcessingSelection}
+                                  onChange={(newValue) => props.callBackFunction('updateSourceOperation', props.row.id, newValue, props.row.id)}
+                      >
+                        {props?.mappingFunctions?.map((rt) => (
+                          <DropdownItem key={rt.uri} value={rt.uri}>
+                            {rt.name}
+                          </DropdownItem>
+                        ))}
+                      </Dropdown>
+                          <div><TextInput
+                              onChange={(newValue) => props.callBackFunction('updateSourceOperationValue', props.row.id, newValue)}
+                              visualPlaceholder="Operation value"
+                          /></div>
 
-                            <Dropdown
-                            className="mt-2 node-info-dropdown"
-                            labelText="Predicate"
-                            visualPlaceholder="Exact match"
-                            onChange={(newValue) => props.callBackFunction('updateSourcePredicate', props.row.id, newValue)}
-                        >
-                          {props.predicateOperationValues.map((rt) => (
-                            <DropdownItem key={rt.id} value={rt.name}>
-                              {rt.name}
-                            </DropdownItem>
-                          ))}
-                        </Dropdown><SButton className="align-self-end"
-                                            style={{height: 'min-content'}}
-                                            onClick={() => deleteNodeFromMapping()}
-                                            variant="secondaryNoBorder"
-                        >
-                          {'Remove node'}
-                        </SButton></>
-                    }
-                  </div>
-                  <br/>
+                          <Dropdown
+                              className="mt-2 node-info-dropdown"
+                              labelText="Predicate"
+                              visualPlaceholder="Exact match"
+                              onChange={(newValue) => props.callBackFunction('updateSourcePredicate', props.row.id, newValue)}
+                          >
+                            {props.predicateOperationValues.map((rt) => (
+                              <DropdownItem key={rt.id} value={rt.name}>
+                                {rt.name}
+                              </DropdownItem>
+                            ))}
+                          </Dropdown>
+                      </>
+                  }
                 </div>
-                <div className='col-2 mt-4 d-flex flex-row gx-0 justify-content-end'>
-                  <div className="d-flex flex-column action-buttons">
-                  </div>
+                <br/>
+              </div>
+              <div className='col-12 mt-4 d-flex flex-row gx-0 justify-content-end my-2'>
+                <div className="d-flex flex-row">
+                  <SButton className="align-self-end"
+                           style={{height: 'min-content'}}
+                           onClick={() => deleteNodeFromMapping()}
+                           variant="secondaryNoBorder"
+                  >
+                    {'Remove node'}
+                  </SButton>
                 </div>
+              </div>
             </div>
           </StyledCollapse>
         </TableCell>
@@ -224,7 +287,8 @@ export default function NodeListingAccordion(props: any) {
           description: node?.source.properties.description,
           sourceProcessingSelection: node?.sourceProcessing?.id ?? '',
           type: node?.source.properties.type,
-          isSelected: false, notes: undefined, name: node.source.name, id: node.source.id}
+          isSelected: false, notes: undefined, name: node.source.name, id: node.source.id
+        }
         newNodes.push(newNode);
       });
     } else {
@@ -233,14 +297,15 @@ export default function NodeListingAccordion(props: any) {
         description: node?.target.properties.description,
         sourceProcessingSelection: node?.sourceProcessing?.id ?? '',
         type: node?.target.properties.type,
-        isSelected: false, notes: undefined, name: node.target.name, id: node.target.id}
+        isSelected: false, notes: undefined, name: node.target.name, id: node.target.id
+      }
       newNodes.push(newNode);
     }
     setNodeData(newNodes);
+    console.log('nodeData', newNodes);
     setShowAttributeNames(props.showAttributeNames);
   }, [props]);
 
-  const nodeMappingsInput = props.nodeMappings;
   return (
     <>
       <TableContainer component={Paper} className="gx-0">
@@ -271,23 +336,6 @@ export default function NodeListingAccordion(props: any) {
                   />
                 );
               })}
-            </TableBody>
-          )}
-          {nodeMappingsInput?.length < 1 && (
-            <TableBody>
-              <TableRow className="">
-                <td>
-                  <div className="empty-mappings-table">
-                    <div className="info-icon">
-                      <InfoIcon></InfoIcon>
-                    </div>
-                    <div>
-                      No elements have been mapped yet. Mappings will appear in
-                      this table.
-                    </div>
-                  </div>
-                </td>
-              </TableRow>
             </TableBody>
           )}
         </Table>

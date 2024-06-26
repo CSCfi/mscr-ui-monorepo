@@ -1,5 +1,5 @@
 import {
-  CrosswalkConnectionNew, NodeListingRow,
+  CrosswalkConnectionNew,
   NodeMapping,
 } from '@app/common/interfaces/crosswalk-connection.interface';
 import validateMapping from '@app/modules/crosswalk-editor/mapping-validator';
@@ -14,6 +14,7 @@ import {
   ModalTitle,
 } from 'suomifi-ui-components';
 import NodeListingAccordion from "@app/modules/crosswalk-editor/tabs/node-mappings/node-listing-accordion";
+import {MidColumnWrapper} from "@app/modules/crosswalk-editor/tabs/node-mappings/node-mappings.styles";
 
 export default function NodeMappings(props: {
   nodeSelections: CrosswalkConnectionNew[];
@@ -286,14 +287,42 @@ export default function NodeMappings(props: {
 
   function accordionCallbackFunction(operationName: string, dataId: any, operationValue: any, operationSourceValue: any) {
     if (sourceNodes) {
-      if (operationName === 'deleteSourceNode' && sourceNodes.length > 1) {
+      if (operationName === 'moveNodeUp' && sourceNodes.length > 1) {
+        let sourceNodesNew = [...sourceNodes];
+      for (let i = 0; i < sourceNodes.length; i += 1){
+        if (sourceNodes[i].source.id === dataId){
+          let first = sourceNodes[i-1];
+          let second = sourceNodes[i];
+          sourceNodesNew[i-1] = second;
+          sourceNodesNew[i] = first;
+          setSourceNodes(sourceNodesNew);
+          break;
+        }
+        }
+      }
+
+      else if (operationName === 'moveNodeDown' && sourceNodes.length > 1) {
+        let sourceNodesNew = [...sourceNodes];
+        for (let i = 0; i < sourceNodes.length; i += 1) {
+          if (sourceNodes[i].source.id === dataId){
+            let first = sourceNodes[i];
+            let second = sourceNodes[i+1];
+            sourceNodesNew[i] = second;
+            sourceNodesNew[i+1] = first;
+            setSourceNodes(sourceNodesNew);
+            break;
+          }
+        }
+      }
+
+      else if (operationName === 'deleteSourceNode' && sourceNodes.length > 1) {
         let newNodeSelections = sourceNodes.filter(node => {
           return node.source.id !== dataId;
         });
         setSourceNodes(newNodeSelections);
       }
 
-      if (operationName === 'updateSourceOperation' || operationName === 'updateSourceOperationValue') {
+      else if (operationName === 'updateSourceOperation' || operationName === 'updateSourceOperationValue') {
         let newNodeSelections = sourceNodes.map(node => {
           if (node.source.id === dataId) {
             const params =  {[getMappingFunctionParams(operationValue)[0].name]: operationSourceValue};
@@ -396,7 +425,7 @@ export default function NodeMappings(props: {
 
               {/* MID COLUMN */}
               <div className="col-4 d-flex flex-column bg-light-blue">
-                <div>
+                <MidColumnWrapper>
                   <div><Dropdown className='mt-2 node-info-dropdown'
                                  labelText="Mapping operation"
                                  visualPlaceholder="Operation not selected"
@@ -434,14 +463,14 @@ export default function NodeMappings(props: {
                     </Dropdown>
 
                   </div>
-                </div>
-                <Textarea
-                  onChange={(event) => setNotesValue(event.target.value)}
-                  labelText="Notes:"
-                  visualPlaceholder="No notes set. Add free form notes here."
-                  value={notesValue}
-                />
-                <br/>
+                  <Textarea
+                    onChange={(event) => setNotesValue(event.target.value)}
+                    labelText="Notes:"
+                    visualPlaceholder="No notes set. Add free form notes here."
+                    value={notesValue}
+                  />
+                  <br/>
+                </MidColumnWrapper>
               </div>
 
               {/* TARGET OPERATIONS */}

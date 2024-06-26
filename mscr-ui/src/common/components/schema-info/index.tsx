@@ -105,7 +105,7 @@ export default function SchemaInfo(props: {
 
   useEffect(() => {
     // Update selections for node info and parent component for mappings
-    const selectedTreeNodeIds = getTreeNodesByIds(treeSelectedArray);
+    const selectedTreeNodeIds = getRenderTreeNodesByIds(treeSelectedArray);
     if (
       props.updateTreeNodeSelectionsOutput &&
       props.isSourceTree !== undefined
@@ -131,14 +131,23 @@ export default function SchemaInfo(props: {
   };
 
   // Used to generate data for mappings modal
-  function getTreeNodesByIds(nodeIds: string[]) {
+  function getRenderTreeNodesByIds(nodeIds: string[]) {
     const foundSourceNodes: RenderTree[] = [];
-    return findNodesFromTree(treeDataOriginal, nodeIds, foundSourceNodes);
+    findNodesFromTree(treeDataOriginal, nodeIds, foundSourceNodes);
+
+    const retNodes: RenderTree[] = [];
+    // Remove duplicates and preserve original order for multi node mappings
+    nodeIds.forEach(id => {
+      foundSourceNodes.forEach(item => {
+        if (item.id === id){
+          retNodes.push(item);
+        }
+      });
+    });
+    return retNodes;
   }
 
   // Used to tree filtering
-
-  //TODO: fix algorithm to recursive form to gather nodes from subtrees
   function findNodesFromTree(
     tree: RenderTree[],
     itemsToFind: string[],
