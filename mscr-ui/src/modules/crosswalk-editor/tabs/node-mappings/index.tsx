@@ -150,10 +150,6 @@ export default function NodeMappings(props: {
     target: [],
   };
 
-  function removeSelectedSourceNode() {
-    // TODO: implement!
-  }
-
   function generateMappingPayload() {
     let mappings = mappingPayloadInit;
     if (sourceNodes) {

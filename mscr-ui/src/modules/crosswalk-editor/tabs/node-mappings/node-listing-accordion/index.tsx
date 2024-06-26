@@ -129,11 +129,6 @@ function Row(props: {
     setOpen(false);
   }
 
-  function moveNodeDown(id: string) {
-
-  }
-
-  console.log('props.rowCount', props.rowCount)
   return (
     <>
       <StyledTableRow className="row">
@@ -165,13 +160,6 @@ function Row(props: {
 
           <div className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center ms-3'}>{props.row.name}</div>
         </StyledTableCell>
-
-        {/*                <StyledTableCell className='fw-bold' style={{width: '10%'}}>
-                    <IconButton onClick={(e) => {props.cbf.performAccordionAction(row, 'remove'); e.stopPropagation();}} aria-label="unlink" color="primary" title='Unlink nodes'
-                                size="large">
-                    <LinkOffIcon/>
-                    </IconButton>
-                </StyledTableCell>*/}
 
         <StyledTableButtonCell className="col-3 fw-bold">
           <div>
@@ -250,13 +238,15 @@ function Row(props: {
               </div>
               <div className='col-12 mt-4 d-flex flex-row gx-0 justify-content-end my-2'>
                 <div className="d-flex flex-row">
-                  <SButton className="align-self-end"
-                           style={{height: 'min-content'}}
-                           onClick={() => deleteNodeFromMapping()}
-                           variant="secondaryNoBorder"
-                  >
-                    {'Remove node'}
-                  </SButton>
+                  {props.rowCount > 1 &&
+                      <SButton className="align-self-end"
+                               style={{height: 'min-content'}}
+                               onClick={() => deleteNodeFromMapping()}
+                               variant="secondaryNoBorder"
+                      >
+                        {'Remove node'}
+                      </SButton>
+                  }
                 </div>
               </div>
             </div>
@@ -302,7 +292,6 @@ export default function NodeListingAccordion(props: any) {
       newNodes.push(newNode);
     }
     setNodeData(newNodes);
-    console.log('nodeData', newNodes);
     setShowAttributeNames(props.showAttributeNames);
   }, [props]);
 
