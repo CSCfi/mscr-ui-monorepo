@@ -3,8 +3,9 @@ import {
   usePatchCrosswalkMutation,
 } from '@app/common/components/crosswalk/crosswalk.slice';
 import {
+  selectIsEditModeActive, setIsEditModeActive,
   useDeleteSchemaMutation,
-  usePatchSchemaMutation,
+  usePatchSchemaMutation
 } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
 import { ActionMenu, ActionMenuItem } from 'suomifi-ui-components';
@@ -21,6 +22,7 @@ import { SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
 import { ActionMenuWrapper } from '@app/common/components/schema-and-crosswalk-actionmenu/schema-and-crosswalk-actionmenu.styles';
 import FormModal, { ModalType } from '@app/modules/form';
 import { Format, formatsAvailableForMscrCopy } from '@app/common/interfaces/format.interface';
+import { useSelector } from 'react-redux';
 
 interface SchemaAndCrosswalkActionmenuProps {
   type: ActionMenuTypes;
@@ -41,7 +43,9 @@ export default function SchemaAndCrosswalkActionMenu({
 }: SchemaAndCrosswalkActionmenuProps) {
   const { t } = useTranslation('common');
   const dispatch = useStoreDispatch();
-  const [isEditModeActive, setIsEditModeActive] = useState(false);
+  const isSchemaEditActive = useSelector(selectIsEditModeActive());
+  const setIsSchemaEditActive = (value: boolean) => dispatch(setIsEditModeActive(value));
+  const [isEditCrosswalkModeActive, setIsEditCrosswalkModeActive] = useState(false);
   const [patchCrosswalk, crosswalkPatchResponse] = usePatchCrosswalkMutation();
   const [patchSchema] = usePatchSchemaMutation();
   const [deleteSchema] = useDeleteSchemaMutation();
@@ -65,7 +69,7 @@ export default function SchemaAndCrosswalkActionMenu({
       crosswalkPatchResponse?.originalArgs?.payload?.state === State.Published
     ) {
       buttonCallbackFunction('disableEdit');
-      setIsEditModeActive(false);
+      setIsEditCrosswalkModeActive(false);
       setCrosswalkPublished(true);
     }
   }
@@ -96,7 +100,7 @@ export default function SchemaAndCrosswalkActionMenu({
         payload.state = State.Removed;
     }
     if (['publish', 'invalidate', 'deprecate', 'remove'].includes(action)) {
-      setIsEditModeActive(false);
+      setIsEditCrosswalkModeActive(false);
       if (
         type !== ActionMenuTypes.Schema &&
         type !== ActionMenuTypes.SchemaMetadata
@@ -188,7 +192,7 @@ export default function SchemaAndCrosswalkActionMenu({
   };
 
   useEffect(() => {
-    setIsEditModeActive(isMappingsEditModeActive);
+    setIsEditCrosswalkModeActive(isMappingsEditModeActive);
   }, [isMappingsEditModeActive]);
 
   useEffect(() => {
@@ -220,9 +224,20 @@ export default function SchemaAndCrosswalkActionMenu({
             }
             onClick={() => buttonCallbackFunction('edit')}
           >
-            {isEditModeActive
+            {isEditCrosswalkModeActive
               ? t('actionmenu.finish-editing')
               : t('actionmenu.edit-mappings')}
+          </ActionMenuItem>
+          <ActionMenuItem
+            className={
+              (type === ActionMenuTypes.Schema ||
+                type === ActionMenuTypes.SchemaMetadata)
+                ? ''
+                : 'd-none'
+            }
+            onClick={() => setIsSchemaEditActive(!isSchemaEditActive)}
+          >
+            {isSchemaEditActive ? t('actionmenu.finish-editing') : t('actionmenu.edit-schema')}
           </ActionMenuItem>
           <ActionMenuItem
             onClick={() => buttonCallbackFunction('edit')}

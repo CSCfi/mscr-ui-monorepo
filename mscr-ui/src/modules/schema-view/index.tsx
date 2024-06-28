@@ -1,9 +1,13 @@
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { SyntheticEvent, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import { useGetSchemaWithRevisionsQuery } from '@app/common/components/schema/schema.slice';
+import {
+  selectIsEditModeActive,
+  selectSelectedTab,
+  setSelectedTab,
+  useGetSchemaWithRevisionsQuery
+} from '@app/common/components/schema/schema.slice';
 import MetadataAndFiles from './metadata-and-files';
 import { createTheme, Grid, ThemeProvider } from '@mui/material';
 import VersionHistory from 'src/common/components/version-history';
@@ -19,9 +23,13 @@ import {
 } from '@app/modules/schema-view/schema-view-styles';
 import HasPermission from '@app/common/utils/has-permission';
 import { formatsAvailableForMscrCopy } from '@app/common/interfaces/format.interface';
+import { useStoreDispatch } from '@app/store';
+import { useSelector } from 'react-redux';
 
 export default function SchemaView({ schemaId }: { schemaId: string }) {
   const { t } = useTranslation('common');
+  const dispatch = useStoreDispatch();
+  const selectedTab = useSelector(selectSelectedTab());
 
   const {
     data: schemaDetails,
@@ -53,8 +61,6 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     },
   });
 
-  const [selectedTab, setSelectedTab] = useState(0);
-
   function a11yProps(index: number) {
     return {
       id: `simple-tab-${index}`,
@@ -62,9 +68,6 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     };
   }
 
-  const changeTab = (event: SyntheticEvent | undefined, newValue: number) => {
-    setSelectedTab(newValue);
-  };
   if (isLoading) {
     return (
       <div className="d-flex justify-content-center">
@@ -103,7 +106,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
             >
               <Tabs
                 value={selectedTab}
-                onChange={changeTab}
+                onChange={(event, newValue) => dispatch(setSelectedTab(newValue))}
                 aria-label="Category selection"
               >
                 <Tab label={t('tabs.metadata-and-files')} {...a11yProps(0)} />

@@ -10,7 +10,7 @@ import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
 import { cloneDeep } from 'lodash';
 import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
-import { useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
+import { selectIsEditModeActive, useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
 import {
   CheckboxWrapper,
@@ -22,8 +22,9 @@ import {
 } from '@app/common/components/schema-info/schema-info.styles';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import SpinnerOverlay, { SpinnerType } from "@app/common/components/spinner-overlay";
+import SpinnerOverlay, { SpinnerType } from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
+import { useSelector } from 'react-redux';
 
 export default function SchemaInfo(props: {
   updateTreeNodeSelectionsOutput?: (
@@ -39,6 +40,8 @@ export default function SchemaInfo(props: {
 }) {
   const { t } = useTranslation('common');
   const lang = useRouter().locale ?? '';
+  const isSchemaEditActive = useSelector(selectIsEditModeActive());
+  const isEditable = props.isSingleTree && isSchemaEditActive;
   const emptyTreeSelection: RenderTree = {
     elementPath: '',
     qname: 'empty',
@@ -363,7 +366,9 @@ export default function SchemaInfo(props: {
           <NodeInfo
             treeData={selectedTreeNodes}
             // performNodeInfoAction={performNodeInfoAction}
-           dataIsLoaded={isTreeDataFetched}></NodeInfo>
+            dataIsLoaded={isTreeDataFetched}
+            isEditable={isEditable}
+          />
           <CheckboxWrapper>
             <Checkbox
               checked={showAttributeNames}

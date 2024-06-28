@@ -20,6 +20,7 @@
     "deprecate-schema": "",
     "edit-mappings": "",
     "edit-metadata": "",
+    "edit-schema": "",
     "finish-editing": "",
     "invalidate-crosswalk": "",
     "invalidate-schema": "",
@@ -231,7 +232,8 @@
   "node-info": {
     "loading": "",
     "select-a-node": "",
-    "selected-node-info": ""
+    "selected-node-info": "",
+    "set-as-root-node": ""
   },
   "not-recommended-synonym": "",
   "notifications": {

@@ -8,6 +8,8 @@ import {
 import { MscrSearchResults } from '@app/common/interfaces/search.interface';
 import { Format } from '@app/common/interfaces/format.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
+import { createSlice } from '@reduxjs/toolkit';
+import { AppState, AppThunk } from '@app/store';
 
 function createUrl(formatRestrictions: Array<Format>) {
   const formatString = formatRestrictions.reduce((filterString, fr) => {
@@ -159,4 +161,66 @@ export const {
 export const { putSchema, getSchema, deleteSchema, getSchemas, putSchemaFull, putSchemaRevision } =
   schemaApi.endpoints;
 
+// Slice setup below
 
+enum Tab {
+  Metadata = 0,
+  Editor,
+  History,
+}
+
+const initialState = {
+  selectedTab: Tab.Metadata,
+  isEditModeActive: false,
+};
+
+export const schemaSlice = createSlice({
+  name: 'schema',
+  initialState: initialState,
+  reducers: {
+    setSelectedTab(state, action) {
+      if (action.payload.tab === Tab.Editor) {
+        return {
+          ...state,
+          selectedTab: action.payload.tab,
+        };
+      }
+      return {
+        ...state,
+        selectedTab: action.payload.tab,
+        isEditModeActive: false,
+      };
+    },
+    setEditModeActive(state, action) {
+      if (action.payload === false) {
+        return {
+          ...state,
+          isEditModeActive: false,
+        };
+      }
+      return {
+        ...state,
+        selectedTab: Tab.Editor,
+        isEditModeActive: true,
+      };
+    },
+  }
+});
+
+export function selectSelectedTab() {
+  return (state: AppState) => state.schema.selectedTab;
+}
+
+export function setSelectedTab(tab: number): AppThunk {
+  return (dispatch) =>
+    dispatch(schemaSlice.actions.setSelectedTab({ tab }));
+}
+
+export function selectIsEditModeActive() {
+  return (state: AppState) => state.schema.isEditModeActive;
+}
+
+export function setIsEditModeActive(isActive?: boolean): AppThunk {
+  return (dispatch) =>
+    dispatch(schemaSlice.actions.setEditModeActive(isActive ?? false));
+}

@@ -1,14 +1,16 @@
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
-import { Dropdown, DropdownItem } from 'suomifi-ui-components';
+import { Dropdown, DropdownItem, ToggleButton } from 'suomifi-ui-components';
 import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { InfoIcon } from '@app/common/components/shared-icons';
 import { useTranslation } from 'next-i18next';
 import { DropdownWrapper } from '@app/common/components/schema-info/schema-info.styles';
+import { ToggleWrapper } from '@app/common/components/schema-info/schema-tree/node-info/node-info.styles';
 
 export default function NodeInfo(props: {
   treeData: RenderTree[];
-  dataIsLoaded: boolean
+  dataIsLoaded: boolean;
+  isEditable?: boolean;
   // performNodeInfoAction: any;
 }) {
   const { t } = useTranslation('common');
@@ -55,6 +57,11 @@ export default function NodeInfo(props: {
     }
   }
 
+  // Todo: Implement api call when setting root node is possible in the backend
+  const handleRootToggle = (checked: boolean) => {
+    console.log(t('node-info.set-as-root-node'), checked);
+  };
+
   function processHtmlLinks(input: string | undefined) {
     if (input && input.startsWith('http://' || 'https://')) {
       return (
@@ -89,16 +96,8 @@ export default function NodeInfo(props: {
                   </div>
                 </div>
                 <div className="col-10 d-flex align-self-center">
-                  {!dataIsLoaded &&
-                      <div>
-                        {t('node-info.loading')}
-                      </div>
-                  }
-                  {dataIsLoaded &&
-                      <div>
-                        {t('node-info.select-a-node')}
-                      </div>
-                  }
+                  {!dataIsLoaded && <div>{t('node-info.loading')}</div>}
+                  {dataIsLoaded && <div>{t('node-info.select-a-node')}</div>}
                 </div>
               </div>
             </>
@@ -122,6 +121,15 @@ export default function NodeInfo(props: {
             </DropdownWrapper>
           )}
           <div>
+            {/*{props.treeData.length >= 1 && props.isEditable && (*/}
+            {/*  <ToggleWrapper>*/}
+            {/*    <ToggleButton*/}
+            {/*      onClick={handleRootToggle}*/}
+            {/*    >*/}
+            {/*      {t('node-info.set-as-root-node')}*/}
+            {/*    </ToggleButton>*/}
+            {/*  </ToggleWrapper>*/}
+            {/*)}*/}
             <div className="row">
               {props.treeData.length > 1 && (
                 <>
