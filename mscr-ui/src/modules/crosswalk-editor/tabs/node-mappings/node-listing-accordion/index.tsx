@@ -43,7 +43,7 @@ import {
   Button as SButton,
 } from 'suomifi-ui-components';
 import {getLanguageVersion} from "@app/common/utils/get-language-version";
-
+import validateMapping from "@app/modules/crosswalk-editor/mapping-validator";
 
 const StyledCollapse = styled(Collapse)({
   maxWidth: '277px'
@@ -116,18 +116,73 @@ function Row(props: {
   mappingFunctions: any;
   showAttributeNames: boolean;
   sourceOperationValues: Array<any>;
+  sourceProcessing: any;
   predicateOperationValues: [];
   index: number;
   callBackFunction: any;
   rowCount: number;
   isSourceAccordion: boolean;
+  isOneToManyMapping: boolean;
 }) {
   const [open, setOpen] = React.useState(props.rowCount < 2 && props.index === 0);
+  const [sourceOperationValueFields, setSourceOperationValueFields] = useState<React.ReactFragment>();
+  const [sourceOperationValue, setSourceOperationValue] = useState<string>('');
+  const [originalValuesInit, setOriginalValuesInit] = useState<boolean>(false);
+
+  if (!originalValuesInit) {
+    setSourceOperationSelection(props.row?.sourceProcessingSelection, props.row.id);
+    setOriginalValuesInit(true);
+  }
 
   function deleteNodeFromMapping() {
-    props.callBackFunction('deleteSourceNode', props.row.id);
+    props.isSourceAccordion ? props.callBackFunction('deleteSourceNode', props.row.id) : props.callBackFunction('deleteTargetNode', props.row.id);
     setOpen(false);
   }
+
+  function setSourceOperationSelection(operationKey: string | undefined, mappingId: string) {
+    if (operationKey) {
+      console.log('setting source operation', operationKey , mappingId);
+      props.callBackFunction('updateSourceOperation', mappingId, '', operationKey);
+      //setSourceOperationValue(operationKey);
+      generateSourceOperationValueFields(operationKey, mappingId);
+    }
+  }
+
+  function updateSourceOperationValue(mappingId: string, newValue: string, inputName: string) {
+    setSourceOperationValue(newValue);
+    props.callBackFunction('updateSourceOperationValue', mappingId, newValue, inputName)
+  }
+
+  function generateSourceOperationValueFields(operationKey: string | undefined, mappingId: string) {
+    const inputFieldParams = props?.mappingFunctions.filter((fnc: { uri: string | undefined; }) => {
+      return fnc.uri === operationKey;
+    })[0].parameters;
+
+    if (operationKey !== 'N/A') {
+      setSourceOperationValueFields(
+        inputFieldParams.map(input => {
+          // If function has a default value, it's hidden form UI.
+          if (!input.defaultValue) {
+            const originalValue = getMappingFunctionOriginalValues(operationKey, input.name);
+            setSourceOperationValue(originalValue);
+            return (<div className='mt-2'><TextInput
+              labelText={input.name}
+              defaultValue={originalValue}
+              //value={sourceOperationValue}
+              onChange={(newValue) => updateSourceOperationValue(mappingId, newValue ? newValue.toString() : '', input.name)}
+              visualPlaceholder="Operation value"
+            /></div>)
+          }
+        }));
+    }
+  }
+
+  function getMappingFunctionOriginalValues(operationKey: string, paramName: string) {
+      if (props.row.sourceProcessing && props.row.sourceProcessing.id === operationKey) {
+        // @ts-ignore
+        return props.row.sourceProcessing.params[paramName];
+      }
+  };
 
   return (
     <>
@@ -135,18 +190,18 @@ function Row(props: {
         <StyledTableCell className="col-9 d-flex flex-row justify-content-start">
 
           <div
-            className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center d-none ms-4'}>
+            className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center d-none'}>
             <div>
-              <Tooltip
-                title={'Order node up'}
-                placement="left"
+              <Tooltip className={props.index !== 0 && props.isSourceAccordion ? '' : 'd-none'}
+                       title={'Order node up'}
+                       placement="left"
               >
-                <StyledArrowCircleUp className={props.index !== 0 ? '' : 'd-none'}
-                                     onClick={() => props.callBackFunction('moveNodeUp', props.row.id)}></StyledArrowCircleUp>
+                <StyledArrowCircleUp
+                  onClick={() => props.callBackFunction('moveNodeUp', props.row.id)}></StyledArrowCircleUp>
               </Tooltip>
             </div>
-            <div className="">
-              {props.index !== props.rowCount - 1 && props.rowCount > 1 &&
+            <div className={props.isSourceAccordion ? '' : 'ms-3'}>
+              {props.index !== props.rowCount - 1 && props.rowCount > 1 && props.isSourceAccordion &&
                   <Tooltip
                       title={'Order node down'}
                       placement="left"
@@ -158,7 +213,8 @@ function Row(props: {
             </div>
           </div>
 
-          <div className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center ms-3'}>{props.row.name}</div>
+          <div
+            className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center ms-3'}>{props.row.name}</div>
         </StyledTableCell>
 
         <StyledTableButtonCell className="col-3 fw-bold">
@@ -205,8 +261,9 @@ function Row(props: {
                       <><Dropdown className='mt-2 node-info-dropdown'
                                   labelText="Source operation"
                                   visualPlaceholder="Operation not selected"
+                                  defaultValue="Operation not selected"
                                   value={props.row?.sourceProcessingSelection}
-                                  onChange={(newValue) => props.callBackFunction('updateSourceOperation', props.row.id, newValue, props.row.id)}
+                                  onChange={(newValue) => setSourceOperationSelection(newValue, props.row.id)}
                       >
                         {props?.mappingFunctions?.map((rt) => (
                           <DropdownItem key={rt.uri} value={rt.uri}>
@@ -214,23 +271,7 @@ function Row(props: {
                           </DropdownItem>
                         ))}
                       </Dropdown>
-                          <div><TextInput
-                              onChange={(newValue) => props.callBackFunction('updateSourceOperationValue', props.row.id, newValue)}
-                              visualPlaceholder="Operation value"
-                          /></div>
-
-                          <Dropdown
-                              className="mt-2 node-info-dropdown"
-                              labelText="Predicate"
-                              visualPlaceholder="Exact match"
-                              onChange={(newValue) => props.callBackFunction('updateSourcePredicate', props.row.id, newValue)}
-                          >
-                            {props.predicateOperationValues.map((rt) => (
-                              <DropdownItem key={rt.id} value={rt.name}>
-                                {rt.name}
-                              </DropdownItem>
-                            ))}
-                          </Dropdown>
+                        {sourceOperationValueFields}
                       </>
                   }
                 </div>
@@ -257,42 +298,66 @@ function Row(props: {
   );
 }
 
-
-function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAttributeNames: boolean, mappingFunctions: any) {
-  return nodeMappingsInput.filter(item => {
-    const searchString = value.toLowerCase();
-    return (item.source[0].label.toLowerCase().includes(searchString) || item.target[0].label.toLowerCase().includes(searchString) || (item?.notes && item.notes.toLowerCase().includes(searchString)));
-  });
-}
-
 export default function NodeListingAccordion(props: any) {
   const {t} = useTranslation('common');
   const [nodeData, setNodeData] = React.useState<NodeListingRow[]>([]);
   const [showAttributeNames, setShowAttributeNames] = React.useState<boolean>(true);
+  const [mappingFunctions, setMappingFunctions] = React.useState<any>([]);
   useEffect(() => {
     let newNodes: NodeListingRow[] = [];
     if (props.isSourceAccordion) {
-      props.nodes.forEach((node: CrosswalkConnectionNew) => {
+      // Source
+      if (props.isOneToManyMapping) {
         let newNode: NodeListingRow = {
-          description: node?.source.properties.description,
-          sourceProcessingSelection: node?.sourceProcessing?.id ?? '',
-          type: node?.source.properties.type,
-          isSelected: false, notes: undefined, name: node.source.name, id: node.source.id
+          description: props.nodes[0].source.properties.description,
+          sourceProcessingSelection: props.nodes[0].sourceProcessing?.id ?? '',
+          sourceProcessing: props.nodes[0].sourceProcessing,
+          type: props.nodes[0].source.properties.type,
+          isSelected: false, notes: undefined, name: props.nodes[0].source.name, id: props.nodes[0].source.id
         }
         newNodes.push(newNode);
-      });
-    } else {
-      const node = props.nodes[0];
-      let newNode: NodeListingRow = {
-        description: node?.target.properties.description,
-        sourceProcessingSelection: node?.sourceProcessing?.id ?? '',
-        type: node?.target.properties.type,
-        isSelected: false, notes: undefined, name: node.target.name, id: node.target.id
+      } else {
+        props.nodes.forEach((node: CrosswalkConnectionNew) => {
+          let newNode: NodeListingRow = {
+            description: node?.source.properties.description,
+            sourceProcessingSelection: node?.sourceProcessing?.id ?? '',
+            sourceProcessing: node?.sourceProcessing,
+            type: node?.source.properties.type,
+            isSelected: false, notes: undefined, name: node.source.name, id: node.source.id
+          }
+          newNodes.push(newNode);
+        });
       }
-      newNodes.push(newNode);
+    } else {
+      // Target
+      if (props.isOneToManyMapping) {
+        props.nodes.forEach((node: CrosswalkConnectionNew) => {
+          let newNode: NodeListingRow = {
+            description: node?.target.properties.description,
+            sourceProcessingSelection: node?.sourceProcessing?.id ?? '',
+            sourceProcessing: node?.sourceProcessing,
+            type: node?.target.properties.type,
+            isSelected: false, notes: undefined, name: node.target.name, id: node.target.id
+          }
+          newNodes.push(newNode);
+        });
+      } else {
+        let newNode: NodeListingRow = {
+          description: props.nodes[0].target.properties.description,
+          sourceProcessingSelection: props.nodes[0].sourceProcessing?.id ?? '',
+          sourceProcessing: props.nodes[0].sourceProcessing,
+          type: props.nodes[0].target.properties.type,
+          isSelected: false, notes: undefined, name: props.nodes[0].target.name, id: props.nodes[0].target.id
+        }
+        newNodes.push(newNode);
+      }
     }
     setNodeData(newNodes);
     setShowAttributeNames(props.showAttributeNames);
+    if (props?.mappingFunctions) {
+      const emptyDefaultValue = {name: '', uri: 'N/A'}
+      setMappingFunctions([emptyDefaultValue, ...props.mappingFunctions]);
+    }
   }, [props]);
 
   return (
@@ -302,7 +367,8 @@ export default function NodeListingAccordion(props: any) {
           <TableHead className="gx-0">
             <TableRow className="row gx-0">
               <StyledTableHeadingCell className="col-12 bg-light-blue">
-                <span className="fw-bold ps-3">{props.isSourceAccordion ? 'Sources' : 'Target'}</span>
+                <span
+                  className="fw-bold ps-3">{props.isSourceAccordion ? props.isOneToManyMapping ? 'Source' : 'Sources' : props.isOneToManyMapping ? 'Targets' : 'Target'}</span>
               </StyledTableHeadingCell>
             </TableRow>
           </TableHead>
@@ -317,11 +383,13 @@ export default function NodeListingAccordion(props: any) {
                     row={row}
                     callBackFunction={props.accordionCallbackFunction}
                     showAttributeNames={showAttributeNames}
-                    mappingFunctions={props.mappingFunctions}
+                    mappingFunctions={mappingFunctions}
                     predicateOperationValues={props.predicateOperationValues}
                     sourceOperationValues={props.sourceOperationValues}
+                    sourceProcessing={props.sourceProcessing}
                     rowCount={nodeData.length}
                     isSourceAccordion={props.isSourceAccordion}
+                    isOneToManyMapping={props.isOneToManyMapping}
                   />
                 );
               })}

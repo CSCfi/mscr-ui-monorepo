@@ -22,7 +22,8 @@ export default function NodeMappings(props: {
   mappingFilters: any;
   mappingFunctions: any;
   modalOpen: boolean;
-  isJointPatchOperation: boolean;
+  isPatchMappingOperation: boolean;
+  isOneToManyMapping: boolean;
 }) {
   const EXACT_MATCH_DROPDOWN_DEFAULT = 'http://www.w3.org/2004/02/skos/core#exactMatch';
 
@@ -96,7 +97,7 @@ export default function NodeMappings(props: {
       setMappingOperationValue(props.nodeSelections[0].processing.id);
     }
 
-    if (!props?.isJointPatchOperation) {
+    if (!props?.isPatchMappingOperation) {
       setPredicateValue(EXACT_MATCH_DROPDOWN_DEFAULT);
     }
     if (props?.mappingFunctions) {
@@ -105,7 +106,7 @@ export default function NodeMappings(props: {
     }
 
     setVisible(props?.modalOpen);
-    setSourceNodes(props?.nodeSelections);
+    setMappingNodes(props?.nodeSelections);
   }, [props]);
 
   function selectSourceNode(nodeId: string) {
@@ -140,7 +141,7 @@ export default function NodeMappings(props: {
     useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const [sourceNodes, setSourceNodes] = useState<CrosswalkConnectionNew[] | undefined>(undefined);
+  const [mappingNodes, setMappingNodes] = useState<CrosswalkConnectionNew[] | undefined>(undefined);
   const [selectedSourceNode, setSelectedSourceNode] = useState<CrosswalkConnectionNew | undefined>(undefined);
 
   const [notesValue, setNotesValue] = useState<string>('');
@@ -152,48 +153,58 @@ export default function NodeMappings(props: {
 
   function generateMappingPayload() {
     let mappings = mappingPayloadInit;
-    if (sourceNodes) {
-      console.log('GENERATING PAYLOAD', sourceNodes);
+    if (mappingNodes) {
       mappings.source.push({
-        id: sourceNodes[0].source.id,
-        label: sourceNodes[0].source.name,
-        uri: sourceNodes[0].source.uri,
-        processing: sourceNodes[0].sourceProcessing ? props.nodeSelections[0].sourceProcessing : undefined
+        id: mappingNodes[0].source.id,
+        label: mappingNodes[0].source.name,
+        uri: mappingNodes[0].source.uri,
+        processing: mappingNodes[0].sourceProcessing ? props.nodeSelections[0].sourceProcessing : undefined
       });
       mappings.target.push({
-          id: sourceNodes[0].target.id,
-          label: sourceNodes[0].target.name,
-          uri: sourceNodes[0].target.uri
+          id: mappingNodes[0].target.id,
+          label: mappingNodes[0].target.name,
+          uri: mappingNodes[0].target.uri
 
         }
       );
 
-      // Merge sources into single target (need to be implemented in opposite way if one to many mapping)
-      for (let i = 0; i < props.nodeSelections.length; i += 1) {
-        if (i < sourceNodes.length - 1 && (sourceNodes[i].target.id === sourceNodes[i + 1].target.id)) {
-          mappings.source.push({
-            id: sourceNodes[i + 1].source.id,
-            label: sourceNodes[i + 1].source.name,
-            uri: sourceNodes[i + 1].source.uri,
-            processing: sourceNodes[i + 1].sourceProcessing ? sourceNodes[i + 1].sourceProcessing : undefined
-          });
+      if (props.isOneToManyMapping) {
+        // Merge targets into single  source for one to many mapping
+        for (let i = 0; i < props.nodeSelections.length; i += 1) {
+          if (i < mappingNodes.length - 1 && (mappingNodes[i].source.id === mappingNodes[i + 1].source.id)) {
+            mappings.target.push({
+              id: mappingNodes[i + 1].target.id,
+              label: mappingNodes[i + 1].target.name,
+              uri: mappingNodes[i + 1].target.uri,
+              processing: mappingNodes[i + 1].sourceProcessing ? mappingNodes[i + 1].sourceProcessing : undefined
+            });
+          }
+        }
+      } else {
+        // Merge sources into single target for many to one mapping
+        for (let i = 0; i < props.nodeSelections.length; i += 1) {
+          if (i < mappingNodes.length - 1 && (mappingNodes[i].target.id === mappingNodes[i + 1].target.id)) {
+            mappings.source.push({
+              id: mappingNodes[i + 1].source.id,
+              label: mappingNodes[i + 1].source.name,
+              uri: mappingNodes[i + 1].source.uri,
+              processing: mappingNodes[i + 1].sourceProcessing ? mappingNodes[i + 1].sourceProcessing : undefined
+            });
+          }
         }
       }
-
-      //TODO: replace additonalProps with real params, fix dropdowns
-      //const params =  {[getMappingFunctionParams(mappingOperationValue)[0].name]: operationSourceValue};
-
-      mappings.predicate = predicateValue ? predicateValue : '0';
-      mappings.notes = notesValue;
-
-      if (mappingOperationValue) {
-        mappings.processing = {
-          id: mappingOperationValue,
-          params: {additionalProp1: {}, additionalProp3: {}, additionalProp2: {}}
-        }
-      }
-      return mappings;
     }
+
+    mappings.predicate = predicateValue ? predicateValue : '0';
+    mappings.notes = notesValue;
+
+    if (mappingOperationValue) {
+      mappings.processing = {
+        id: mappingOperationValue,
+        params: {additionalProp1: {}, additionalProp3: {}, additionalProp2: {}}
+      }
+    }
+    return mappings;
   }
 
   function closeModal() {
@@ -236,19 +247,19 @@ export default function NodeMappings(props: {
   }
 
   function save() {
-    if (props.isJointPatchOperation) {
+    if (props.isPatchMappingOperation) {
       props.performMappingsModalAction(
         'save',
         generateMappingPayload(),
         props.nodeSelections[0].id,
       );
     } else {
-      props.performMappingsModalAction('addJoint', generateMappingPayload());
+      props.performMappingsModalAction('addMapping', generateMappingPayload());
     }
     setNotesValue('');
   }
 
-  // CLEAR FIELDS WHEN MODAL OPENED
+// CLEAR FIELDS WHEN MODAL OPENED
   useEffect(() => {
     setSourceInputValue(sourceSelectionInit);
     setTargetOperationValue('');
@@ -257,15 +268,15 @@ export default function NodeMappings(props: {
     setFilterOperation(filterOperationsSelectInit);
   }, [visible]);
 
-  // VALIDATE MAPPING
+// VALIDATE MAPPING
   useEffect(() => {
-    if (sourceNodes) {
-      generatePropertiesDropdownItems(sourceNodes[0].source.properties);
-      setValidationErrors(validateMapping(sourceNodes[0]));
+    if (mappingNodes) {
+      generatePropertiesDropdownItems(mappingNodes[0].source.properties);
+      setValidationErrors(validateMapping(mappingNodes[0]));
     }
     generateMappingOperationTextboxes(mappingOperationValue);
   }, [
-    sourceNodes,
+    mappingNodes,
     sourceOperationValues,
     targetOperationValue,
     mappingOperationValue,
@@ -281,66 +292,78 @@ export default function NodeMappings(props: {
     setSourceOperationValues(newValues);
   }
 
-  function accordionCallbackFunction(operationName: string, dataId: any, operationValue: any, operationSourceValue: any) {
-    if (sourceNodes) {
-      if (operationName === 'moveNodeUp' && sourceNodes.length > 1) {
-        let sourceNodesNew = [...sourceNodes];
-      for (let i = 0; i < sourceNodes.length; i += 1){
-        if (sourceNodes[i].source.id === dataId){
-          let first = sourceNodes[i-1];
-          let second = sourceNodes[i];
-          sourceNodesNew[i-1] = second;
-          sourceNodesNew[i] = first;
-          setSourceNodes(sourceNodesNew);
-          break;
-        }
-        }
-      }
-
-      else if (operationName === 'moveNodeDown' && sourceNodes.length > 1) {
-        let sourceNodesNew = [...sourceNodes];
-        for (let i = 0; i < sourceNodes.length; i += 1) {
-          if (sourceNodes[i].source.id === dataId){
-            let first = sourceNodes[i];
-            let second = sourceNodes[i+1];
-            sourceNodesNew[i] = second;
-            sourceNodesNew[i+1] = first;
-            setSourceNodes(sourceNodesNew);
+  function accordionCallbackFunction(action: string, mappingId: any, operationValue: any, operationKey: any, originalValue: string) {
+    console.log('callback called', action, mappingId, operationValue, operationKey, originalValue);
+    if (mappingNodes) {
+      if (action === 'moveNodeUp' && mappingNodes.length > 1) {
+        let sourceNodesNew = [...mappingNodes];
+        for (let i = 0; i < mappingNodes.length; i += 1) {
+          if (mappingNodes[i].source.id === mappingId) {
+            let first = mappingNodes[i - 1];
+            let second = mappingNodes[i];
+            sourceNodesNew[i - 1] = second;
+            sourceNodesNew[i] = first;
+            setMappingNodes(sourceNodesNew);
             break;
           }
         }
-      }
-
-      else if (operationName === 'deleteSourceNode' && sourceNodes.length > 1) {
-        let newNodeSelections = sourceNodes.filter(node => {
-          return node.source.id !== dataId;
+      } else if (action === 'moveNodeDown' && mappingNodes.length > 1) {
+        let sourceNodesNew = [...mappingNodes];
+        for (let i = 0; i < mappingNodes.length; i += 1) {
+          if (mappingNodes[i].source.id === mappingId) {
+            let first = mappingNodes[i];
+            let second = mappingNodes[i + 1];
+            sourceNodesNew[i] = second;
+            sourceNodesNew[i + 1] = first;
+            setMappingNodes(sourceNodesNew);
+            break;
+          }
+        }
+      } else if (action === 'deleteSourceNode' && mappingNodes.length > 1) {
+        let newNodeSelections = mappingNodes.filter(node => {
+          return node.source.id !== mappingId;
         });
-        setSourceNodes(newNodeSelections);
-      }
+        setMappingNodes(newNodeSelections);
+      } else if (action === 'deleteTargetNode' && mappingNodes.length > 1) {
+        let newNodeSelections = mappingNodes.filter(node => {
+          return node.target.id !== mappingId;
+        });
+        setMappingNodes(newNodeSelections);
+      } else if (action === 'updateSourceOperation' || action === 'updateSourceOperationValue') {
+        let newNodeSelections = mappingNodes.map(node => {
+          if (node.source.id === mappingId) {
+            if (action === 'updateSourceOperation') {
+              const originalParams = getMappingFunctionParams(operationKey);
+              let formattedParams: any = {};
+              if (originalParams) {
+                originalParams.forEach((param: { name: any; defaultValue: any; }) => {
+                  formattedParams[param.name] = param.defaultValue ? param.defaultValue : '';
+                });
+              }
 
-      else if (operationName === 'updateSourceOperation' || operationName === 'updateSourceOperationValue') {
-        let newNodeSelections = sourceNodes.map(node => {
-          if (node.source.id === dataId) {
-            const params =  {[getMappingFunctionParams(operationValue)[0].name]: operationSourceValue};
-            if (operationName === 'updateSourceOperation') {
               let processing: any = {
-                id: operationValue,
-                  params: params,
+                id: operationKey,
+                params: formattedParams,
               };
-              node.sourceProcessing = processing;
+              operationKey !== 'N/A' ? node.sourceProcessing = processing : node.sourceProcessing = undefined;
+            }
+
+            if (action === 'updateSourceOperationValue') {
+              // @ts-ignore
+              node.sourceProcessing.params[operationKey] = operationValue;
             }
           }
           return node
         });
-        setSourceNodes(newNodeSelections);
+        setMappingNodes(newNodeSelections);
       }
     }
   }
 
-  function getMappingFunctionParams(functionId: string){
+  function getMappingFunctionParams(functionId: string) {
     const functions = props.mappingFunctions.filter((item: any) => item.uri === functionId
     ).map((fnc: { parameters: any; }) => {
-      return fnc.parameters;
+      return fnc?.parameters;
     });
     return functions[0];
   }
@@ -354,14 +377,17 @@ export default function NodeMappings(props: {
         className="row bg-white edit-mapping-modal"
       >
         <ModalContent className="edit-mapping-modal-content">
-          <ModalTitle>{props.isJointPatchOperation ? 'Edit mapping' : 'Add mapping'}</ModalTitle>
+          <ModalTitle>{props.isPatchMappingOperation ? 'Edit mapping' : 'Add mapping'}</ModalTitle>
           <div className="col flex-column d-flex justify-content-between">
             <div className="row bg-white">
               {/* SOURCE OPERATIONS */}
               <div className="col-4">
-                <NodeListingAccordion nodes={sourceNodes} mappingFunctions={props.mappingFunctions}
+                <NodeListingAccordion nodes={mappingNodes} mappingFunctions={props.mappingFunctions}
                                       predicateOperationValues={predicateValues}
-                                      accordionCallbackFunction={accordionCallbackFunction} isSourceAccordion={true}></NodeListingAccordion>
+                                      accordionCallbackFunction={accordionCallbackFunction}
+                                      isSourceAccordion={true}
+                                      isOneToManyMapping={props.isOneToManyMapping}>
+                </NodeListingAccordion>
                 {/*                                <span hidden={filterDetailsVisible}>
                                 <Button
                                   icon={<IconPlus />}
@@ -435,6 +461,8 @@ export default function NodeMappings(props: {
                     ))}
                   </Dropdown></div>
                   <div><TextInput
+                    className='mt-3'
+                    labelText={'Value'}
                     onChange={(value) => setFilterOperationValue(value ? value.toString() : '')}
                     visualPlaceholder="Operation value"
                   /></div>
@@ -445,7 +473,7 @@ export default function NodeMappings(props: {
                       labelText="Predicate"
                       visualPlaceholder="Exact match"
                       value={predicateValue}
-                      defaultValue={sourceNodes ? sourceNodes[0].predicate : ''}
+                      defaultValue={mappingNodes ? mappingNodes[0].predicate : ''}
                       onChange={(newValue) => {
                         setPredicateValue(newValue)
                       }
@@ -470,11 +498,14 @@ export default function NodeMappings(props: {
               </div>
 
               {/* TARGET OPERATIONS */}
-                <div className="col-4">
-                  <NodeListingAccordion nodes={sourceNodes} mappingFunctions={props.mappingFunctions}
-                                        predicateOperationValues={predicateValues}
-                                        accordionCallbackFunction={accordionCallbackFunction} isSourceAccordion={false}></NodeListingAccordion>
-                  {/*                                <span hidden={filterDetailsVisible}>
+              <div className="col-4">
+                <NodeListingAccordion nodes={mappingNodes} mappingFunctions={props.mappingFunctions}
+                                      predicateOperationValues={predicateValues}
+                                      accordionCallbackFunction={accordionCallbackFunction}
+                                      isSourceAccordion={false}
+                                      isOneToManyMapping={props.isOneToManyMapping}
+                ></NodeListingAccordion>
+                {/*                                <span hidden={filterDetailsVisible}>
                                 <Button
                                   icon={<IconPlus />}
                                   style={{height: 'min-content'}}
@@ -529,11 +560,10 @@ export default function NodeMappings(props: {
                                       </DropdownItem>
                                     ))}
                                 </Dropdown></div>*/}
-                </div>
+              </div>
 
 
-
-{/*                <div className="col-4 bg-light-blue">
+              {/*                <div className="col-4 bg-light-blue">
                 <div className="ps-2">
                   <p>
                     <span className="fw-bold">Target: </span>

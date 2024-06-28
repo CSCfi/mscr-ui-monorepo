@@ -78,21 +78,21 @@ function Row(props: {
     <>
       <StyledTableRow className="accordion-row row">
         <StyledTableCell className="col-5">
-            {props.row.source.map((oneLink) =>
-              <>          <StyledButton
-                className="px-3 py-0"
-                style={{textTransform: 'none'}}
-                title="Select linked node from source tree"
-                onClick={(e) => {
-                  props.callBackFunction.performAccordionAction(
-                    props.row,
-                    props.row.source.length > 1 ? 'selectFromSourceTreeById' : 'selectFromSourceTreeByMapping',
-                    oneLink.id
-                  );
-                  e.stopPropagation();
-                }}
-              >{props.showAttributeNames ? oneLink.label : oneLink.id}</StyledButton><br/></>
-            )}
+          {props.row.source.map((oneLink) =>
+            <>          <StyledButton
+              className="px-3 py-0"
+              style={{textTransform: 'none'}}
+              title="Select linked node from source tree"
+              onClick={(e) => {
+                props.callBackFunction.performAccordionAction(
+                  props.row,
+                  props.row.source.length > 1 ? 'selectFromSourceTreeById' : 'selectFromSourceTreeByMapping',
+                  oneLink.id
+                );
+                e.stopPropagation();
+              }}
+            >{props.showAttributeNames ? oneLink.label : oneLink.id}</StyledButton><br/></>
+          )}
 
         </StyledTableCell>
 
@@ -103,21 +103,23 @@ function Row(props: {
                     </IconButton>
                 </StyledTableCell>*/}
 
-        <StyledTableCell className="col-4 flex-row">
-          <Button
-            className="px-3 py-0"
-            style={{textTransform: 'none'}}
-            title="Select linked node from target tree"
-            onClick={(e) => {
-              props.callBackFunction.performAccordionAction(
-                props.row,
-                'selectFromTargetTreeByMapping',
-              );
-              e.stopPropagation();
-            }}
-          >
-            <span>{props.showAttributeNames ? props.row.target[0].label : props.row.target[0].id}</span>
-          </Button>
+        <StyledTableCell className="col-4">
+          {props.row.target.map((oneLink) =>
+            <>          <StyledButton
+              className="px-3 py-0"
+              style={{textTransform: 'none'}}
+              title="Select linked node from target tree"
+              onClick={(e) => {
+                props.callBackFunction.performAccordionAction(
+                  props.row,
+                  props.row.target.length > 1 ? 'selectFromTargetTreeById' : 'selectFromTargetTreeByMapping',
+                  oneLink.id
+                );
+                e.stopPropagation();
+              }}
+            >{props.showAttributeNames ? oneLink.label : oneLink.id}</StyledButton><br/></>
+          )}
+
         </StyledTableCell>
 
         <StyledTableCell className="col-1">
@@ -125,7 +127,7 @@ function Row(props: {
                         aria-label="expand row"
                         size="small"
                         onClick={(e) => {
-                            props.cbf.performAccordionAction(row, 'openJointDetails')
+                            props.cbf.performAccordionAction(row, 'openMappingDetails')
                         }}
                     >
                         {row.isSelected ? <EditRoundedIcon className='selection-active'/> : <EditRoundedIcon/>}
@@ -215,10 +217,25 @@ function Row(props: {
 }
 
 function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAttributeNames: boolean) {
-  return nodeMappingsInput.filter(item => {
-    const searchString = value.toLowerCase();
-    return (item.source[0].label.toLowerCase().includes(searchString) || item.target[0].label.toLowerCase().includes(searchString) || (item?.notes && item.notes.toLowerCase().includes(searchString)));
-  });
+  let results: NodeMapping[] = [];
+  const searchString = value.toLowerCase();
+  nodeMappingsInput.forEach(item => {
+      if (item?.notes && item.notes.toLowerCase().includes(searchString)) {
+        results.push(item);
+      }
+      item.source.forEach(src => {
+        if (src.label.toLowerCase().includes(searchString)) {
+          results.push(item);
+        }
+      });
+      item.target.forEach(src => {
+        if (src.label.toLowerCase().includes(searchString)) {
+          results.push(item);
+        }
+      });
+    }
+  );
+  return results;
 }
 
 export default function MappingsAccordion(props: any) {
@@ -292,8 +309,8 @@ export default function MappingsAccordion(props: any) {
                       <InfoIcon></InfoIcon>
                     </div>
                     <div>
-                    No elements have been mapped yet. Mappings will appear in
-                    this table.
+                      No elements have been mapped yet. Mappings will appear in
+                      this table.
                     </div>
                   </div>
                 </td>
