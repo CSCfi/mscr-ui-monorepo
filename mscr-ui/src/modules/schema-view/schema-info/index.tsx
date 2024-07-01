@@ -5,11 +5,11 @@ import {Checkbox, SearchInput, ToggleButton} from 'suomifi-ui-components';
 import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
-import SchemaTree from '@app/common/components/schema-info/schema-tree';
-import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
+import SchemaTree from '@app/modules/schema-view/schema-info/schema-tree';
+import NodeInfo from '@app/modules/schema-view/schema-info/schema-tree/node-info';
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
 import { cloneDeep } from 'lodash';
-import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
+import { generateTreeFromJson } from '@app/modules/schema-view/schema-info/schema-tree/schema-tree-renderer';
 import { selectIsEditModeActive, useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
 import {
@@ -19,7 +19,7 @@ import {
   SchemaHeading,
   SearchWrapper,
   TreeviewWrapper,
-} from '@app/common/components/schema-info/schema-info.styles';
+} from '@app/modules/schema-view/schema-info/schema-info.styles';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import SpinnerOverlay, { SpinnerType } from '@app/common/components/spinner-overlay';

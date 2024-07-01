@@ -33,7 +33,7 @@ import { useGetCrosswalkMappingFunctionsQuery } from '@app/common/components/cro
 import { createTheme, Grid, ThemeProvider } from '@mui/material';
 import HasPermission from '@app/common/utils/has-permission';
 import VersionHistory from '@app/common/components/version-history';
-import SchemaInfo from '@app/common/components/schema-info';
+import SchemaInfo from 'src/modules/schema-view/schema-info';
 import { useTranslation } from 'next-i18next';
 import { State } from '@app/common/interfaces/state.interface';
 import MetadataStub from '@app/modules/form/metadata-form/metadata-stub';

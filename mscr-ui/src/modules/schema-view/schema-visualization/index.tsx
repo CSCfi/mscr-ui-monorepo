@@ -1,4 +1,4 @@
-import SchemaInfo from '@app/common/components/schema-info';
+import SchemaInfo from 'src/modules/schema-view/schema-info';
 import { useTranslation } from 'next-i18next';
 import {
   Format,

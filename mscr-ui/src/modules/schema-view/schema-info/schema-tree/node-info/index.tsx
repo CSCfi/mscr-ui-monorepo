@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { InfoIcon } from '@app/common/components/shared-icons';
 import { useTranslation } from 'next-i18next';
-import { DropdownWrapper } from '@app/common/components/schema-info/schema-info.styles';
-import { ToggleWrapper } from '@app/common/components/schema-info/schema-tree/node-info/node-info.styles';
+import { DropdownWrapper } from '@app/modules/schema-view/schema-info/schema-info.styles';
+import { ToggleWrapper } from '@app/modules/schema-view/schema-info/schema-tree/node-info/node-info.styles';
 
 export default function NodeInfo(props: {
   treeData: RenderTree[];
