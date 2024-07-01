@@ -252,6 +252,8 @@
     "mappings-finish": "Mapping controls disabled",
     "schema-deleted": "Schema was removed",
     "schema-deprecated": "Schema deprecated",
+    "schema-edit": "Schema editing enabled",
+    "schema-finish": "Schema editing disabled",
     "schema-invalidated": "Schema invalidated",
     "schema-published": "Schema published successfully",
     "schema-saved": "Schema metadata saved successfully"

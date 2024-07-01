@@ -44,7 +44,10 @@ export default function SchemaAndCrosswalkActionMenu({
   const { t } = useTranslation('common');
   const dispatch = useStoreDispatch();
   const isSchemaEditActive = useSelector(selectIsEditModeActive());
-  const setIsSchemaEditActive = (value: boolean) => dispatch(setIsEditModeActive(value));
+  const setIsSchemaEditActive = (value: boolean) => {
+    dispatch(setIsEditModeActive(value));
+    value ? dispatch(setNotification('EDIT_SCHEMA')) : dispatch(setNotification('FINISH_EDITING_SCHEMA'));
+  };
   const [isEditCrosswalkModeActive, setIsEditCrosswalkModeActive] = useState(false);
   const [patchCrosswalk, crosswalkPatchResponse] = usePatchCrosswalkMutation();
   const [patchSchema] = usePatchSchemaMutation();

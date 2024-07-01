@@ -336,6 +336,10 @@ export function translateNotification(
       return t('notifications.mappings-edit');
     case 'FINISH_EDITING_MAPPINGS':
       return t('notifications.mappings-finish');
+    case 'EDIT_SCHEMA':
+      return t('notifications.schema-edit');
+    case 'FINISH_EDITING_SCHEMA':
+      return t('notifications.schema-finish');
     case 'CROSSWALK_REVISION':
       return t('notifications.add-crosswalk-revision');
     case 'SCHEMA_REVISION':
