@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {Checkbox, SearchInput, ToggleButton} from 'suomifi-ui-components';
+import { Checkbox, SearchInput, ToggleButton } from 'suomifi-ui-components';
 import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
@@ -10,7 +10,10 @@ import NodeInfo from '@app/modules/schema-view/schema-info/schema-tree/node-info
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
 import { cloneDeep } from 'lodash';
 import { generateTreeFromJson } from '@app/modules/schema-view/schema-info/schema-tree/schema-tree-renderer';
-import { selectIsEditModeActive, useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
+import {
+  selectIsSchemaEditModeActive,
+  useGetFrontendSchemaQuery,
+} from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
 import {
   CheckboxWrapper,
@@ -22,9 +25,12 @@ import {
 } from '@app/modules/schema-view/schema-info/schema-info.styles';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import SpinnerOverlay, { SpinnerType } from '@app/common/components/spinner-overlay';
+import SpinnerOverlay, {
+  SpinnerType,
+} from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
 import { useSelector } from 'react-redux';
+import { State } from '@app/common/interfaces/state.interface';
 
 export default function SchemaInfo(props: {
   updateTreeNodeSelectionsOutput?: (
@@ -37,11 +43,12 @@ export default function SchemaInfo(props: {
   schemaUrn: string;
   raiseHeading?: boolean;
   isSingleTree?: boolean;
+  hasEditPermission?: boolean;
 }) {
   const { t } = useTranslation('common');
   const lang = useRouter().locale ?? '';
-  const isSchemaEditActive = useSelector(selectIsEditModeActive());
-  const isEditable = props.isSingleTree && isSchemaEditActive;
+  const isSchemaEditActive = useSelector(selectIsSchemaEditModeActive());
+
   const emptyTreeSelection: RenderTree = {
     elementPath: '',
     qname: 'empty',
@@ -72,12 +79,20 @@ export default function SchemaInfo(props: {
   const [treeSelectedArray, setTreeSelections] = React.useState<string[]>([]);
 
   // These are used by datamodel
-  const [selectedTreeNodes, setSelectedTreeNodes] = React.useState<RenderTree[]>([emptyTreeSelection]);
+  const [selectedTreeNodes, setSelectedTreeNodes] = React.useState<
+    RenderTree[]
+  >([emptyTreeSelection]);
 
   const [isTreeDataFetched, setTreeDataFetched] =
     React.useState<boolean>(false);
 
   const [showAttributeNames, setShowAttributeNames] = React.useState(true);
+
+  const isNodeEditable =
+    (props.hasEditPermission ?? false) &&
+    (props.isSingleTree ?? false) &&
+    getSchemaData?.metadata.state === State.Draft &&
+    isSchemaEditActive;
 
   useEffect(() => {
     if (getSchemaData?.content) {
@@ -169,11 +184,13 @@ export default function SchemaInfo(props: {
     results: { nodeIds: string[]; childNodeIds: string[] }
   ) {
     tree.forEach((item) => {
-      if (showAttributeNames &&
-        item.name &&
-        item.name.toLowerCase().includes(nameToFind.toLowerCase()) || !showAttributeNames &&
-        item.qname &&
-        item.qname.toLowerCase().includes(nameToFind.toLowerCase())
+      if (
+        (showAttributeNames &&
+          item.name &&
+          item.name.toLowerCase().includes(nameToFind.toLowerCase())) ||
+        (!showAttributeNames &&
+          item.qname &&
+          item.qname.toLowerCase().includes(nameToFind.toLowerCase()))
       ) {
         results.nodeIds.push(item.id);
         if (item.children && item.children.length > 0) {
@@ -304,37 +321,43 @@ export default function SchemaInfo(props: {
       <TreeviewWrapper className="row gx-0">
         <div className="col-7 px-0">
           <div className="d-flex justify-content-between mb-2 ps-3 pe-2">
-            {isTreeDataFetched && (<><SearchWrapper className="w-100">
-              <SearchInput
-                className="py-2"
-                labelText={props.caption}
-                searchButtonLabel={t('schema-tree.search')}
-                clearButtonLabel={t('schema-tree.clear')}
-                visualPlaceholder={t('schema-tree.search-placeholder')}
-                onSearch={(value) => {
-                  if (typeof value === 'string') {
-                    searchFromTree(value);
-                  }
-                }}
-                onChange={(value) => {
-                  if (!value) {
-                    clearTreeSearch();
-                  }
-                }}/>
-            </SearchWrapper><ExpandButtonWrapper>
-              <IconButton
-                onClick={() => handleExpandClick()}
-                aria-label={t('schema-tree.expand')}
-                color="primary"
-                size="large"
-              >
-                {treeExpandedArray.length === 0 ? (
-                  <ExpandMoreIcon/>
-                ) : (
-                  <ExpandLessIcon/>
-                )}
-              </IconButton>
-            </ExpandButtonWrapper></>)}
+            {isTreeDataFetched && (
+              <>
+                <SearchWrapper className="w-100">
+                  <SearchInput
+                    className="py-2"
+                    labelText={props.caption}
+                    searchButtonLabel={t('schema-tree.search')}
+                    clearButtonLabel={t('schema-tree.clear')}
+                    visualPlaceholder={t('schema-tree.search-placeholder')}
+                    onSearch={(value) => {
+                      if (typeof value === 'string') {
+                        searchFromTree(value);
+                      }
+                    }}
+                    onChange={(value) => {
+                      if (!value) {
+                        clearTreeSearch();
+                      }
+                    }}
+                  />
+                </SearchWrapper>
+                <ExpandButtonWrapper>
+                  <IconButton
+                    onClick={() => handleExpandClick()}
+                    aria-label={t('schema-tree.expand')}
+                    color="primary"
+                    size="large"
+                  >
+                    {treeExpandedArray.length === 0 ? (
+                      <ExpandMoreIcon />
+                    ) : (
+                      <ExpandLessIcon />
+                    )}
+                  </IconButton>
+                </ExpandButtonWrapper>
+              </>
+            )}
           </div>
           <div>
             <Box
@@ -345,11 +368,19 @@ export default function SchemaInfo(props: {
                 maxWidth: 700,
                 overflowY: 'auto',
               }}
-            ><>
-              <div className='d-flex justify-content-center'>
-                <SpinnerOverlay animationVisible={!isTreeDataFetched} type={props.isSingleTree ? SpinnerType.SchemaTreeSingle : SpinnerType.SchemaTreeDouble}></SpinnerOverlay>
-              </div>
-            </>
+            >
+              <>
+                <div className="d-flex justify-content-center">
+                  <SpinnerOverlay
+                    animationVisible={!isTreeDataFetched}
+                    type={
+                      props.isSingleTree
+                        ? SpinnerType.SchemaTreeSingle
+                        : SpinnerType.SchemaTreeDouble
+                    }
+                  ></SpinnerOverlay>
+                </div>
+              </>
               {isTreeDataFetched && (
                 <SchemaTree
                   nodes={treeData[0]}
@@ -367,7 +398,7 @@ export default function SchemaInfo(props: {
             treeData={selectedTreeNodes}
             // performNodeInfoAction={performNodeInfoAction}
             dataIsLoaded={isTreeDataFetched}
-            isEditable={isEditable}
+            isEditable={isNodeEditable}
           />
           <CheckboxWrapper>
             <Checkbox

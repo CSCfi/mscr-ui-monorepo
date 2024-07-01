@@ -3,9 +3,10 @@ import {
   usePatchCrosswalkMutation,
 } from '@app/common/components/crosswalk/crosswalk.slice';
 import {
-  selectIsEditModeActive, setIsEditModeActive,
+  selectIsSchemaEditModeActive,
+  setIsSchemaEditModeActive,
   useDeleteSchemaMutation,
-  usePatchSchemaMutation
+  usePatchSchemaMutation,
 } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
 import { ActionMenu, ActionMenuItem } from 'suomifi-ui-components';
@@ -21,7 +22,10 @@ import { CrosswalkWithVersionInfo } from '@app/common/interfaces/crosswalk.inter
 import { SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
 import { ActionMenuWrapper } from '@app/common/components/schema-and-crosswalk-actionmenu/schema-and-crosswalk-actionmenu.styles';
 import FormModal, { ModalType } from '@app/modules/form';
-import { Format, formatsAvailableForMscrCopy } from '@app/common/interfaces/format.interface';
+import {
+  Format,
+  formatsAvailableForMscrCopy,
+} from '@app/common/interfaces/format.interface';
 import { useSelector } from 'react-redux';
 
 interface SchemaAndCrosswalkActionmenuProps {
@@ -43,12 +47,15 @@ export default function SchemaAndCrosswalkActionMenu({
 }: SchemaAndCrosswalkActionmenuProps) {
   const { t } = useTranslation('common');
   const dispatch = useStoreDispatch();
-  const isSchemaEditActive = useSelector(selectIsEditModeActive());
+  const isSchemaEditActive = useSelector(selectIsSchemaEditModeActive());
   const setIsSchemaEditActive = (value: boolean) => {
-    dispatch(setIsEditModeActive(value));
-    value ? dispatch(setNotification('EDIT_SCHEMA')) : dispatch(setNotification('FINISH_EDITING_SCHEMA'));
+    dispatch(setIsSchemaEditModeActive(value));
+    value
+      ? dispatch(setNotification('EDIT_SCHEMA'))
+      : dispatch(setNotification('FINISH_EDITING_SCHEMA'));
   };
-  const [isEditCrosswalkModeActive, setIsEditCrosswalkModeActive] = useState(false);
+  const [isEditCrosswalkModeActive, setIsEditCrosswalkModeActive] =
+    useState(false);
   const [patchCrosswalk, crosswalkPatchResponse] = usePatchCrosswalkMutation();
   const [patchSchema] = usePatchSchemaMutation();
   const [deleteSchema] = useDeleteSchemaMutation();
@@ -234,13 +241,16 @@ export default function SchemaAndCrosswalkActionMenu({
           <ActionMenuItem
             className={
               (type === ActionMenuTypes.Schema ||
-                type === ActionMenuTypes.SchemaMetadata)
+                type === ActionMenuTypes.SchemaMetadata) &&
+              metadata.state == State.Draft
                 ? ''
                 : 'd-none'
             }
             onClick={() => setIsSchemaEditActive(!isSchemaEditActive)}
           >
-            {isSchemaEditActive ? t('actionmenu.finish-editing') : t('actionmenu.edit-schema')}
+            {isSchemaEditActive
+              ? t('actionmenu.finish-editing')
+              : t('actionmenu.edit-schema')}
           </ActionMenuItem>
           <ActionMenuItem
             onClick={() => buttonCallbackFunction('edit')}

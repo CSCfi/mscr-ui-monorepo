@@ -3,10 +3,10 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import { useTranslation } from 'next-i18next';
 import {
-  selectIsEditModeActive,
+  selectIsSchemaEditModeActive,
   selectSelectedTab,
   setSelectedTab,
-  useGetSchemaWithRevisionsQuery
+  useGetSchemaWithRevisionsQuery,
 } from '@app/common/components/schema/schema.slice';
 import MetadataAndFiles from './metadata-and-files';
 import { createTheme, Grid, ThemeProvider } from '@mui/material';
@@ -106,7 +106,9 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
             >
               <Tabs
                 value={selectedTab}
-                onChange={(event, newValue) => dispatch(setSelectedTab(newValue))}
+                onChange={(event, newValue) =>
+                  dispatch(setSelectedTab(newValue))
+                }
                 aria-label="Category selection"
               >
                 <Tab label={t('tabs.metadata-and-files')} {...a11yProps(0)} />

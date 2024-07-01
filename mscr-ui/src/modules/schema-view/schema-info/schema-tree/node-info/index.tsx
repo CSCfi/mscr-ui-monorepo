@@ -6,6 +6,7 @@ import { InfoIcon } from '@app/common/components/shared-icons';
 import { useTranslation } from 'next-i18next';
 import { DropdownWrapper } from '@app/modules/schema-view/schema-info/schema-info.styles';
 import { ToggleWrapper } from '@app/modules/schema-view/schema-info/schema-tree/node-info/node-info.styles';
+import TypeSelector from '@app/modules/schema-view/schema-info/schema-tree/node-info/type-selector';
 
 export default function NodeInfo(props: {
   treeData: RenderTree[];
@@ -14,24 +15,18 @@ export default function NodeInfo(props: {
   // performNodeInfoAction: any;
 }) {
   const { t } = useTranslation('common');
-  let sourceSelectionInit = '';
+  const [selectedNode, setSelectedNode] = useState<RenderTree>();
 
   useEffect(() => {
     if (props.treeData && props.treeData.length > 0) {
-      sourceSelectionInit = props.treeData[0].id;
-      setDropdownValue(props.treeData[0].id);
-      // console.log('props.sourceData');
+      setSelectedNode(props.treeData[0]);
     }
-    if (props.dataIsLoaded) {
-      setDataIsLoaded(true);
-    }
-  }, [props]);
+  }, [props.treeData]);
 
-  const [dataIsLoaded, setDataIsLoaded] = useState(false);
-  const [sourceDropdownValue, setDropdownValue] = useState(sourceSelectionInit);
-  const [selectedNode] = props.treeData.filter(
-    (item) => item.id === sourceDropdownValue
-  );
+  const handleDropDownSelect = (nodeId: string) => {
+    const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
+    setSelectedNode(newSelectedNode ?? selectedNode);
+  };
 
   let dropdownInit: { id: string; name?: string }[] = [
     {
@@ -48,8 +43,8 @@ export default function NodeInfo(props: {
   }
 
   const nodeProperties: constantAttribute[] = [];
-  if (props.treeData.length > 0 && props.treeData[0]?.properties) {
-    for (const [key, value] of Object.entries(props.treeData[0]?.properties)) {
+  if (selectedNode && selectedNode.properties) {
+    for (const [key, value] of Object.entries(selectedNode.properties)) {
       nodeProperties.push({
         name: key,
         value: typeof value === 'string' ? value.toString() : undefined,
@@ -96,8 +91,10 @@ export default function NodeInfo(props: {
                   </div>
                 </div>
                 <div className="col-10 d-flex align-self-center">
-                  {!dataIsLoaded && <div>{t('node-info.loading')}</div>}
-                  {dataIsLoaded && <div>{t('node-info.select-a-node')}</div>}
+                  {!props.dataIsLoaded && <div>{t('node-info.loading')}</div>}
+                  {props.dataIsLoaded && (
+                    <div>{t('node-info.select-a-node')}</div>
+                  )}
                 </div>
               </div>
             </>
@@ -109,8 +106,8 @@ export default function NodeInfo(props: {
                 labelMode={'hidden'}
                 className="mt-2"
                 visualPlaceholder={t('schema-tree.dropdown-placeholder')}
-                value={sourceDropdownValue}
-                onChange={(newValue) => setDropdownValue(newValue)}
+                value={selectedNode?.id ?? ''}
+                onChange={(newValue) => handleDropDownSelect(newValue)}
               >
                 {dropdownInit.map((rt) => (
                   <DropdownItem key={rt.id} value={rt.id}>
@@ -146,6 +143,9 @@ export default function NodeInfo(props: {
                   <div className="attribute-font">
                     {processHtmlLinks(attrib.value)}
                   </div>
+                  {props.isEditable &&
+                    attrib.name === '@type' &&
+                    selectedNode?.children.length === 0 && <TypeSelector />}
                 </div>
               ))}
             </div>

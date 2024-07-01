@@ -2,8 +2,9 @@ import { HYDRATE } from 'next-redux-wrapper';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
 import {
-  Schema, SchemaWithContent,
-  SchemaWithVersionInfo
+  Schema,
+  SchemaWithContent,
+  SchemaWithVersionInfo,
 } from '@app/common/interfaces/schema.interface';
 import { MscrSearchResults } from '@app/common/interfaces/search.interface';
 import { Format } from '@app/common/interfaces/format.interface';
@@ -48,18 +49,24 @@ export const schemaApi = createApi({
         },
       }),
     }),
-    putSchemaRevision: builder.mutation<Schema, { pid: string; data: FormData }>({
-      query: ({pid, data }) => ({
+    putSchemaRevision: builder.mutation<
+      Schema,
+      { pid: string; data: FormData }
+    >({
+      query: ({ pid, data }) => ({
         url: `/schemaFull?action=revisionOf&target=${pid}`,
         method: 'PUT',
         data: data,
         headers: {
           'content-Type': 'multipart/form-data;',
         },
-      })
+      }),
     }),
-    putSchemaMscrCopy: builder.mutation<Schema, { pid: string; data: Partial<Metadata> }>({
-      query: ({pid, data }) => ({
+    putSchemaMscrCopy: builder.mutation<
+      Schema,
+      { pid: string; data: Partial<Metadata> }
+    >({
+      query: ({ pid, data }) => ({
         url: `/schema?action=mscrCopyOf&target=${pid}`,
         method: 'PUT',
         data: data,
@@ -79,7 +86,7 @@ export const schemaApi = createApi({
         url: `/schema/${value.pid}`,
         method: 'PATCH',
         data: value.payload,
-      })
+      }),
     }),
     getSchema: builder.query<Schema, string>({
       query: (pid) => ({
@@ -158,8 +165,14 @@ export const {
   util: { getRunningQueriesThunk },
 } = schemaApi;
 
-export const { putSchema, getSchema, deleteSchema, getSchemas, putSchemaFull, putSchemaRevision } =
-  schemaApi.endpoints;
+export const {
+  putSchema,
+  getSchema,
+  deleteSchema,
+  getSchemas,
+  putSchemaFull,
+  putSchemaRevision,
+} = schemaApi.endpoints;
 
 // Slice setup below
 
@@ -204,7 +217,7 @@ export const schemaSlice = createSlice({
         isEditModeActive: true,
       };
     },
-  }
+  },
 });
 
 export function selectSelectedTab() {
@@ -212,15 +225,14 @@ export function selectSelectedTab() {
 }
 
 export function setSelectedTab(tab: number): AppThunk {
-  return (dispatch) =>
-    dispatch(schemaSlice.actions.setSelectedTab({ tab }));
+  return (dispatch) => dispatch(schemaSlice.actions.setSelectedTab({ tab }));
 }
 
-export function selectIsEditModeActive() {
+export function selectIsSchemaEditModeActive() {
   return (state: AppState) => state.schema.isEditModeActive;
 }
 
-export function setIsEditModeActive(isActive?: boolean): AppThunk {
+export function setIsSchemaEditModeActive(isActive?: boolean): AppThunk {
   return (dispatch) =>
     dispatch(schemaSlice.actions.setEditModeActive(isActive ?? false));
 }

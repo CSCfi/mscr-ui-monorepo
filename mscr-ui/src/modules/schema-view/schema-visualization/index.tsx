@@ -37,6 +37,7 @@ export default function SchemaVisualization({
               caption={filterLabel}
               schemaUrn={pid}
               isSingleTree={true}
+              hasEditPermission={hasEditPermission}
             />
           </div>
           <div className="col-2 d-flex justify-content-end flex-row pe-3 pb-2">

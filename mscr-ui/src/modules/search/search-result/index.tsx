@@ -12,6 +12,8 @@ import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import Link from 'next/link';
 import { useContext } from 'react';
 import { SearchContext } from '@app/common/components/search-context-provider';
+import { useStoreDispatch } from '@app/store';
+import { setIsSchemaEditModeActive } from '@app/common/components/schema/schema.slice';
 
 export default function SearchResult({ hit }: { hit: MscrSearchResult }) {
   const { setIsSearchActive } = useContext(SearchContext);
@@ -48,12 +50,15 @@ export default function SearchResult({ hit }: { hit: MscrSearchResult }) {
     chips = chips.concat(result.format);
   }
 
+  const dispatch = useStoreDispatch();
+  const handleNavigate = () => {
+    setIsSearchActive(false);
+    dispatch(setIsSchemaEditModeActive(false));
+  };
+
   return (
     <Link href={url} passHref>
-      <StyledRouterLink
-        onClick={() => setIsSearchActive(false)}
-        aria-label={localizedLabel}
-      >
+      <StyledRouterLink onClick={handleNavigate} aria-label={localizedLabel}>
         <Block>
           <h4>{localizedLabel}</h4>
           <ChipWrapper>
