@@ -189,7 +189,6 @@ export const getDataTypeRegistryBaseQuery = () => axiosBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_DTR_URL ?? 'dtr_url_not_found',
   prepareHeaders: () => {
     return {
-      'content-type': 'application/json',
       'X-TYPESENSE-API-KEY': process.env.NEXT_PUBLIC_X_TYPESENSE_API_KEY,
     };
   }

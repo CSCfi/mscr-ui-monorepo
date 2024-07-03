@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { HYDRATE } from 'next-redux-wrapper';
 import { getDataTypeRegistryBaseQuery } from '@app/store/api-base-query';
+import { DataTypeResults } from '@app/common/interfaces/data-type.interface';
 
 export const dataTypeApi = createApi({
   reducerPath: 'dataTypeApi',
@@ -19,7 +20,13 @@ export const dataTypeApi = createApi({
         method: 'GET',
       }),
     }),
+    getTypesSearchResults: builder.query<DataTypeResults, string>({
+      query: (query) => ({
+        url: `/collections/types/documents/search?q=${query}&query_by=name`,
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
-export const { useGetTypesCollectionQuery } = dataTypeApi;
+export const { useGetTypesCollectionQuery, useGetTypesSearchResultsQuery } = dataTypeApi;
