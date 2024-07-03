@@ -21,6 +21,7 @@ module.exports = () => {
     i18n,
     async headers() {
       const isProd = process.env.NODE_ENV === 'production';
+      const dtrUrl = process.env.NEXT_PUBLIC_DTR_URL;
 
       const ProductionContentSecurityPolicy = [
         "base-uri 'self';",
@@ -28,7 +29,7 @@ module.exports = () => {
         "font-src 'self';",
         "img-src 'self' data:;",
         "script-src 'self' 'unsafe-inline';",
-        "connect-src 'self';",
+        `connect-src 'self' ${dtrUrl};`,
         "style-src 'self' 'unsafe-inline' data:;",
         "frame-src 'self';",
       ];
@@ -39,7 +40,7 @@ module.exports = () => {
         "font-src 'self';",
         "img-src 'self' 'unsafe-eval' 'unsafe-inline' data:;",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
-        "connect-src 'self';",
+        `connect-src 'self' ${dtrUrl};`,
         "style-src 'self' 'unsafe-inline' data:;",
         "frame-src 'self';",
       ];

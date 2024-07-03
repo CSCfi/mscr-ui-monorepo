@@ -3,12 +3,15 @@ import {
 } from '@app/modules/schema-view/schema-info/schema-tree/node-info/type-selector/type-selector.styles';
 import { SearchInput } from 'suomifi-ui-components';
 import { useTranslation } from 'next-i18next';
+import { useGetTypesCollectionQuery } from '@app/common/components/data-type/data-type.slice';
 
 export default function TypeSelector() {
   const { t } = useTranslation('common');
+  const { data } = useGetTypesCollectionQuery();
   const handleInputChange = (value: string) => {
     if (value.length < 3) return;
     console.log('searching with: ', value);
+    console.log('returning ', data);
   };
 
   return (

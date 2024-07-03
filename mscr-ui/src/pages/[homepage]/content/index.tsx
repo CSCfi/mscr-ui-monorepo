@@ -63,7 +63,7 @@ export default function IndexPage(props: IndexPageProps) {
         fakeableUsers={props.fakeableUsers}
       >
         <PageHead
-          baseUrl="http:/localhost:3000"
+          baseUrl="https://mscr-test.rahtiapp.fi"
           title={t('mscr-title')}
           description={t('service-description')}
         />
