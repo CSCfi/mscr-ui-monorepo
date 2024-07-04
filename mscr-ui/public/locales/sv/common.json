@@ -230,10 +230,19 @@
   "no-languages-available": "",
   "no-subscribed-items": "",
   "node-info": {
+    "clear-search-label": "",
+    "found-results": "",
+    "link-to-type-registry": "",
     "loading": "",
+    "make-query-and-choose": "",
+    "search-label": "",
     "select-a-node": "",
     "selected-node-info": "",
-    "set-as-root-node": ""
+    "set-as-root-node": "",
+    "type-search": "",
+    "type-search-results-title": "",
+    "type-to-search": "",
+    "use-button": ""
   },
   "not-recommended-synonym": "",
   "notifications": {

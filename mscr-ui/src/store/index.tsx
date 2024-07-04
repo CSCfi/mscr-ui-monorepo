@@ -24,7 +24,7 @@ import {
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
 import { crosswalkMappingFunctionsApi } from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
 import { notificationsSlice } from '@app/common/components/notifications/notifications.slice';
-import { dataTypeApi } from '@app/common/components/data-type/data-type.slice';
+import { dataTypeApi, dataTypeSlice } from '@app/common/components/data-type/data-type.slice';
 
 // make Context from next-redux-wrapper compatible with next-iron-session
 export type NextIronContext = Context | (Context & { req: NextApiRequest });
@@ -42,6 +42,7 @@ export function makeStore(ctx: NextIronContext) {
       [schemaApi.reducerPath]: schemaApi.reducer,
       [schemaSlice.name]: schemaSlice.reducer,
       [dataTypeApi.reducerPath]: dataTypeApi.reducer,
+      [dataTypeSlice.name]: dataTypeSlice.reducer,
       [crosswalkApi.reducerPath]: crosswalkApi.reducer,
       [searchInternalResourcesApi.reducerPath]:
         searchInternalResourcesApi.reducer,

@@ -230,10 +230,19 @@
   "no-languages-available": "",
   "no-subscribed-items": "",
   "node-info": {
+    "clear-search-label": "Clear",
+    "found-results": "Found {{hitCount}} results",
+    "link-to-type-registry": "Go to full description",
     "loading": "Loading...",
+    "make-query-and-choose": "Use the search to see type selection",
+    "search-label": "Search",
     "select-a-node": "Nothing to show just now. Select an entity to view information.",
     "selected-node-info": "Selected node info",
-    "set-as-root-node": "Set as root node"
+    "set-as-root-node": "Set as root node",
+    "type-search": "Search for types",
+    "type-search-results-title": "Type search results",
+    "type-to-search": "Type to search",
+    "use-button": "Use"
   },
   "not-recommended-synonym": "",
   "notifications": {
