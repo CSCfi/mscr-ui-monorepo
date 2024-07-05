@@ -73,6 +73,8 @@ export default function SchemaInfo(props: {
     []
   );
   const [treeData, setTreeData] = React.useState<RenderTree[]>([]);
+  const [propertyIndex, setPropertyIndex] = React.useState<{[key: string]: RenderTree}>({});
+  const [nodeIdToIndexDictionary, setNodeIdToIndexDictionary] = React.useState<{[key: string]: string[]}>({});
   const [treeExpandedArray, setTreeExpanded] = React.useState<string[]>([]);
 
   // These are used by tree visualization
@@ -96,13 +98,16 @@ export default function SchemaInfo(props: {
 
   useEffect(() => {
     if (getSchemaData?.content) {
-      generateTreeFromJson(getSchemaData).then((res) => {
+      const {generatedTree, propertyIndex, idToIndexDictionary} = generateTreeFromJson(getSchemaData);
+      generatedTree.then((res) => {
         if (res) {
           // Expand tree when data is loaded
-          setExpanded();
+          setPartlyExpanded();
           setTreeDataOriginal(cloneDeep(res));
           setTreeData(res);
           setTreeDataFetched(true);
+          setPropertyIndex(propertyIndex);
+          setNodeIdToIndexDictionary(idToIndexDictionary);
           //refetchOriginalSourceSchemaData();
         }
       });
@@ -111,47 +116,49 @@ export default function SchemaInfo(props: {
 
   // Expand tree when data is loaded
   useEffect(() => {
-    setExpanded();
+    setPartlyExpanded();
   }, [isTreeDataFetched]);
 
   // Expand and select nodes when input changed (from mappings accordion)
   useEffect(() => {
     if (props.treeSelection) {
-      expandAndSelectNodes(props.treeSelection);
+      const nodeIndexes = props.treeSelection.map((nodeId) => nodeIdToIndexDictionary[nodeId]).flat();
+      expandAndSelectNodes(nodeIndexes);
     }
   }, [props.treeSelection]);
 
   useEffect(() => {
     // Update selections for node info and parent component for mappings
-    const selectedTreeNodeIds = getTreeNodesByIds(treeSelectedArray);
+    const selectedTreeNodes = getTreeNodesByIndexes(treeSelectedArray);
     if (
       props.updateTreeNodeSelectionsOutput &&
       props.isSourceTree !== undefined
     ) {
       props.updateTreeNodeSelectionsOutput(
-        selectedTreeNodeIds,
+        selectedTreeNodes,
         props.isSourceTree
       );
     }
-    setSelectedTreeNodes(selectedTreeNodeIds);
+    setSelectedTreeNodes(selectedTreeNodes);
   }, [treeSelectedArray]);
 
-  const setExpanded = () => {
-    const retData: string[] = [];
-    treeData.forEach(({ children, id }) => {
-      if (children && children?.length > 0) {
-        retData.push(id.toString());
+  const setPartlyExpanded = () => {
+    const nodeIndexesToExpand: string[] = [];
+    treeData.forEach(({ children, visualTreeId }) => {
+      if (children && children.length > 0) {
+        nodeIndexesToExpand.push(visualTreeId);
+        if (children.length === 1) {
+          nodeIndexesToExpand.push(children[0].visualTreeId);
+        }
       }
     });
-    setTreeExpanded(() => {
-      return retData;
-    });
+    setTreeExpanded(nodeIndexesToExpand);
   };
 
   // Used to generate data for mappings modal
-  function getTreeNodesByIds(nodeIds: string[]) {
+  function getTreeNodesByIndexes(nodeIndexes: string[]) {
     const foundSourceNodes: RenderTree[] = [];
-    return findNodesFromTree(treeDataOriginal, nodeIds, foundSourceNodes);
+    return findNodesFromTree(treeDataOriginal, nodeIndexes, foundSourceNodes);
   }
 
   // Used to tree filtering
@@ -161,7 +168,7 @@ export default function SchemaInfo(props: {
     results: RenderTree[]
   ) {
     tree.forEach((item: RenderTree) => {
-      if (itemsToFind.includes(item.id)) {
+      if (itemsToFind.includes(item.visualTreeId)) {
         results.push(item);
       } else {
         if (item.children && item.children.length > 0) {
@@ -175,13 +182,13 @@ export default function SchemaInfo(props: {
   function clearTreeSearch() {
     setTreeSelections([]);
     setTreeData(cloneDeep(treeDataOriginal));
-    setExpanded();
+    setPartlyExpanded();
   }
 
   function doFiltering(
     tree: RenderTree[],
     nameToFind: string,
-    results: { nodeIds: string[]; childNodeIds: string[] }
+    results: { nodeIndexes: string[]; childNodeIndexes: string[] }
   ) {
     tree.forEach((item) => {
       if (
@@ -192,10 +199,10 @@ export default function SchemaInfo(props: {
           item.qname &&
           item.qname.toLowerCase().includes(nameToFind.toLowerCase()))
       ) {
-        results.nodeIds.push(item.id);
+        results.nodeIndexes.push(item.visualTreeId);
         if (item.children && item.children.length > 0) {
           item.children.forEach((child) => {
-            results.childNodeIds.push(child.id);
+            results.childNodeIndexes.push(child.visualTreeId);
           });
         }
       }
@@ -207,62 +214,62 @@ export default function SchemaInfo(props: {
   }
 
   function getElementPathsFromTree(
-    treeData: RenderTree[],
-    nodeIds: string[],
+    nodeIndexes: string[],
     results: string[]
   ) {
-    treeData.forEach((item) => {
-      if (nodeIds.includes(item.id)) {
-        if (item.elementPath != null) {
-          results.push(item.elementPath);
-        }
-      }
-      if (item.children && item.children.length > 0) {
-        return getElementPathsFromTree(item.children, nodeIds, results);
-      }
+    nodeIndexes.forEach((index) => {
+      results.push(propertyIndex[index].elementPath);
     });
+    // treeData.forEach((item) => {
+    //   if (nodeIndexes.includes(item.id)) {
+    //     if (item.elementPath != null) {
+    //       results.push(item.elementPath);
+    //     }
+    //   }
+    //   if (item.children && item.children.length > 0) {
+    //     return getElementPathsFromTree(item.children, nodeIndexes, results);
+    //   }
+    // });
     return results;
   }
 
   // Used by tree select and filtering
-  function getAllNodeIdsOnPathToLeaf(nodeIds: string[]) {
-    const elementPaths = getElementPathsFromTree(treeData, nodeIds, []);
+  function getAllNodeIndexesOnPathToLeaf(nodeIndexes: string[]) {
+    // const elementPaths = getElementPathsFromTree(nodeIndexes, []);
+    const elementPaths = nodeIndexes.map((index) => propertyIndex[index].elementPath);
     const nodesToSelect: Set<string> = new Set();
 
     elementPaths.forEach((path) => {
-      const nodes = path.split('.');
-      nodes.forEach((node) => {
-        nodesToSelect.add(node);
+      const nodeIds = path.split('.');
+      nodeIds.forEach((nodeId) => {
+        nodeIdToIndexDictionary[nodeId].map((index) => nodesToSelect.add(index));
       });
     });
+
     return Array.from(nodesToSelect);
   }
 
   const handleExpandClick = () => {
-    const allTreeNodes: string[] = [];
-    treeData.forEach(({ children, id }) => {
-      if (children && children?.length > 0) {
-        allTreeNodes.push(id.toString());
-      }
-    });
-    setTreeExpanded((oldExpanded) => {
-      return oldExpanded.length === 0 ? allTreeNodes : [];
-    });
+    if (treeExpandedArray.length === 0) {
+      setPartlyExpanded();
+    } else {
+      setTreeExpanded([]);
+    }
   };
 
-  function expandAndSelectNodes(nodeIds: string[]) {
-    if (nodeIds.length > 0) {
-      const nodeIdsToExpand = getAllNodeIdsOnPathToLeaf(nodeIds);
-      setTreeExpanded(nodeIdsToExpand);
-      setTreeSelections(nodeIds);
+  function expandAndSelectNodes(nodeIndexes: string[]) {
+    if (nodeIndexes.length > 0) {
+      const nodeIndexesToExpand = getAllNodeIndexesOnPathToLeaf(nodeIndexes);
+      setTreeExpanded(nodeIndexesToExpand);
+      setTreeSelections(nodeIndexes);
     }
   }
 
   function searchFromTree(input: string) {
     clearTreeSearch();
-    const hits = { nodeIds: [], childNodeIds: [] };
+    const hits : { nodeIndexes: string[]; childNodeIndexes: string[] } = { nodeIndexes: [], childNodeIndexes: [] };
     doFiltering(treeData, input.toString(), hits);
-    expandAndSelectNodes(hits.nodeIds);
+    expandAndSelectNodes(hits.nodeIndexes);
   }
 
   function handleTreeClick(nodeIds: string[]) {

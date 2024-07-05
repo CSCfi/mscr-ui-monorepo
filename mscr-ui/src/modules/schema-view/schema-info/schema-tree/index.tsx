@@ -13,7 +13,7 @@ function toTree(nodes: RenderTree, showQname: boolean) {
       return (
         <TreeItem
           key={node.id}
-          nodeId={node.id}
+          nodeId={node.visualTreeId}
           label={showQname ? node.qname : node.name}
           className="linked-tree-item"
         >
@@ -27,7 +27,7 @@ function toTree(nodes: RenderTree, showQname: boolean) {
     ret = (
       <TreeItem
         key={nodes.id}
-        nodeId={nodes.id}
+        nodeId={nodes.visualTreeId}
         label={showQname ? nodes.qname : nodes.name}
         className="linked-tree-item"
       >
@@ -76,7 +76,7 @@ export default function SchemaTree({
     >
       <TreeItem
         key={nodes.id}
-        nodeId={nodes.id}
+        nodeId={nodes.visualTreeId}
         label={nodes.name}
         className="linked-tree-item"
       >

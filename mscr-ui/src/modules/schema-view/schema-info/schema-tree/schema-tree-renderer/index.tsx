@@ -208,50 +208,79 @@ export default function MockupSchemaLoader(emptyTemplate: boolean): Promise<Rend
 }
 let treeIndex = 0;
 
-function createRenderTree(input: any, elementPath: string, definitions: any) {
-    let retArray: RenderTree[] = [];
-    for (let obj in input) {
-        treeIndex += 1;
-        let newNode: RenderTree = {
-            name: definitions[obj].title,
-            qname: definitions[obj]?.qname ? definitions[obj]?.qname : 'empty',
-            visualTreeId: treeIndex.toString(),
-            id: obj.toString(),
-            properties: definitions[obj],
-            elementPath: elementPath + '.' + obj.toString(),
-            parentElementPath: elementPath,
-            children: [],
-            uri: definitions[obj]['@id']
-        };
+function createRenderTree(
+  input: any,
+  elementPath: string,
+  definitions: any,
+  index: { [key: string]: RenderTree },
+  dictionary: { [key: string]: string[] }
+) {
+  const retArray: RenderTree[] = [];
+  for (const obj in input) {
+    treeIndex += 1;
+    const newNode: RenderTree = {
+      name: definitions[obj].title,
+      qname: definitions[obj]?.qname ? definitions[obj]?.qname : 'empty',
+      visualTreeId: treeIndex.toString(),
+      id: obj.toString(),
+      properties: definitions[obj],
+      elementPath: elementPath + '.' + obj.toString(),
+      parentElementPath: elementPath,
+      children: [],
+      uri: definitions[obj]['@id'],
+    };
+    index[treeIndex.toString()] = newNode;
+    dictionary[obj.toString()] = dictionary[obj.toString()] ?? [];
+    dictionary[obj.toString()].push(treeIndex.toString());
 
-        //console.log('OBJ', obj, input[obj].keys, Object.keys(input[obj]));
-        if (Object.keys(input[obj]).length > 0) {
-            // HAS CHILDREN
-            newNode.children = createRenderTree(input[obj], newNode.elementPath, definitions);
-        } else {
-            // IS LEAF
-        }
-        retArray.push(newNode);
+    //console.log('OBJ', obj, input[obj].keys, Object.keys(input[obj]));
+    if (Object.keys(input[obj]).length > 0) {
+      // HAS CHILDREN
+      newNode.children = createRenderTree(
+        input[obj],
+        newNode.elementPath,
+        definitions,
+        index,
+        dictionary
+      );
+    } else {
+      // IS LEAF
     }
-    return retArray;
+    retArray.push(newNode);
+  }
+  return retArray;
 }
 
 export function generateTreeFromJson(jsonInput: any) {
-    return new Promise<RenderTree[]>((resolve) => {
-        let renderedTree = createRenderTree(jsonInput.content.tree, 'ROOT', jsonInput.content.definitions);
-        let retTree: RenderTree[] = [];
-        let treeRoot = {
-            name: 'ROOT',
-            qname: 'ROOT',
-            visualTreeId: '0',
-            id: 'ROOT',
-            properties: undefined,
-            elementPath: 'ROOT',
-            parentElementPath: undefined,
-            children: renderedTree,
-        }
-        retTree.push(treeRoot);
-        // console.log('renderedTree', renderedTree);
-        resolve(retTree);
+  const schemaPropertyShallowIndex: { [key: string]: RenderTree } = {};
+  const nodeIdToIndexDictionary: {[key: string]: string[]} = {};
+  const treeRoot: RenderTree = {
+    name: 'ROOT',
+    qname: 'ROOT',
+    visualTreeId: '0',
+    id: 'ROOT',
+    properties: undefined,
+    uri: '',
+    elementPath: 'ROOT',
+    parentElementPath: undefined,
+    children: [],
+  };
+  schemaPropertyShallowIndex['0'] = treeRoot;
+  nodeIdToIndexDictionary['ROOT'] = ['0'];
+
+  const generatedTree = new Promise<RenderTree[]>((resolve) => {
+    const renderedTree = createRenderTree(
+      jsonInput.content.tree,
+      'ROOT',
+      jsonInput.content.definitions,
+      schemaPropertyShallowIndex,
+      nodeIdToIndexDictionary,
+    );
+    const retTree: RenderTree[] = [];
+    treeRoot.children = renderedTree;
+    retTree.push(treeRoot);
+    // console.log('renderedTree', renderedTree);
+    resolve(retTree);
     });
+  return {generatedTree: generatedTree, propertyIndex: schemaPropertyShallowIndex, idToIndexDictionary: nodeIdToIndexDictionary};
 }

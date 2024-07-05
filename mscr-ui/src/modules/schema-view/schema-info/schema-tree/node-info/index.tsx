@@ -16,10 +16,12 @@ export default function NodeInfo(props: {
 }) {
   const { t } = useTranslation('common');
   const [selectedNode, setSelectedNode] = useState<RenderTree>();
+  const [dropDownList, setDropDownList] = useState<RenderTree[]>([]);
   const isLeafNode = selectedNode?.children.length === 0;
 
   useEffect(() => {
     if (props.treeData && props.treeData.length > 0) {
+      setDropDownList(props.treeData);
       setSelectedNode(props.treeData[0]);
     }
   }, [props.treeData]);
@@ -28,15 +30,6 @@ export default function NodeInfo(props: {
     const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
     setSelectedNode(newSelectedNode ?? selectedNode);
   };
-
-  let dropdownInit: { id: string; name?: string }[] = [
-    {
-      id: '1',
-    },
-  ];
-  if (props.treeData && props.treeData.length > 0) {
-    dropdownInit = props.treeData;
-  }
 
   interface ConstantAttribute {
     name: string;
@@ -106,7 +99,7 @@ export default function NodeInfo(props: {
               </div>
             </>
           )}
-          {props.treeData.length > 1 && (
+          {dropDownList.length > 1 && (
             <DropdownWrapper>
               <Dropdown
                 labelText={t('schema-tree.dropdown-label')}
@@ -116,8 +109,8 @@ export default function NodeInfo(props: {
                 value={selectedNode?.id ?? ''}
                 onChange={(newValue) => handleDropDownSelect(newValue)}
               >
-                {dropdownInit.map((rt) => (
-                  <DropdownItem key={rt.id} value={rt.id}>
+                {dropDownList.map((rt) => (
+                  <DropdownItem key={rt.visualTreeId} value={rt.id}>
                     {rt.name}
                   </DropdownItem>
                 ))}
