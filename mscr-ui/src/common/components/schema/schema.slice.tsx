@@ -22,7 +22,7 @@ function createUrl(formatRestrictions: Array<Format>) {
 export const schemaApi = createApi({
   reducerPath: 'schemaApi',
   baseQuery: getDatamodelApiBaseQuery(),
-  tagTypes: ['schemaApi'],
+  tagTypes: ['schemaApi', 'frontendSchema'],
   extractRehydrationInfo(action, { reducerPath }) {
     if (action.type === HYDRATE) {
       return action.payload[reducerPath];
@@ -117,6 +117,7 @@ export const schemaApi = createApi({
       query: (pid) => ({
         url: `/frontend/schema/${pid}`,
         method: 'GET',
+        providesTags: ['frontendSchema'],
       }),
     }),
     postSchema: builder.mutation<
@@ -150,6 +151,7 @@ export const schemaApi = createApi({
         url: `/dtr/schema/${schemaID}/properties?target=${target}&datatype=${datatype}`,
         method: 'PATCH',
       }),
+      invalidatesTags: ['frontendSchema'],
     }),
   }),
 });

@@ -32,6 +32,7 @@ import { useRouter } from 'next/router';
 import Tooltip from '@mui/material/Tooltip';
 import { useStoreDispatch } from '@app/store';
 import { useSelector } from 'react-redux';
+import { usePatchDataTypeMutation } from '@app/common/components/schema/schema.slice';
 
 export default function TypeSelector({ target }: { target?: string }) {
   // Todo: What if target is undefined when you need to make internal change type api call?
@@ -44,7 +45,8 @@ export default function TypeSelector({ target }: { target?: string }) {
   const currentPage = useSelector(selectPage());
   const pageSize = useSelector(selectPageSize());
   const { query: queryRoute } = useRouter();
-  const schemaId = (queryRoute?.pid ?? [''])[0];
+  const schemaID = (queryRoute?.pid ?? [''])[0];
+  const [patchDataType, resultPatchDataType] = usePatchDataTypeMutation();
   const { data, isSuccess } = useGetTypesSearchResultsQuery(
     { query, page: currentPage, pageSize },
     { skip }
@@ -76,6 +78,15 @@ export default function TypeSelector({ target }: { target?: string }) {
   // });
   // console.log('API would be called with {schemaId: ', schemaId, ',  target: ', target);
 
+  const handleClick = (datatype: string) => {
+    if (target && schemaID !== '') {
+      // patchDataType({ schemaID, target, datatype });
+      console.log('Sending API call with schemaID: ', schemaID, ', target: ', target, ', datatype: ', datatype);
+    } else {
+      console.log('Something went wrong');
+    }
+  };
+
   function dataTypeSearchResult(id: string, name: string, description: string) {
     return (
       <TypeSearchResultWrapper key={id}>
@@ -83,7 +94,10 @@ export default function TypeSelector({ target }: { target?: string }) {
           <Heading variant={'h5'}>{name}</Heading>
           <Paragraph>{description}</Paragraph>
         </TypeInfoWrapper>
-        <ResultButton variant={'secondaryNoBorder'}>
+        <ResultButton
+          variant={'secondaryNoBorder'}
+          onClick={(e) => handleClick(id)}
+        >
           {t('node-info.use-button')}
         </ResultButton>
         <Tooltip
