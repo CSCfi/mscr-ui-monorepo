@@ -225,7 +225,8 @@ export default function NodeMappings(props: {
   useEffect(() => {
     if (mappingNodes) {
       generatePropertiesDropdownItems(mappingNodes[0].source.properties);
-      setValidationErrors(validateMapping(mappingNodes[0]));
+      validateMappings(mappingNodes);
+      //setValidationErrors(validateMapping(mappingNodes[0]));
     }
   }, [
     mappingNodes,
@@ -234,6 +235,69 @@ export default function NodeMappings(props: {
     filterOperation,
     predicateValue,
   ]);
+
+  function validateMappings(mappingNodes: CrosswalkConnectionNew[]){
+    console.log('VALIDATE', mappingNodes);
+    let mappingErrors: string[] = [];
+    mappingNodes.forEach(node => {
+      if (node.sourceProcessing) {
+        // Source has source processing function
+        const sourceProcessingIOFormats = getMappingFunctionIOFormats(node.sourceProcessing.id);
+        if (node.source.properties.type !== sourceProcessingIOFormats.input) {
+          mappingErrors.push('Datatype mismatch: ' + node.source.name + ': ' + node.source.properties.type + ' -> ' + node.sourceProcessing.id + ': ' + sourceProcessingIOFormats.input);
+        }
+        if (node?.processing) {
+          // Mapping operation is present
+          const mappingFncIOFormats = getMappingFunctionIOFormats(node.processing.id);
+          if (sourceProcessingIOFormats.output !== mappingFncIOFormats.input) {
+            mappingErrors.push('Datatype mismatch: ' + node.sourceProcessing.id + ': ' + sourceProcessingIOFormats.output + ' -> ' + node.processing.id + ': ' + mappingFncIOFormats.input);
+          }
+          if (node.target.properties.type !== mappingFncIOFormats.output) {
+            mappingErrors.push('Datatype mismatch: ' + node.processing.id + ': ' + mappingFncIOFormats.output + ' -> ' + node.target.name + ': ' + node.target.properties.type);
+          }
+        } else {
+          // Source has source processing and no mapping operation
+          if (sourceProcessingIOFormats.output !== node.target.properties.type) {
+            mappingErrors.push('Datatype mismatch: ' + node.sourceProcessing.id + ': ' + sourceProcessingIOFormats.output + ' -> ' + node.target.id + ': ' + node.target.properties.type);
+          }
+        }
+
+      } else {
+        // Source has no source processing function
+        if (node?.processing) {
+          // Mapping operation is present
+          const mappingFncIOFormats = getMappingFunctionIOFormats(node?.processing?.id);
+          if (node.source.properties.type !== mappingFncIOFormats.input) {
+            mappingErrors.push('Datatype mismatch: ' + node.source.name + ': ' + node.source.properties.type + ' -> ' + node.processing.id + ': ' + mappingFncIOFormats.input);
+          }
+          if (node.target.properties.type !== mappingFncIOFormats.output) {
+            mappingErrors.push('Datatype mismatch: ' + node.processing.id + ': ' + mappingFncIOFormats.output + ' -> ' + node.target.name + ': ' + node.target.properties.type);
+          }
+        } else {
+          // Source has no source processing function and no mapping operation
+          if (node.source.properties.type !== node.target.properties.type ) {
+            mappingErrors.push('Datatype mismatch: ' + node.source.name + ': ' + node.source.properties.type + ' -> ' + node.target.name + ': ' + node.target.properties.type);
+          }
+        }
+      }
+      mappingErrors.forEach(error => console.log(error));
+    });
+  }
+
+  function getMappingFunctionIOFormats(functionId: string) {
+    let IOFormats = {input: '', output: ''}
+    
+    const functions = props.mappingFunctions.filter((item: any) => item.uri === functionId);
+    functions[0].parameters.map((param: { name: string; datatype: any; }) => {
+      if (param?.name === 'input' && param?.datatype){
+        IOFormats.input = param.datatype;
+      }
+    });
+    if (functions[0]?.outputs){
+      functions[0]?.outputs[0]?.datatype ? IOFormats.output = functions[0]?.outputs[0]?.datatype : undefined;
+    }
+    return IOFormats;
+  }
 
   function accordionCallbackFunction(action: string, mappingId: any, operationValue: any, operationName: any, mappingOperationKey: any) {
     if (mappingNodes) {
