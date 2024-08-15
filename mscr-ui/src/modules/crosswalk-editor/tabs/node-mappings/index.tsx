@@ -2,8 +2,8 @@ import {
   CrosswalkConnectionNew,
   NodeMapping,
 } from '@app/common/interfaces/crosswalk-connection.interface';
-import validateMapping from '@app/modules/crosswalk-editor/mapping-validator';
-import {Dropdown, IconPlus, Textarea, TextInput} from 'suomifi-ui-components';
+import GenerateValidationErrorBar from '@app/modules/crosswalk-editor/mapping-validator';
+import {Dropdown, IconPlus, InlineAlert, Textarea, TextInput} from 'suomifi-ui-components';
 import {DropdownItem} from 'suomifi-ui-components';
 import {useEffect, useState} from 'react';
 import {
@@ -16,6 +16,7 @@ import {
 import NodeListingAccordion from "@app/modules/crosswalk-editor/tabs/node-mappings/node-listing-accordion";
 import {MidColumnWrapper} from "@app/modules/crosswalk-editor/tabs/node-mappings/node-mappings.styles";
 import {cloneDeep} from 'lodash';
+import {validateMappings} from "@app/modules/crosswalk-editor/mapping-validator";
 
 export default function NodeMappings(props: {
   nodeSelections: CrosswalkConnectionNew[];
@@ -106,9 +107,11 @@ export default function NodeMappings(props: {
     }
 
     setVisible(props?.modalOpen);
+    setIsErrorBarVisible(true);
     setMappingNodes(props?.nodeSelections);
   }, [props]);
 
+  const [isErrorBarVisible, setIsErrorBarVisible] = useState<boolean>(true);
   const [targetOperationValue, setTargetOperationValue] = useState('');
   const [mappingOperationSelection, setMappingOperationSelection] = useState<string | undefined>(undefined);
   const [mappingOperationFormatted, setMappingOperationFormatted] = useState([] as any);
@@ -225,8 +228,7 @@ export default function NodeMappings(props: {
   useEffect(() => {
     if (mappingNodes) {
       generatePropertiesDropdownItems(mappingNodes[0].source.properties);
-      validateMappings(mappingNodes);
-      //setValidationErrors(validateMapping(mappingNodes[0]));
+      setValidationErrors(validateMappings(mappingNodes, props.mappingFunctions));
     }
   }, [
     mappingNodes,
@@ -235,69 +237,6 @@ export default function NodeMappings(props: {
     filterOperation,
     predicateValue,
   ]);
-
-  function validateMappings(mappingNodes: CrosswalkConnectionNew[]){
-    console.log('VALIDATE', mappingNodes);
-    let mappingErrors: string[] = [];
-    mappingNodes.forEach(node => {
-      if (node.sourceProcessing) {
-        // Source has source processing function
-        const sourceProcessingIOFormats = getMappingFunctionIOFormats(node.sourceProcessing.id);
-        if (node.source.properties.type !== sourceProcessingIOFormats.input) {
-          mappingErrors.push('Datatype mismatch: ' + node.source.name + ': ' + node.source.properties.type + ' -> ' + node.sourceProcessing.id + ': ' + sourceProcessingIOFormats.input);
-        }
-        if (node?.processing) {
-          // Mapping operation is present
-          const mappingFncIOFormats = getMappingFunctionIOFormats(node.processing.id);
-          if (sourceProcessingIOFormats.output !== mappingFncIOFormats.input) {
-            mappingErrors.push('Datatype mismatch: ' + node.sourceProcessing.id + ': ' + sourceProcessingIOFormats.output + ' -> ' + node.processing.id + ': ' + mappingFncIOFormats.input);
-          }
-          if (node.target.properties.type !== mappingFncIOFormats.output) {
-            mappingErrors.push('Datatype mismatch: ' + node.processing.id + ': ' + mappingFncIOFormats.output + ' -> ' + node.target.name + ': ' + node.target.properties.type);
-          }
-        } else {
-          // Source has source processing and no mapping operation
-          if (sourceProcessingIOFormats.output !== node.target.properties.type) {
-            mappingErrors.push('Datatype mismatch: ' + node.sourceProcessing.id + ': ' + sourceProcessingIOFormats.output + ' -> ' + node.target.id + ': ' + node.target.properties.type);
-          }
-        }
-
-      } else {
-        // Source has no source processing function
-        if (node?.processing) {
-          // Mapping operation is present
-          const mappingFncIOFormats = getMappingFunctionIOFormats(node?.processing?.id);
-          if (node.source.properties.type !== mappingFncIOFormats.input) {
-            mappingErrors.push('Datatype mismatch: ' + node.source.name + ': ' + node.source.properties.type + ' -> ' + node.processing.id + ': ' + mappingFncIOFormats.input);
-          }
-          if (node.target.properties.type !== mappingFncIOFormats.output) {
-            mappingErrors.push('Datatype mismatch: ' + node.processing.id + ': ' + mappingFncIOFormats.output + ' -> ' + node.target.name + ': ' + node.target.properties.type);
-          }
-        } else {
-          // Source has no source processing function and no mapping operation
-          if (node.source.properties.type !== node.target.properties.type ) {
-            mappingErrors.push('Datatype mismatch: ' + node.source.name + ': ' + node.source.properties.type + ' -> ' + node.target.name + ': ' + node.target.properties.type);
-          }
-        }
-      }
-      mappingErrors.forEach(error => console.log(error));
-    });
-  }
-
-  function getMappingFunctionIOFormats(functionId: string) {
-    let IOFormats = {input: '', output: ''}
-    
-    const functions = props.mappingFunctions.filter((item: any) => item.uri === functionId);
-    functions[0].parameters.map((param: { name: string; datatype: any; }) => {
-      if (param?.name === 'input' && param?.datatype){
-        IOFormats.input = param.datatype;
-      }
-    });
-    if (functions[0]?.outputs){
-      functions[0]?.outputs[0]?.datatype ? IOFormats.output = functions[0]?.outputs[0]?.datatype : undefined;
-    }
-    return IOFormats;
-  }
 
   function accordionCallbackFunction(action: string, mappingId: any, operationValue: any, operationName: any, mappingOperationKey: any) {
     if (mappingNodes) {
@@ -462,6 +401,23 @@ export default function NodeMappings(props: {
     } else return '';
   }
 
+  function generateValidationErrorBar2() {
+    if (validationErrors.length > 0) {
+      return (<InlineAlert className='mt-3' status="warning" labelText={validationErrors.length + ' datatype validation warnings'}>
+{/*        <ul>
+          {validationErrors.map((error, idx) => (
+            <li key={`validation-error-${idx}`}>{error}</li>
+          ))}
+        </ul>*/}
+      </InlineAlert>);
+    }
+  }
+
+  function hideErrorBarCallback(input: any) {
+    setIsErrorBarVisible(false);
+    console.log('hide called');
+  }
+
   return (
     <>
       <Modal
@@ -472,6 +428,10 @@ export default function NodeMappings(props: {
       >
         <ModalContent className="edit-mapping-modal-content">
           <ModalTitle>{props.isPatchMappingOperation ? 'Edit mapping' : 'Add mapping'}</ModalTitle>
+          {isErrorBarVisible &&
+              <GenerateValidationErrorBar hideErrorBarCallback={hideErrorBarCallback} mappingNodes={mappingNodes}
+                                          mappingFunctions={props.mappingFunctions}></GenerateValidationErrorBar>
+          }
           <div className="col flex-column d-flex justify-content-between">
             <div className="row bg-white">
               {/* SOURCE OPERATIONS */}
