@@ -82,7 +82,6 @@ export function validateMappings(mappingNodes: CrosswalkConnectionNew[], mapping
         }
       }
     }
-    errorMessages.forEach(error => console.log(error));
   });
   return errorMessages;
 }

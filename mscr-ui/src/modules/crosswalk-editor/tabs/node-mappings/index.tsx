@@ -126,9 +126,6 @@ export default function NodeMappings(props: {
   );
 
   const [visible, setVisible] = useState(props.modalOpen);
-
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
-
   const [mappingNodes, setMappingNodes] = useState<CrosswalkConnectionNew[] | undefined>(undefined);
 
   const [notesValue, setNotesValue] = useState<string>('');
@@ -223,20 +220,6 @@ export default function NodeMappings(props: {
     setFilterTarget(filterTargetSelectInit);
     setFilterOperation(filterOperationsSelectInit);
   }, [visible]);
-
-// VALIDATE MAPPING
-  useEffect(() => {
-    if (mappingNodes) {
-      generatePropertiesDropdownItems(mappingNodes[0].source.properties);
-      setValidationErrors(validateMappings(mappingNodes, props.mappingFunctions));
-    }
-  }, [
-    mappingNodes,
-    targetOperationValue,
-    filterTarget,
-    filterOperation,
-    predicateValue,
-  ]);
 
   function accordionCallbackFunction(action: string, mappingId: any, operationValue: any, operationName: any, mappingOperationKey: any) {
     if (mappingNodes) {
@@ -401,21 +384,8 @@ export default function NodeMappings(props: {
     } else return '';
   }
 
-  function generateValidationErrorBar2() {
-    if (validationErrors.length > 0) {
-      return (<InlineAlert className='mt-3' status="warning" labelText={validationErrors.length + ' datatype validation warnings'}>
-{/*        <ul>
-          {validationErrors.map((error, idx) => (
-            <li key={`validation-error-${idx}`}>{error}</li>
-          ))}
-        </ul>*/}
-      </InlineAlert>);
-    }
-  }
-
   function hideErrorBarCallback(input: any) {
     setIsErrorBarVisible(false);
-    console.log('hide called');
   }
 
   return (
