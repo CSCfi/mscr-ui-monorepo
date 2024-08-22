@@ -1,5 +1,5 @@
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
-import { Dropdown, DropdownItem, ToggleButton } from 'suomifi-ui-components';
+import { Dropdown, DropdownItem, ToggleButton, Button } from 'suomifi-ui-components';
 import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { InfoIcon } from '@app/common/components/shared-icons';
@@ -7,12 +7,15 @@ import { useTranslation } from 'next-i18next';
 import { DropdownWrapper } from '@app/common/components/schema-info/schema-info.styles';
 import TypeSelector from '@app/common/components/schema-info/schema-tree/node-info/type-selector';
 import { IconLinkExternal } from 'suomifi-icons';
+import {setConfirmModalState, setNodeSelection} from '@app/common/components/actionmenu/actionmenu.slice';
+import {useStoreDispatch} from '@app/store';
 
 export default function NodeInfo(props: {
   treeData: RenderTree[];
   dataIsLoaded: boolean;
   isNodeEditable?: boolean;
 }) {
+  const dispatch = useStoreDispatch();
   const { t } = useTranslation('common');
   const [selectedNode, setSelectedNode] = useState<RenderTree>();
   const [nodeAttributes, setNodeAttributes] = useState<ConstantAttribute[]>([]);
@@ -67,6 +70,11 @@ export default function NodeInfo(props: {
     return input;
   }
 
+  function seAsRootNode(node: any) {
+    dispatch(setNodeSelection(node));
+    dispatch(setConfirmModalState({ key: 'setRootNodeSelection', value: true }))
+  }
+
   return (
     <div className="row d-flex justify-content-between node-info-box">
       <h3>{t('node-info.selected-node-info')}</h3>
@@ -116,6 +124,9 @@ export default function NodeInfo(props: {
               </Dropdown>
             </DropdownWrapper>
           )}
+          {props.isNodeEditable && <Button variant="secondaryNoBorder" onClick={() => seAsRootNode(selectedNode)}>
+              Set as root node
+          </Button>}
           <div>
             <div className="row">
               {props.treeData.length > 1 && (
