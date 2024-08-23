@@ -110,7 +110,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   const setSchemaRootSelection = () => {
     console.log('CALLBACK', nodeSelection, nodeSelection.properties['@id']);
     if (schemaData && nodeSelection) {
-      patchSchemaRootSelection({schemaId: schemaData?.pid, payload: nodeSelection.properties['@id']})
+      patchSchemaRootSelection({schemaId: schemaData?.pid, value: nodeSelection.properties['@id']})
         .unwrap()
         .then(() => {
           dispatch(
