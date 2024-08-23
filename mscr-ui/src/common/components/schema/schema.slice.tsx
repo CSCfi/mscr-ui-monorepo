@@ -67,7 +67,7 @@ export const schemaApi = createApi({
     putSchemaMscrCopy: builder.mutation<Schema, { pid: string; data: Partial<Metadata> }>({
       query: ({pid, data }) => ({
         url: `/schema?action=mscrCopyOf&target=${pid}`,
-        method: 'PATCH',
+        method: 'PUT',
         data: data,
         headers: {
           'content-Type': 'application/json;',
@@ -76,10 +76,9 @@ export const schemaApi = createApi({
     }),
     patchSchemaRootSelection: builder.mutation<any, any>({
       query: (value) => ({
-        url: `/schema/${value.schemaId}/rootResource?value=${value.value}`,
+        url: `/schema/${value.schemaId}/rootResource?value=${encodeURIComponent(value.value)}`,
         method: 'PATCH',
       }),
-      invalidatesTags: ['Schema', 'FrontendSchema'],
     }),
     patchSchema: builder.mutation<
       Metadata,
