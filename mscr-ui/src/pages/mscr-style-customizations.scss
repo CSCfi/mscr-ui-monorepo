@@ -100,13 +100,26 @@ body {
   max-width: 740px;
 
   &.schema-registration-modal {
-    min-height: 230px;
-    height: calc(100% - 270px);
-    @media screen and (min-height: 1000px) {
+    min-height: 390px;
+    height: calc(100% - 400px);
+    @media screen and (min-height: 500px) {
+      height: calc(100% - 550px);
+    }
+    @media screen and (min-height: 850px) {
       height: calc(100% - 280px);
     }
     @media screen and (min-height: 1200px) {
       height: calc(100% - 450px);
+    }
+  }
+  &.mscr-copy-modal {
+    min-height: 270px;
+    height: calc(100% - 570px);
+    @media screen and (min-height: 900px) {
+      height: calc(100% - 650px);
+    }
+    @media screen and (min-height: 1200px) {
+      height: calc(100% - 650px);
     }
   }
   &.crosswalk-registration-modal {

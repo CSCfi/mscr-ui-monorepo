@@ -63,7 +63,7 @@ export enum ModalType {
   RegisterNewMscr = 'REGISTER_NEW_MSCR',
   RevisionFull = 'REVISION_FULL',
   RevisionMscr = 'REVISION_MSCR',
-  McsrCopy = 'MSCR_COPY',
+  MscrCopy = 'MSCR_COPY',
 }
 
 interface FormModalProps {
@@ -108,13 +108,13 @@ export default function FormModal({
   const [putSchemaMscrCopy, resultSchemaMscrCopy] =
     usePutSchemaMscrCopyMutation();
   const [submitAnimationVisible, setSubmitAnimationVisible] =
-    useState<boolean>(false);
+    useState<boolean>(true);
 
   const formDataFromInitialData = useCallback(() => {
     if (!initialData) return;
     const existingData: FormType = {
       format:
-        modalType == ModalType.McsrCopy ? Format.Mscr : initialData.format,
+        modalType == ModalType.MscrCopy ? Format.Mscr : initialData.format,
       languages: [
         {
           labelText: t('language-english-with-suffix'),
@@ -273,7 +273,7 @@ export default function FormModal({
           case ModalType.RevisionMscr:
             notificationKey = 'SCHEMA_REVISION';
             break;
-          case ModalType.McsrCopy:
+          case ModalType.MscrCopy:
             notificationKey = 'SCHEMA_COPY';
         }
       } else {
@@ -287,7 +287,7 @@ export default function FormModal({
           case ModalType.RevisionMscr:
             notificationKey = 'CROSSWALK_REVISION';
             break;
-          case ModalType.McsrCopy:
+          case ModalType.MscrCopy:
             notificationKey = 'CROSSWALK_COPY';
         }
       }
@@ -307,7 +307,7 @@ export default function FormModal({
   const spinnerDelay = async () => {
     setSubmitAnimationVisible(true);
     if (!(errors && Object.values(errors).includes(true))) {
-      await delay(2000);
+      await delay(20000);
     }
     return Promise.resolve();
   };
@@ -543,6 +543,8 @@ export default function FormModal({
     );
   }
 
+  console.log('contentType', contentType, 'modalType', modalType);
+
   return (
     <Modal
       appElementId="__next"
@@ -562,12 +564,14 @@ export default function FormModal({
                 contentType == Type.Schema
                   ? modalType == ModalType.RegisterNewFull
                     ? SpinnerType.SchemaRegistrationModal
-                    : SpinnerType.SchemaRevisionModal
+                    : modalType == ModalType.MscrCopy ?
+                      SpinnerType.MscrCopyModal :
+                      SpinnerType.SchemaRevisionModal
                   : modalType == ModalType.RegisterNewFull
-                  ? SpinnerType.CrosswalkRegistrationModal
-                  : modalType == ModalType.RegisterNewMscr
-                  ? SpinnerType.CrosswalkCreationModal
-                  : SpinnerType.CrosswalkRevisionModal
+                    ? SpinnerType.CrosswalkRegistrationModal
+                    : modalType == ModalType.RegisterNewMscr
+                      ? SpinnerType.CrosswalkCreationModal
+                      : SpinnerType.CrosswalkRevisionModal
               }
             ></SpinnerOverlay>
           )}
