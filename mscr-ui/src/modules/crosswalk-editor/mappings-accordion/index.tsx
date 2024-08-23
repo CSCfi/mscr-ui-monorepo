@@ -39,21 +39,29 @@ const StyledTableCell = styled(TableCell)({
   alignSelf: 'normal'
 });
 
-const StyledTableButtonCell = styled(TableCell)({
+const StyledTableLastCell = styled(TableCell)({
   height: 'auto',
   minHeight: '52px',
   display: 'flex',
-  padding: '0px 20px',
-  justifyContent: 'right',
-  flexDirection: 'row',
+  justifyContent: 'center',
+  flexDirection: 'column',
   alignSelf: 'normal',
-  button: {maxHeight: '52px'}
+  textAlign: 'right',
+  paddingRight: '110px !important'
+});
+
+const StyledTableButtonCell = styled(TableCell)({
+  textAlign: 'end',
+  display: 'flex',
+  justifyContent: 'end'
 });
 
 const StyledButton = styled(Button)({
   display: 'flex',
   justifyContent: 'start',
   alignSelf: 'normal',
+  textTransform: 'none',
+  textAlign: 'initial'
 });
 
 const StyledTableRow = styled(TableRow)(({theme}) => ({
@@ -78,7 +86,7 @@ function Row(props: {
   return (
     <>
       <StyledTableRow className="accordion-row row">
-        <StyledTableCell className="col-5">
+        <StyledTableCell className="col-4">
           {props.row.source.map((oneLink) =>
             <>          <StyledButton
               className="px-3 py-0"
@@ -97,18 +105,22 @@ function Row(props: {
 
         </StyledTableCell>
 
-        {/*                <StyledTableCell className='fw-bold' style={{width: '10%'}}>
-                    <IconButton onClick={(e) => {props.cbf.performAccordionAction(row, 'remove'); e.stopPropagation();}} aria-label="unlink" color="primary" title='Unlink nodes'
-                                size="large">
-                    <LinkOffIcon/>
-                    </IconButton>
-                </StyledTableCell>*/}
+        <StyledTableCell className="col-1">TEST
+          {/*<IconButton
+                        aria-label="expand row"
+                        size="small"
+                        onClick={(e) => {
+                            props.cbf.performAccordionAction(row, 'openMappingDetails')
+                        }}
+                    >
+                        {row.isSelected ? <EditRoundedIcon className='selection-active'/> : <EditRoundedIcon/>}
+                    </IconButton>*/}
+        </StyledTableCell>
 
         <StyledTableCell className="col-4">
           {props.row.target.map((oneLink) =>
             <>          <StyledButton
               className="px-3 py-0"
-              style={{textTransform: 'none'}}
               title="Select linked node from target tree"
               onClick={(e) => {
                 props.callBackFunction.performAccordionAction(
@@ -123,30 +135,44 @@ function Row(props: {
 
         </StyledTableCell>
 
-        <StyledTableCell className="col-1">
-          {/*<IconButton
-                        aria-label="expand row"
-                        size="small"
-                        onClick={(e) => {
-                            props.cbf.performAccordionAction(row, 'openMappingDetails')
-                        }}
-                    >
-                        {row.isSelected ? <EditRoundedIcon className='selection-active'/> : <EditRoundedIcon/>}
-                    </IconButton>*/}
-        </StyledTableCell>
-
-        <StyledTableButtonCell className="col-2 fw-bold">
-          <IconButton
-            hidden={props.viewOnlyMode}
-            aria-label="expand row"
-            size="small"
-            onClick={(e) => {
-              setOpen(!open);
-              e.stopPropagation();
-            }}
-          >
-            {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
-          </IconButton>
+        <StyledTableButtonCell className="col-3 fw-bold">
+            <>
+              <div className='d-flex flex-row flex-wrap align-content-center'>
+                {props.isEditModeActive && (
+                  <><Sbutton
+                    onClick={(e) => {
+                      props.callBackFunction.performAccordionAction(
+                        props.row,
+                        'openMappingDetails'
+                      );
+                    }}
+                  >
+                    E
+                  </Sbutton><Sbutton
+                    className="ms-2"
+                    onClick={(e) => {
+                      props.callBackFunction.performAccordionAction(
+                        props.row,
+                        'removeMapping'
+                      );
+                    }}
+                  >
+                    D
+                  </Sbutton></>)}
+                <IconButton
+                  className="ms-2"
+                  hidden={props.viewOnlyMode}
+                  aria-label="expand row"
+                  size="small"
+                  onClick={(e) => {
+                    setOpen(!open);
+                    e.stopPropagation();
+                  }}
+                >
+                  {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
+                </IconButton>
+              </div>
+            </>
         </StyledTableButtonCell>
       </StyledTableRow>
 
@@ -181,31 +207,7 @@ function Row(props: {
                 </div>
                 <div className='col mt-4 d-flex flex-row gx-0 justify-content-end'>
                   <div className="d-flex flex-column action-buttons">
-                    {props.isEditModeActive && (
-                      <>
-                        <Sbutton
-                          onClick={(e) => {
-                            props.callBackFunction.performAccordionAction(
-                              props.row,
-                              'openMappingDetails',
-                            );
-                          }}
-                        >
-                          Edit
-                        </Sbutton>
-                        <Sbutton
-                          className="mt-2"
-                          onClick={(e) => {
-                            props.callBackFunction.performAccordionAction(
-                              props.row,
-                              'removeMapping',
-                            );
-                          }}
-                        >
-                          Delete
-                        </Sbutton>
-                      </>
-                    )}
+
                   </div>
                 </div>
               </div>
@@ -250,38 +252,42 @@ export default function MappingsAccordion(props: any) {
   const nodeMappingsInput = props.nodeMappings;
   return (
     <>
+      <div className='d-flex justify-content-end'>
+      <SearchWrapper>
+        <SearchInput
+          labelText={''}
+          labelMode='hidden'
+          searchButtonLabel={t('mappings-accordion.filter-from-mappings')}
+          clearButtonLabel={t('mappings-accordion.clear')}
+          visualPlaceholder={t('mappings-accordion.filter-from-mappings')}
+          onSearch={(value) => {
+            if (typeof value === 'string') {
+              setMappingData(filterMappings(nodeMappingsInput, value, showAttributeNames));
+            }
+          }}
+          onChange={(value) => {
+            if (!value) {
+              setMappingData(props.nodeMappings);
+            }
+          }}
+        />
+      </SearchWrapper>
+      </div>
       <TableContainer component={Paper} className="gx-0">
         <Table aria-label="collapsible table w-100">
           <TableHead>
             <TableRow className="accordion-row row">
-              <StyledTableCell className="col-5">
+              <StyledTableCell className="col-4">
                 <span className="fw-bold ps-4">Source</span>
+              </StyledTableCell>
+              <StyledTableCell className="col-1">
+                <span className="fw-bold">Mapping operation</span>
               </StyledTableCell>
               <StyledTableCell className="col-4">
                 <span className="fw-bold ps-4">Target</span>
               </StyledTableCell>
-              <StyledTableCell className="col-1"></StyledTableCell>
-              <StyledTableCell className="col-2">
-                <SearchWrapper className="w-100">
-                  <SearchInput
-                    labelText={''}
-                    labelMode='hidden'
-                    searchButtonLabel={t('mappings-accordion.filter-from-mappings')}
-                    clearButtonLabel={t('mappings-accordion.clear')}
-                    visualPlaceholder={t('mappings-accordion.filter-from-mappings')}
-                    onSearch={(value) => {
-                      if (typeof value === 'string') {
-                        setMappingData(filterMappings(nodeMappingsInput, value, showAttributeNames));
-                      }
-                    }}
-                    onChange={(value) => {
-                      if (!value) {
-                        setMappingData(props.nodeMappings);
-                      }
-                    }}
-                  />
-                </SearchWrapper>
-              </StyledTableCell>
+              <StyledTableLastCell className="col-3"><span className="fw-bold ps-4">Actions</span>
+              </StyledTableLastCell>
             </TableRow>
           </TableHead>
 
