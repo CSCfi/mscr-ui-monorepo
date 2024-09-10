@@ -32,6 +32,7 @@ export default function WorkspaceTable({
     t('workspace.state'),
     t('workspace.numberOfRevisions'),
     t('workspace.pid'),
+    ...((contentType == Type.Schema) ? [t('metadata.format')] : []),
     '',
   ];
 
