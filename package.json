@@ -6,8 +6,5 @@
     "datamodel-ui",
     "terminology-ui",
     "mscr-ui"
-  ],
-  "devDependencies": {
-    "husky": "^8.0.0"
-  }
+  ]
 }
