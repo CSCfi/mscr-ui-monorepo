@@ -1,9 +1,6 @@
 {
   "name": "yhteentoimiva-monorepo",
   "private": true,
-  "scripts": {
-    "prepare": "husky install"
-  },
   "workspaces": [
     "common-ui",
     "datamodel-ui",
