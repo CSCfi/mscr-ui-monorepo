@@ -12,6 +12,7 @@ export interface MenuList {
   version: boolean;
   mscrCopy: boolean;
   deleteDraft: boolean;
+  unsetRootNodeSelection: boolean;
 }
 
 const initialMenuList: MenuList = {
@@ -24,6 +25,7 @@ const initialMenuList: MenuList = {
   publish: false,
   remove: false,
   version: false,
+  unsetRootNodeSelection: false,
 };
 
 export interface ModalList {
@@ -49,6 +51,7 @@ export interface ConfirmState {
   remove: boolean;
   saveMetadata: boolean;
   setRootNodeSelection: any;
+  unsetRootNodeSelection: any;
 }
 
 const initialConfirmState: ConfirmState = {
@@ -59,6 +62,7 @@ const initialConfirmState: ConfirmState = {
   remove: false,
   saveMetadata: false,
   setRootNodeSelection: false,
+  unsetRootNodeSelection: false,
 };
 
 const initialModalList: ModalList = {

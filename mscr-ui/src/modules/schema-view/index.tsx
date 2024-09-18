@@ -32,6 +32,7 @@ import FormModal, { ModalType } from '@app/modules/form';
 import Tabmenu from '@app/common/components/tabmenu';
 import MetadataStub from '@app/modules/form/metadata-form/metadata-stub';
 import { selectIsEditContentActive } from '@app/common/components/content-view/content-view.slice';
+import {useRouter} from "next/router";
 
 export default function SchemaView({ schemaId }: { schemaId: string }) {
   const { t } = useTranslation('common');
@@ -60,6 +61,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   });
   const isNodeEditable = isEditContentActive && hasEditPermission && schemaData?.format === Format.Mscr;
   const hasCopyPermission = HasPermission({ action: 'MAKE_MSCR_COPY' });
+  const router = useRouter();// Force refresh the page
   const isMscrCopyAvailable =
     hasCopyPermission &&
     schemaData &&
@@ -108,8 +110,8 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   };
 
   const setSchemaRootSelection = () => {
-    if (schemaData && nodeSelection) {
-      patchSchemaRootSelection({schemaId: schemaData?.pid, value: nodeSelection.properties['@id']})
+    if (schemaData) {
+      patchSchemaRootSelection({schemaId: schemaData?.pid, value: nodeSelection ? nodeSelection.properties['@id'] : ''})
         .unwrap()
         .then(() => {
           dispatch(
@@ -119,7 +121,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
               'MscrSearch',
             ])
           );
-          dispatch(setNotification('SCHEMA_SET_ROOT_SELECTION'));
+          router.reload();
         });
     }
   }
@@ -224,6 +226,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
                     pid={schemaId}
                     format={schemaData.format}
                     isNodeEditable={isNodeEditable}
+                    hasCustomRoot={schemaData?.customRoot}
                   />
                 ),
               },
@@ -317,6 +320,18 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
             }
             heading={t('confirm-modal.heading')}
             text1={t('confirm-modal.set-root-selection')}
+          />
+        )}
+        {confirmModalIsOpen.unsetRootNodeSelection && (
+          <ConfirmModal
+            actionText={t('action.unsetRootSelection')}
+            cancelText={t('action.cancel')}
+            confirmAction={patchSchemaRoot}
+            onClose={() =>
+              dispatch(setConfirmModalState({ key: 'unsetRootNodeSelection', value: false }))
+            }
+            heading={t('confirm-modal.heading')}
+            text1={t('confirm-modal.unset-root-selection')}
           />
         )}
         {/*ToDo: When making a revision of an mscr copy is possible, take that into account here (Modaltype.RevisionMscr)*/}

@@ -149,6 +149,18 @@ export default function SchemaAndCrosswalkActionMenu() {
         </ActionMenuItem>
       );
     }
+    if (menuState.unsetRootNodeSelection) {
+      items.push(
+        <ActionMenuItem
+          key={'unsetRootNodeSelection'}
+          onClick={() =>
+            dispatch(setConfirmModalState({ key: 'unsetRootNodeSelection', value: true }))
+          }
+        >
+          {t('actionmenu.unsetRootNodeSelection')}
+        </ActionMenuItem>
+      );
+    }
     if (menuState.deleteDraft) {
       items.push(
         <ActionMenuItem

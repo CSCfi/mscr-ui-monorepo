@@ -11,7 +11,9 @@
     "invalidate": "Invalidate",
     "publish": "Publish",
     "save": "Save",
-    "schema-actions": "Schema actions"
+    "schema-actions": "Schema actions",
+    "setRootSelection": "Set custom root",
+    "unsetRootSelection": "Reset root selection"
   },
   "actionmenu": {
     "delete-crosswalk": "Delete crosswalk",
@@ -28,7 +30,8 @@
     "mscr-copy": "Make MSCR copy",
     "publish-crosswalk": "Publish crosswalk",
     "publish-schema": "Publish schema",
-    "revision": "Add new revision"
+    "revision": "Add new revision",
+    "unsetRootNodeSelection": "Reset custom root selection"
   },
   "and": "and",
   "association": "",
@@ -74,7 +77,9 @@
     "publish-crosswalk1": "Are you sure you want to publish the crosswalk?",
     "publish-crosswalk2": "After publishing, you cannot make changes to mappings in crosswalk.",
     "publish-schema": "Are you sure you want to publish the schema?",
-    "save": "Are you sure you want to save changes?"
+    "save": "Are you sure you want to save changes?",
+    "set-root-selection": "Are you sure you want to set custom root element?",
+    "unset-root-selection": "Are you sure you want to reset custom root selection?"
   },
   "confirm-page-leave": "Are you sure you want to leave the page? Changes you made won't be saved.",
   "content-form": {
@@ -266,7 +271,8 @@
     "schema-finish-editing": "Schema editing disabled",
     "schema-invalidated": "Schema invalidated",
     "schema-published": "Schema published successfully",
-    "schema-saved": "Schema metadata saved successfully"
+    "schema-saved": "Schema metadata saved successfully",
+    "set-root-selection": "Root element changed successfully"
   },
   "organization": "",
   "organizations-and-roles": "",

@@ -76,7 +76,7 @@ export const schemaApi = createApi({
     }),
     patchSchemaRootSelection: builder.mutation<any, any>({
       query: (value) => ({
-        url: `/schema/${value.schemaId}/rootResource?value=${encodeURIComponent(value.value)}`,
+        url: value.value ? `/schema/${value.schemaId}/rootResource?value=${encodeURIComponent(value.value)}` : `/schema/${value.schemaId}/rootResource`,
         method: 'PATCH',
       }),
     }),

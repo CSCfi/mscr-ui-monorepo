@@ -11,7 +11,9 @@
     "invalidate": "",
     "publish": "",
     "save": "",
-    "schema-actions": ""
+    "schema-actions": "",
+    "setRootSelection": "",
+    "unsetRootSelection": ""
   },
   "actionmenu": {
     "delete-crosswalk": "",
@@ -28,7 +30,8 @@
     "mscr-copy": "",
     "publish-crosswalk": "",
     "publish-schema": "",
-    "revision": ""
+    "revision": "",
+    "unsetRootNodeSelection": ""
   },
   "and": "",
   "association": "",
@@ -74,7 +77,9 @@
     "publish-crosswalk1": "",
     "publish-crosswalk2": "",
     "publish-schema": "",
-    "save": ""
+    "save": "",
+    "set-root-selection": "",
+    "unset-root-selection": ""
   },
   "confirm-page-leave": "",
   "content-form": {
@@ -266,7 +271,8 @@
     "schema-finish-editing": "",
     "schema-invalidated": "",
     "schema-published": "",
-    "schema-saved": ""
+    "schema-saved": "",
+    "set-root-selection": ""
   },
   "organization": "",
   "organizations-and-roles": "",

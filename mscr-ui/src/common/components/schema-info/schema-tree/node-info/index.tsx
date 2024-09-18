@@ -14,6 +14,7 @@ export default function NodeInfo(props: {
   treeData: RenderTree[];
   dataIsLoaded: boolean;
   isNodeEditable?: boolean;
+  hasCustomRoot?: boolean;
 }) {
   const dispatch = useStoreDispatch();
   const { t } = useTranslation('common');
@@ -70,9 +71,13 @@ export default function NodeInfo(props: {
     return input;
   }
 
-  function seAsRootNode(node: any) {
+  function setAsRootNode(node: any) {
     dispatch(setNodeSelection(node));
-    dispatch(setConfirmModalState({ key: 'setRootNodeSelection', value: true }))
+    if (node) {
+      dispatch(setConfirmModalState({ key: 'setRootNodeSelection', value: true }));
+    } else {
+      dispatch(setConfirmModalState({ key: 'unsetRootNodeSelection', value: true }));
+      }
   }
 
   return (
@@ -124,8 +129,11 @@ export default function NodeInfo(props: {
               </Dropdown>
             </DropdownWrapper>
           )}
-          {props.isNodeEditable && <Button variant="secondaryNoBorder" onClick={() => seAsRootNode(selectedNode)}>
+          {props.isNodeEditable && !isLeafNode && !props.hasCustomRoot &&<Button variant="secondary" className="mb-1" onClick={() => setAsRootNode(selectedNode)}>
               Set as root node
+          </Button>}
+          {props.isNodeEditable && props.hasCustomRoot && <Button variant="secondary" onClick={() => setAsRootNode(undefined)}>
+              Unset custom root node
           </Button>}
           <div>
             <div className="row">
@@ -146,7 +154,8 @@ export default function NodeInfo(props: {
                   </div>
                 </div>
               ))}
-              {props.isNodeEditable &&
+              //TODO: finish implementation and remove false
+              {false && props.isNodeEditable &&
                 isLeafNode &&
                 nodeTypeAttribute !== '' && (
                   <div className="col-12" key={self.crypto.randomUUID()}>

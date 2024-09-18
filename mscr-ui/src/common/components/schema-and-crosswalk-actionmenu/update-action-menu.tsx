@@ -17,16 +17,21 @@ export function updateActionMenu(
   hasEditPermission: boolean,
   isMscrCopyAvailable?: boolean
 ) {
+
   dispatch(resetMenuList());
   if (!contentData || contentData.state === State.Removed) {
     return;
+  }
+  if (contentData?.customRoot) {
+    dispatch(setMenuList(['unsetRootNodeSelection']));
   }
   dispatch(setIsCrosswalk(contentType === Type.Crosswalk));
   if (isMscrCopyAvailable) {
     dispatch(setMenuList(['mscrCopy']));
   }
-  if (!hasEditPermission) return;
+    if (!hasEditPermission) return;
   dispatch(setMenuList(['editMetadata']));
+
   switch (contentData.state) {
     case State.Draft:
       dispatch(setMenuList(['deleteDraft', 'publish']));
