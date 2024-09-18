@@ -132,8 +132,8 @@ export default function NodeInfo(props: {
           {props.isNodeEditable && !isLeafNode && !props.hasCustomRoot &&<Button variant="secondary" className="mb-1" onClick={() => setAsRootNode(selectedNode)}>
               Set as root node
           </Button>}
-          {props.isNodeEditable && props.hasCustomRoot && <Button variant="secondary" onClick={() => setAsRootNode(undefined)}>
-              Unset custom root node
+          {props.isNodeEditable && props.hasCustomRoot && <Button variant="secondary" className="mb-1" onClick={() => setAsRootNode(undefined)}>
+              Reset custom root node
           </Button>}
           <div>
             <div className="row">
@@ -154,7 +154,7 @@ export default function NodeInfo(props: {
                   </div>
                 </div>
               ))}
-              //TODO: finish implementation and remove false
+              {/*TODO: finish implementation and remove false*/}
               {false && props.isNodeEditable &&
                 isLeafNode &&
                 nodeTypeAttribute !== '' && (
