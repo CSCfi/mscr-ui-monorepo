@@ -48,6 +48,7 @@ export interface ConfirmState {
   publish: boolean;
   remove: boolean;
   saveMetadata: boolean;
+  setRootNodeSelection: any;
 }
 
 const initialConfirmState: ConfirmState = {
@@ -57,6 +58,7 @@ const initialConfirmState: ConfirmState = {
   publish: false,
   remove: false,
   saveMetadata: false,
+  setRootNodeSelection: false,
 };
 
 const initialModalList: ModalList = {
@@ -65,6 +67,7 @@ const initialModalList: ModalList = {
 };
 
 const initialState = {
+  nodeSelections: undefined,
   isCrosswalk: false,
   menuList: initialMenuList,
   modal: initialModalList,
@@ -74,6 +77,12 @@ export const actionmenuSlice = createSlice({
   name: 'actionmenu',
   initialState: initialState,
   reducers: {
+    setNodeSelections(state, action) {
+      return {
+        ...state,
+        nodeSelections: action.payload,
+      };
+    },
     setIsCrosswalk(state, action) {
       return {
         ...state,
@@ -133,6 +142,15 @@ export function selectIsCrosswalk() {
 export function setIsCrosswalk(isCrosswalk?: boolean): AppThunk {
   return (dispatch) =>
     dispatch(actionmenuSlice.actions.setIsCrosswalk(isCrosswalk ?? false));
+}
+
+export function selectNodeSelection() {
+  return (state: AppState) => state.actionmenu.nodeSelections;
+}
+
+export function setNodeSelection(nodeSelections: any): AppThunk {
+  return (dispatch) =>
+    dispatch(actionmenuSlice.actions.setNodeSelections(nodeSelections));
 }
 
 export function selectMenuList() {

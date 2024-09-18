@@ -4,6 +4,7 @@ import {
   useDeleteSchemaMutation,
   useGetSchemaWithRevisionsQuery,
   usePatchSchemaMutation,
+  usePatchSchemaRootSelectionMutation
 } from '@app/common/components/schema/schema.slice';
 import MetadataAndFiles from './metadata-and-files';
 import { createTheme, ThemeProvider } from '@mui/material';
@@ -14,10 +15,10 @@ import { Type } from '@app/common/interfaces/search.interface';
 import { Text } from 'suomifi-ui-components';
 import HasPermission from '@app/common/utils/has-permission';
 import { Format, formatsAvailableForMscrCopy } from '@app/common/interfaces/format.interface';
-import { useStoreDispatch } from '@app/store';
+import {AppState, useStoreDispatch} from '@app/store';
 import {
   selectConfirmModalState,
-  selectFormModalState,
+  selectFormModalState, selectMenuList, selectNodeSelection,
   setConfirmModalState,
   setFormModalState,
 } from '@app/common/components/actionmenu/actionmenu.slice';
@@ -38,8 +39,11 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   const confirmModalIsOpen = useSelector(selectConfirmModalState());
   const formModalIsOpen = useSelector(selectFormModalState());
   const isEditContentActive = useSelector(selectIsEditContentActive());
+  const nodeSelection = useSelector(selectNodeSelection());
+  const menuState = useSelector(selectMenuList());
   const [patchSchema] = usePatchSchemaMutation();
   const [deleteSchema] = useDeleteSchemaMutation();
+  const [patchSchemaRootSelection] = usePatchSchemaRootSelectionMutation();
 
   const {
     data: schemaData,
@@ -98,6 +102,27 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     const removePayload = { ...payloadBase, state: State.Removed };
     changeSchemaState(removePayload, 'SCHEMA_DELETE');
   };
+
+  const patchSchemaRoot = () => {
+    setSchemaRootSelection();
+  };
+
+  const setSchemaRootSelection = () => {
+    if (schemaData && nodeSelection) {
+      patchSchemaRootSelection({schemaId: schemaData?.pid, value: nodeSelection.properties['@id']})
+        .unwrap()
+        .then(() => {
+          dispatch(
+            mscrSearchApi.util.invalidateTags([
+              'PersonalContent',
+              'OrgContent',
+              'MscrSearch',
+            ])
+          );
+          dispatch(setNotification('SCHEMA_SET_ROOT_SELECTION'));
+        });
+    }
+  }
 
   const changeSchemaState = (
     payload: StatePayload,
@@ -280,6 +305,18 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
             }
             heading={t('confirm-modal.heading')}
             text1={t('confirm-modal.deprecate-schema')}
+          />
+        )}
+        {confirmModalIsOpen.setRootNodeSelection && (
+          <ConfirmModal
+            actionText={t('action.setRootSelection')}
+            cancelText={t('action.cancel')}
+            confirmAction={patchSchemaRoot}
+            onClose={() =>
+              dispatch(setConfirmModalState({ key: 'setRootNodeSelection', value: false }))
+            }
+            heading={t('confirm-modal.heading')}
+            text1={t('confirm-modal.set-root-selection')}
           />
         )}
         {/*ToDo: When making a revision of an mscr copy is possible, take that into account here (Modaltype.RevisionMscr)*/}
