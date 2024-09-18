@@ -31,7 +31,7 @@ export default function NodeInfo(props: {
     } else {
       setSelectedNode(undefined);
     }
-  }, [props.treeData]);
+  }, [props.treeData, selectedNode]);
 
   const handleDropDownSelect = (nodeId: string) => {
     const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
@@ -129,7 +129,7 @@ export default function NodeInfo(props: {
               </Dropdown>
             </DropdownWrapper>
           )}
-          {props.isNodeEditable && !isLeafNode && !props.hasCustomRoot &&<Button variant="secondary" className="mb-1" onClick={() => setAsRootNode(selectedNode)}>
+          {props.isNodeEditable && selectedNode && selectedNode?.elementPath !== 'ROOT' && !isLeafNode && !props.hasCustomRoot &&<Button variant="secondary" className="mb-1" onClick={() => setAsRootNode(selectedNode)}>
               Set as root node
           </Button>}
           {props.isNodeEditable && props.hasCustomRoot && <Button variant="secondary" className="mb-1" onClick={() => setAsRootNode(undefined)}>
