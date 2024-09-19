@@ -38,6 +38,7 @@ export default function SchemaInfo(props: {
   isSingleTree?: boolean;
   isNodeEditable?: boolean;
   hasCustomRoot?: boolean;
+  scrollToSelected?: boolean;
 }) {
   const { t } = useTranslation('common');
   const lang = useRouter().locale ?? '';
@@ -160,7 +161,10 @@ export default function SchemaInfo(props: {
       setTreeExpandedArray(nodeIdsToExpand);
       setTreeSelectedArray(nodeIds);
       // Get element by id sometimes returns a null reference. Added artificial delay to mitigate the problem.
-      setTimeout(() => {  scrollToElement(props.isSourceTree, nodeIds[0]); }, 1);
+      console.log('scroll', props?.scrollToSelected);
+      if (props?.scrollToSelected){
+        setTimeout(() => {  scrollToElement(props.isSourceTree, nodeIds[0]); }, 10);
+      }
     }
   }
 

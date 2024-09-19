@@ -85,6 +85,8 @@ export default function CrosswalkEditor({
     useState<boolean>(false);
   const [isPatchMappingOperation, setIsMappingPatchOperation] =
     useState<boolean>(false);
+  const [scrollToSelectedNodes, setScrollToSelectedNodes] =
+    useState<boolean>(false);
   const [mappingToBeEdited, setMappingToBeEdited] = useState<CrosswalkConnectionNew[] | undefined>(undefined);
   const [highlightOperation, setHighlightOperation] =
     useState<highlightOperation | undefined>(undefined);
@@ -363,36 +365,44 @@ export default function CrosswalkEditor({
     nodeId?: string,
     highlightOperationId?: string
   ) => {
+    setScrollToSelectedNodes(false);
     // TODO: implement add notes from accordion if needed?
     if (action === 'remove') {
       removeMapping(mapping);
     } else if (action === 'selectFromSourceTreeByMapping') {
+      setScrollToSelectedNodes(true);
       selectFromTreeByNodeMapping(mapping, true);
     } else if (action === 'selectFromSourceTreeById') {
       if (nodeId) {
+        setScrollToSelectedNodes(true);
         setSourceTreeSelection([nodeId]);
       }
     } else if (action === 'selectFromTargetTreeByMapping') {
+      setScrollToSelectedNodes(true);
       selectFromTreeByNodeMapping(mapping, false);
     } else if (action === 'selectFromTargetTreeById') {
       if (nodeId) {
+        setScrollToSelectedNodes(true);
         setTargetTreeSelection([nodeId]);
       }
     } else if (action === 'selectFromTargetTreeByMapping') {
+      setScrollToSelectedNodes(true);
       selectFromTreeByNodeMapping(mapping, false);
     } else if (action === 'openMappingDetails') {
+      setScrollToSelectedNodes(false);
       setIsMappingPatchOperation(true);
       setPatchPid(mapping.pid ? mapping.pid : '');
       selectFromTreeByNodeMapping(mapping, true);
       selectFromTreeByNodeMapping(mapping, false);
     } else if (action === 'highlightFunctionField') {
+      setScrollToSelectedNodes(false);
       setHighlightOperation({operationId: highlightOperationId ? highlightOperationId : '', nodeId: nodeId});
-
       setIsMappingPatchOperation(true);
       setPatchPid(mapping.pid ? mapping.pid : '');
       selectFromTreeByNodeMapping(mapping, true);
       selectFromTreeByNodeMapping(mapping, false);
     } else if (action === 'removeMapping') {
+      setScrollToSelectedNodes(false);
       removeMapping(mapping.pid);
     }
   };
@@ -458,6 +468,7 @@ export default function CrosswalkEditor({
               treeSelection={sourceTreeSelection}
               caption={t('crosswalk-editor.search-from-source-schema')}
               schemaUrn={sourceSchemaUrn}
+              scrollToSelected={scrollToSelectedNodes}
             />
           </div>
 
@@ -495,6 +506,7 @@ export default function CrosswalkEditor({
               treeSelection={targetTreeSelection}
               caption={t('crosswalk-editor.search-from-target-schema')}
               schemaUrn={targetSchemaUrn}
+              scrollToSelected={scrollToSelectedNodes}
             />
           </div>
         </div>

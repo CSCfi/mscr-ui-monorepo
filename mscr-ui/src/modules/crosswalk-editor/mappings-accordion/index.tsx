@@ -347,6 +347,7 @@ export default function MappingsAccordion(props: any) {
   useEffect(() => {
     setMappingData(props.nodeMappings);
     setShowAttributeNames(props.showAttributeNames);
+    console.log('mappingData', props);
   }, [props]);
   const nodeMappingsInput = props.nodeMappings;
   return (
