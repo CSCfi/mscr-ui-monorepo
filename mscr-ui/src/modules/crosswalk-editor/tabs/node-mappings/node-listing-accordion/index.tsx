@@ -333,9 +333,10 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
   const [mappingFunctions, setMappingFunctions] = useState<any>([]);
 
   function generateAccordionNodes() {
+    console.log(props.nodes);
     let newNodes: NodeListingRow[] = [];
     if (props.isSourceAccordion) {
-      // Source
+      // Source accordion
       if (props.isOneToManyMapping) {
         let newNode: NodeListingRow = {
           description: props.nodes[0].source.properties.description,
@@ -358,7 +359,7 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
         });
       }
     } else {
-      // Target
+      // Target accordion
       if (props.isOneToManyMapping) {
         props.nodes.forEach((node: CrosswalkConnectionNew) => {
           let newNode: NodeListingRow = {
@@ -376,11 +377,12 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
           processingSelection: props.isSourceAccordion ? (props.nodes[0].sourceProcessing?.id ?? '') : (props.nodes[0].targetProcessing?.id ?? ''),
           processing: props.isSourceAccordion ? (props.nodes[0].sourceProcessing) : (props.nodes[0].targetProcessing),
           type: props.isSourceAccordion ? (props.nodes[0].source.properties.type) : (props.nodes[0].target.properties.type),
-          isSelected: false, notes: undefined, name: props.isSourceAccordion ? (props.nodes[0].target.name) : (props.nodes[0].source.name), id: props.isSourceAccordion ? (props.nodes[0].target.id) : (props.nodes[0].source.id)
+          isSelected: false, notes: undefined, name: props.nodes[0].target.name, id: props.nodes[0].target.id
         }
         newNodes.push(newNode);
       }
     }
+    console.log('nenodes', newNodes);
     setNodeData(newNodes);
     setShowAttributeNames(props.showAttributeNames);
     if (props?.mappingFunctions) {
