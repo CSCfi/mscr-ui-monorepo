@@ -333,7 +333,6 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
   const [mappingFunctions, setMappingFunctions] = useState<any>([]);
 
   function generateAccordionNodes() {
-    console.log(props.nodes);
     let newNodes: NodeListingRow[] = [];
     if (props.isSourceAccordion) {
       // Source accordion
@@ -382,7 +381,6 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
         newNodes.push(newNode);
       }
     }
-    console.log('nenodes', newNodes);
     setNodeData(newNodes);
     setShowAttributeNames(props.showAttributeNames);
     if (props?.mappingFunctions) {
