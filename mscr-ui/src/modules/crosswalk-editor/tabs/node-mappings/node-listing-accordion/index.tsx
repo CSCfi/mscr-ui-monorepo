@@ -340,8 +340,8 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
       if (props.isOneToManyMapping) {
         let newNode: NodeListingRow = {
           description: props.nodes[0].source.properties.description,
-          processingSelection: props.isSourceAccordion ? (props.nodes[0].sourceProcessing?.id ?? '') : (props.nodes[0].targetProcessing?.id ?? ''),
-          processing: props.isSourceAccordion ? (props.nodes[0].sourceProcessing) : (props.nodes[0].targetProcessing),
+          processingSelection: props.nodes[0].sourceProcessing?.id,
+          processing: props.nodes[0].sourceProcessing,
           type: props.nodes[0].source.properties.type,
           isSelected: false, notes: undefined, name: props.nodes[0].source.name, id: props.nodes[0].source.id
         }
@@ -350,8 +350,8 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
         props.nodes.forEach((node: CrosswalkConnectionNew) => {
           let newNode: NodeListingRow = {
             description: node?.source.properties.description,
-            processingSelection: props.isSourceAccordion ? (node?.sourceProcessing?.id ?? '') : (node?.targetProcessing?.id ?? ''),
-            processing: props.isSourceAccordion ? node?.sourceProcessing : node?.targetProcessing,
+            processingSelection: node?.sourceProcessing?.id,
+            processing: node?.sourceProcessing,
             type: node?.source.properties.type,
             isSelected: false, notes: undefined, name: node.source.name, id: node.source.id
           }
@@ -364,8 +364,8 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
         props.nodes.forEach((node: CrosswalkConnectionNew) => {
           let newNode: NodeListingRow = {
             description: node?.target.properties.description,
-            processingSelection: props.isSourceAccordion ? (node?.sourceProcessing?.id ?? '') : (node?.targetProcessing?.id ?? ''),
-            processing: props.isSourceAccordion ? node?.sourceProcessing : node?.targetProcessing,
+            processingSelection: node?.targetProcessing?.id,
+            processing: node?.targetProcessing,
             type: node?.target.properties.type,
             isSelected: false, notes: undefined, name: node.target.name, id: node.target.id
           }
@@ -374,9 +374,9 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
       } else {
         let newNode: NodeListingRow = {
           description: props.nodes[0].target.properties.description,
-          processingSelection: props.isSourceAccordion ? (props.nodes[0].sourceProcessing?.id ?? '') : (props.nodes[0].targetProcessing?.id ?? ''),
-          processing: props.isSourceAccordion ? (props.nodes[0].sourceProcessing) : (props.nodes[0].targetProcessing),
-          type: props.isSourceAccordion ? (props.nodes[0].source.properties.type) : (props.nodes[0].target.properties.type),
+          processingSelection: props.nodes[0].targetProcessing?.id,
+          processing: props.nodes[0].targetProcessing,
+          type: props.nodes[0].target.properties.type,
           isSelected: false, notes: undefined, name: props.nodes[0].target.name, id: props.nodes[0].target.id
         }
         newNodes.push(newNode);
