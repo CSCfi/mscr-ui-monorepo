@@ -319,7 +319,7 @@ export default function SchemaInfo(props: {
                   treeExpanded={treeExpandedArray}
                   performTreeAction={performCallbackFromTreeAction}
                   showQname={!showAttributeNames}
-                  treeId={props.isSourceTree}
+                  isSourceTree={props.isSourceTree}
                 />
               )}
             </Box>

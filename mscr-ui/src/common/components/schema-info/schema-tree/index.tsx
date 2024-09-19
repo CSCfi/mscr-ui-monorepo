@@ -44,14 +44,14 @@ export default function SchemaTree({
   nodes,
   treeSelectedArray,
   treeExpanded,
-  performTreeAction, showQname, treeId
+  performTreeAction, showQname, isSourceTree
 }: {
   nodes: RenderTree;
   treeSelectedArray: string[];
   treeExpanded: string[];
   performTreeAction: (action: string, nodeIds: string[]) => void;
   showQname: boolean;
-  treeId: boolean | undefined;
+  isSourceTree: boolean | undefined;
 }) {
   const { t } = useTranslation('common');
 
@@ -69,7 +69,7 @@ export default function SchemaTree({
   // console.log('TREEVIEW DATA', nodes, treeSelectedArray);
   return (
     <TreeView
-      id={treeId ? 'source' : 'target'}
+      id={isSourceTree ? 'source' : 'target'}
       aria-label={t('schema-tree.tree-label')}
       expanded={treeExpanded}
       selected={treeSelectedArray}
