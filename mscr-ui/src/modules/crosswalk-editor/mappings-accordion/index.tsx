@@ -77,6 +77,16 @@ function Row(props: {
 }) {
   const [open, setOpen] = React.useState(false);
 
+  function selectFromTrees(row: any, mappingId: any, isSourceTree: boolean) {
+    props.callBackFunction.performAccordionAction(
+      row,
+      'selectFromTreesByMapping',
+      mappingId,
+      '',
+      isSourceTree
+    );
+  };
+
   return (
     <>
       <StyledTableRow className="accordion-row row">
@@ -90,13 +100,9 @@ function Row(props: {
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title="Select linked node from source tree"
+                        title="Select linked nodes from schema trees"
                         onClick={(e) => {
-                          props.callBackFunction.performAccordionAction(
-                            props.row,
-                            props.row.source.length > 1 ? 'selectFromSourceTreeById' : 'selectFromSourceTreeByMapping',
-                            mapping.id
-                          );
+                          selectFromTrees(props.row, mapping.id, true);
                           e.stopPropagation();
                         }}
                       >{props.showAttributeNames ? mapping.label : mapping.id}</StyledButton>
@@ -196,13 +202,9 @@ function Row(props: {
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title="Select linked node from target tree"
+                        title="Select linked nodes from schema trees"
                         onClick={(e) => {
-                          props.callBackFunction.performAccordionAction(
-                            props.row,
-                            props.row.target.length > 1 ? 'selectFromTargetTreeById' : 'selectFromTargetTreeByMapping',
-                            mapping.id
-                          );
+                          selectFromTrees(props.row, mapping.id, false);
                           e.stopPropagation();
                         }}
                       >{props.showAttributeNames ? mapping.label : mapping.id}</StyledButton>
@@ -347,7 +349,6 @@ export default function MappingsAccordion(props: any) {
   useEffect(() => {
     setMappingData(props.nodeMappings);
     setShowAttributeNames(props.showAttributeNames);
-    console.log('mappingData', props);
   }, [props]);
   const nodeMappingsInput = props.nodeMappings;
   return (

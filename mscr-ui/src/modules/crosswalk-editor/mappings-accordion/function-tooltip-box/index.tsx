@@ -120,7 +120,7 @@ export default function FunctionTooltipBox(props: {
                   tooltipClick();
                   props.callBackFunction.performAccordionAction(
                     props.row,
-                    'highlightFunctionField', props.processingId, props.functionName
+                    'highlightFunctionField', props.processingId, props.functionName, false
                   );
                 }}
               >

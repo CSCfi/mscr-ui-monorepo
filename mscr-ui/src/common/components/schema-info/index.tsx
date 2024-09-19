@@ -38,7 +38,7 @@ export default function SchemaInfo(props: {
   isSingleTree?: boolean;
   isNodeEditable?: boolean;
   hasCustomRoot?: boolean;
-  scrollToSelected?: boolean;
+  scrollToSelectedNodeId?: string;
 }) {
   const { t } = useTranslation('common');
   const lang = useRouter().locale ?? '';
@@ -161,9 +161,9 @@ export default function SchemaInfo(props: {
       setTreeExpandedArray(nodeIdsToExpand);
       setTreeSelectedArray(nodeIds);
       // Get element by id sometimes returns a null reference. Added artificial delay to mitigate the problem.
-      console.log('scroll', props?.scrollToSelected);
-      if (props?.scrollToSelected){
-        setTimeout(() => {  scrollToElement(props.isSourceTree, nodeIds[0]); }, 10);
+      console.log('scroll', props?.scrollToSelectedNodeId);
+      if (props?.scrollToSelectedNodeId){
+        setTimeout(() => {  scrollToElement(props.isSourceTree, props.scrollToSelectedNodeId); }, 10);
       }
     }
   }
@@ -221,10 +221,12 @@ export default function SchemaInfo(props: {
     }
   };
 
-  function scrollToElement(isSourceTree: boolean | undefined, elementId: string) {
-    const elementRef = document.getElementById(isSourceTree ? 'source-' + elementId : 'target-' + elementId);
-    if (elementRef) {
-      elementRef.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+  function scrollToElement(isSourceTree: boolean | undefined, elementId: string | undefined) {
+    if (elementId) {
+      const elementRef = document.getElementById(isSourceTree ? 'source-' + elementId : 'target-' + elementId);
+      if (elementRef) {
+        elementRef.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+      }
     }
   }
 
