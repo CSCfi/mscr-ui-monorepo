@@ -36,13 +36,11 @@ export default function NodeInfo(props: {
     } else {
       setSelectedNode(undefined);
     }
-  }, [props.treeData, selectedNode, props.currentlySelectedNodeId]);
-
-  useEffect(() => {
-  }, [props.currentlySelectedNodeId]);
+  }, [props.treeData, props.currentlySelectedNodeId]);
 
 
   const handleDropDownSelect = (nodeId: string) => {
+    console.log('nodeid', nodeId);
     const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
     setSelectedNode(newSelectedNode ?? selectedNode);
   };
