@@ -340,7 +340,7 @@ export default function CrosswalkEditor({
     return results;
   }
 
-  // Called from accordion
+  // Called from mappings list
   const selectFromTreeByNodeMapping = (
     node: NodeMapping | undefined,
     isSourceTree: boolean
@@ -368,23 +368,18 @@ export default function CrosswalkEditor({
       removeMapping(mapping);
     } else if (action === 'selectFromSourceTreeByMapping') {
       selectFromTreeByNodeMapping(mapping, true);
-      scrollToTop();
     } else if (action === 'selectFromSourceTreeById') {
       if (nodeId) {
         setSourceTreeSelection([nodeId]);
       }
-      scrollToTop();
     } else if (action === 'selectFromTargetTreeByMapping') {
       selectFromTreeByNodeMapping(mapping, false);
-      scrollToTop();
     } else if (action === 'selectFromTargetTreeById') {
       if (nodeId) {
         setTargetTreeSelection([nodeId]);
       }
-      scrollToTop();
     } else if (action === 'selectFromTargetTreeByMapping') {
       selectFromTreeByNodeMapping(mapping, false);
-      scrollToTop();
     } else if (action === 'openMappingDetails') {
       setIsMappingPatchOperation(true);
       setPatchPid(mapping.pid ? mapping.pid : '');
@@ -449,13 +444,6 @@ export default function CrosswalkEditor({
       setNodeMappingsModalOpen(false);
       patchMapping({payload: mappingPayload, pid: patchPid});
     }
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
   };
 
   return (

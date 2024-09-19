@@ -159,6 +159,8 @@ export default function SchemaInfo(props: {
       const nodeIdsToExpand = getAllNodeIdsOnPathToLeaf(nodeIds);
       setTreeExpandedArray(nodeIdsToExpand);
       setTreeSelectedArray(nodeIds);
+      // Get element by id sometimes returns a null reference. Added artificial delay to mitigate the problem.
+      setTimeout(() => {  scrollToElement(props.isSourceTree, nodeIds[0]); }, 1);
     }
   }
 
@@ -214,6 +216,13 @@ export default function SchemaInfo(props: {
       handleTreeToggle(nodeIds);
     }
   };
+
+  function scrollToElement(isSourceTree: boolean | undefined, elementId: string) {
+    const elementRef = document.getElementById(isSourceTree ? 'source-' + elementId : 'target-' + elementId);
+    if (elementRef) {
+      elementRef.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+    }
+  }
 
   return (
     <>
@@ -310,6 +319,7 @@ export default function SchemaInfo(props: {
                   treeExpanded={treeExpandedArray}
                   performTreeAction={performCallbackFromTreeAction}
                   showQname={!showAttributeNames}
+                  treeId={props.isSourceTree}
                 />
               )}
             </Box>
