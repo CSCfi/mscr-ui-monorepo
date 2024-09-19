@@ -12,6 +12,7 @@ import {useStoreDispatch} from '@app/store';
 
 export default function NodeInfo(props: {
   treeData: RenderTree[];
+  currentlySelectedNodeId: string | undefined;
   dataIsLoaded: boolean;
   isNodeEditable?: boolean;
   hasCustomRoot?: boolean;
@@ -27,11 +28,19 @@ export default function NodeInfo(props: {
   useEffect(() => {
     if (props.treeData && props.treeData.length > 0) {
       setDropDownList(props.treeData);
-      setSelectedNode(props.treeData[0]);
+      if (props.currentlySelectedNodeId) {
+        handleDropDownSelect(props.currentlySelectedNodeId);
+      } else {
+        setSelectedNode(props.treeData[0]);
+      }
     } else {
       setSelectedNode(undefined);
     }
-  }, [props.treeData, selectedNode]);
+  }, [props.treeData, selectedNode, props.currentlySelectedNodeId]);
+
+  useEffect(() => {
+  }, [props.currentlySelectedNodeId]);
+
 
   const handleDropDownSelect = (nodeId: string) => {
     const newSelectedNode = props.treeData.find((item) => item.id === nodeId);

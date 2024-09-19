@@ -55,6 +55,7 @@ export default function SchemaInfo(props: {
   const [treeExpandedArray, setTreeExpandedArray] = useState<string[]>([]);
   // These are used by datamodel
   const [selectedTreeNodes, setSelectedTreeNodes] = useState<RenderTree[]>([]);
+  const [currentlySelectedNodeId, setCurrentlySelectedNodeId] = useState<string | undefined>(undefined);
 
   const [isTreeDataFetched, setTreeDataFetched] = useState<boolean>(false);
 
@@ -77,6 +78,8 @@ export default function SchemaInfo(props: {
           setTreeData(res);
           setTreeDataFetched(true);
           setNodeIdToNodeDictionary(nodeIdToShallowNode);
+
+
           //refetchOriginalSourceSchemaData();
         }
       });
@@ -161,8 +164,8 @@ export default function SchemaInfo(props: {
       setTreeExpandedArray(nodeIdsToExpand);
       setTreeSelectedArray(nodeIds);
       // Get element by id sometimes returns a null reference. Added artificial delay to mitigate the problem.
-      console.log('scroll', props?.scrollToSelectedNodeId);
-      if (props?.scrollToSelectedNodeId){
+      if (props?.scrollToSelectedNodeId) {
+        setCurrentlySelectedNodeId(props?.scrollToSelectedNodeId);
         setTimeout(() => {  scrollToElement(props.isSourceTree, props.scrollToSelectedNodeId); }, 10);
       }
     }
@@ -334,6 +337,7 @@ export default function SchemaInfo(props: {
         <NodeInfoWrapper className="col-5 px-0">
           <NodeInfo
             treeData={selectedTreeNodes}
+            currentlySelectedNodeId={currentlySelectedNodeId}
             dataIsLoaded={isTreeDataFetched}
             isNodeEditable={props.isNodeEditable}
             hasCustomRoot={props.hasCustomRoot}
