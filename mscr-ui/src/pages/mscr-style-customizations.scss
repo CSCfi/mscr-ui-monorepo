@@ -112,13 +112,33 @@ body {
     }
   }
   &.mscr-copy-modal {
-    min-height: 270px;
-    height: calc(100% - 570px);
-    @media screen and (min-height: 900px) {
-      height: calc(100% - 650px);
+    height: calc(100% - 260px);
+    @media screen and (min-height: 610px) {
+      height: calc(100% - 350px);
+    }
+    @media screen and (min-height: 700px) {
+      height: calc(100% - 430px);
+    }
+    @media screen and (min-height: 780px) {
+      height: calc(100% - 510px);
+    }
+    @media screen and (min-height: 860px) {
+      height: calc(100% - 590px);
+    }
+    @media screen and (min-height: 950px) {
+      height: calc(100% - 690px);
+    }
+    @media screen and (min-height: 1030px) {
+      height: calc(100% - 770px);
+    }
+    @media screen and (min-height: 1120px) {
+      height: calc(100% - 850px);
     }
     @media screen and (min-height: 1200px) {
-      height: calc(100% - 650px);
+      height: calc(100% - 940px);
+    }
+    @media screen and (min-height: 1300px) {
+      height: calc(100% - 1050px);
     }
   }
   &.crosswalk-registration-modal {
