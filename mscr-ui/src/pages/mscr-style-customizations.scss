@@ -100,16 +100,15 @@ body {
   max-width: 740px;
 
   &.schema-registration-modal {
-    min-height: 390px;
-    height: calc(100% - 400px);
-    @media screen and (min-height: 500px) {
-      height: calc(100% - 550px);
+    height: calc(100% - 255px);
+    @media screen and (min-height: 735px) {
+      height: calc(100% - 255px);
     }
-    @media screen and (min-height: 850px) {
-      height: calc(100% - 280px);
+    @media screen and (min-height: 1155px) {
+      height: calc(100% - 380px);
     }
     @media screen and (min-height: 1200px) {
-      height: calc(100% - 450px);
+      height: calc(100% - 480px);
     }
   }
   &.mscr-copy-modal {
@@ -123,50 +122,39 @@ body {
     }
   }
   &.crosswalk-registration-modal {
-    min-height: 230px;
-    height: calc(100% - 50vh);
-    @media screen and (min-height: 500px) {
-      height: calc(100% - 48vh);
+    height: calc(100% - 250px);
+    @media screen and (min-height: 860px) {
+      height: calc(100% - 250px);
     }
-    @media screen and (min-height: 600px) {
-      height: calc(100% - 40vh);
+    @media screen and (min-height: 940px) {
+      height: calc(100% - 260px);
     }
-    @media screen and (min-height: 700px) {
-      height: calc(100% - 34vh);
+    @media screen and (min-height: 1255px) {
+      height: calc(100% - 280px);
     }
-    @media screen and (min-height: 800px) {
-      height: calc(100% - 30vh);
-    }
-    @media screen and (min-height: 950px) {
-      height: calc(100% - 25vh);
-    }
-    @media screen and (min-height: 1000px) {
-      height: calc(100% - 27vh);
-    }
-    @media screen and (min-height: 1125px) {
-      height: calc(100% - 33vh);
-    }
-    @media screen and (min-height: 1225px) {
-      height: calc(100% - 46vh);
-    }
-
   }
   &.crosswalk-creation-modal {
-    height: calc(100% - 48vh);
-    @media screen and (min-height: 600px) {
-      height: calc(100% - 40vh);
+    height: calc(100% - 290px);
+    @media screen and (min-height: 790px) {
+      height: calc(100% - 290px);
     }
-    @media screen and (min-height: 650px) {
-      height: calc(100% - 48vh);
+    @media screen and (min-height: 860px) {
+      height: calc(100% - 430px);
     }
-    @media screen and (min-height: 800px) {
-      height: calc(100% - 57vh);
+    @media screen and (min-height: 940px) {
+      height: calc(100% - 500px);
     }
-    @media screen and (min-height: 950px) {
-      height: calc(100% - 64vh);
+    @media screen and (min-height: 1000px) {
+      height: calc(100% - 550px);
     }
-    @media screen and (min-height: 1150px) {
-      height: calc(100% - 70vh);
+    @media screen and (min-height: 1080px) {
+      height: calc(100% - 640px);
+    }
+    @media screen and (min-height: 1170px) {
+      height: calc(100% - 730px);
+    }
+    @media screen and (min-height: 1255px) {
+      height: calc(100% - 825px);
     }
   }
   &.schema-tree-single {

@@ -57,6 +57,7 @@ import {
 import { NotificationKeys } from '@app/common/interfaces/notifications.interface';
 import { InputErrors, validateForm } from '@app/modules/form/validate-form';
 import generatePayload from '@app/modules/form/generate-payload';
+import {CloseButton} from "@app/modules/form/form.styles";
 
 export enum ModalType {
   RegisterNewFull = 'REGISTER_NEW_FULL',
@@ -108,7 +109,7 @@ export default function FormModal({
   const [putSchemaMscrCopy, resultSchemaMscrCopy] =
     usePutSchemaMscrCopyMutation();
   const [submitAnimationVisible, setSubmitAnimationVisible] =
-    useState<boolean>(true);
+    useState<boolean>(false);
 
   const formDataFromInitialData = useCallback(() => {
     if (!initialData) return;
@@ -307,7 +308,7 @@ export default function FormModal({
   const spinnerDelay = async () => {
     setSubmitAnimationVisible(true);
     if (!(errors && Object.values(errors).includes(true))) {
-      await delay(20000);
+      await delay(2000);
     }
     return Promise.resolve();
   };
@@ -380,7 +381,7 @@ export default function FormModal({
         });
       } else if (
         initialData &&
-        modalType == ModalType.McsrCopy &&
+        modalType == ModalType.MscrCopy &&
         contentType == Type.Schema
       ) {
         Promise.all([
@@ -584,26 +585,26 @@ export default function FormModal({
               {contentType == Type.Schema
                 ? modalType == ModalType.RegisterNewFull
                   ? t('content-form.title.schema-register')
-                  : modalType == ModalType.McsrCopy
+                  : modalType == ModalType.MscrCopy
                   ? t('content-form.title.schema-mscr-copy')
                   : t('content-form.title.schema-revision')
                 : modalType == ModalType.RegisterNewFull
                 ? t('content-form.title.crosswalk-register')
                 : modalType == ModalType.RegisterNewMscr
                 ? t('content-form.title.crosswalk-create')
-                : modalType == ModalType.McsrCopy
+                : modalType == ModalType.MscrCopy
                 ? t('content-form.title.crosswalk-mscr-copy')
                 : t('content-form.title.crosswalk-revision')}
             </ModalTitle>
           </div>
           <div className="col-4">
-            <Button
+            <CloseButton
               style={{ float: 'right' }}
               variant="secondaryNoBorder"
               icon={<IconClose />}
               aria-label="t('cancel')"
               onClick={() => handleClose()}
-            ></Button>
+            ></CloseButton>
           </div>
         </div>
 
@@ -624,7 +625,7 @@ export default function FormModal({
             hasInitialData={
               modalType == ModalType.RevisionMscr ||
               modalType == ModalType.RevisionFull ||
-              modalType == ModalType.McsrCopy
+              modalType == ModalType.MscrCopy
             }
           />
         )}
@@ -636,7 +637,7 @@ export default function FormModal({
             hasInitialData={
               modalType == ModalType.RevisionMscr ||
               modalType == ModalType.RevisionFull ||
-              modalType == ModalType.McsrCopy
+              modalType == ModalType.MscrCopy
             }
             userPosted={userPosted}
             disabled={
@@ -658,14 +659,14 @@ export default function FormModal({
           {contentType == Type.Schema
             ? modalType == ModalType.RegisterNewFull
               ? t('content-form.button.schema-register')
-              : modalType == ModalType.McsrCopy
+              : modalType == ModalType.MscrCopy
               ? t('content-form.button.mscr-copy')
               : t('content-form.button.schema-revision')
             : modalType == ModalType.RegisterNewFull
             ? t('content-form.button.crosswalk-register')
             : modalType == ModalType.RegisterNewMscr
             ? t('content-form.button.crosswalk-create')
-            : modalType == ModalType.McsrCopy
+            : modalType == ModalType.MscrCopy
             ? t('content-form.button.mscr-copy')
             : t('content-form.button.crosswalk-revision')}
         </Button>
