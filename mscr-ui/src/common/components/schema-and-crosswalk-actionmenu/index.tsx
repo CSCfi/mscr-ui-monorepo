@@ -157,7 +157,7 @@ export default function SchemaAndCrosswalkActionMenu() {
             dispatch(setConfirmModalState({ key: 'unsetRootNodeSelection', value: true }))
           }
         >
-          {t('actionmenu.unsetRootNodeSelection')}
+          {t('actionmenu.unset-root-node-selection')}
         </ActionMenuItem>
       );
     }

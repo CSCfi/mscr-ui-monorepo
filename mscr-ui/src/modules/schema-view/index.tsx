@@ -111,10 +111,6 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     changeSchemaState(removePayload, 'SCHEMA_DELETE');
   };
 
-  const patchSchemaRoot = () => {
-    setSchemaRootSelection();
-  };
-
   const setSchemaRootSelection = () => {
     if (schemaData) {
       patchSchemaRootSelection({
@@ -323,7 +319,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
           <ConfirmModal
             actionText={t('action.set-root-selection')}
             cancelText={t('action.cancel')}
-            confirmAction={patchSchemaRoot}
+            confirmAction={setSchemaRootSelection}
             onClose={() =>
               dispatch(
                 setConfirmModalState({
@@ -340,7 +336,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
           <ConfirmModal
             actionText={t('action.unset-root-selection')}
             cancelText={t('action.cancel')}
-            confirmAction={patchSchemaRoot}
+            confirmAction={setSchemaRootSelection}
             onClose={() =>
               dispatch(
                 setConfirmModalState({
