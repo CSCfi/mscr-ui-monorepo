@@ -58,7 +58,7 @@ import { NotificationKeys } from '@app/common/interfaces/notifications.interface
 import { InputErrors, validateForm } from '@app/modules/form/validate-form';
 import generatePayload from '@app/modules/form/generate-payload';
 import { resetContentView } from '@app/common/components/content-view/content-view.slice';
-import {CloseButton} from "@app/modules/form/form.styles";
+import { CloseButton } from '@app/modules/form/form.styles';
 
 export enum ModalType {
   RegisterNewFull = 'REGISTER_NEW_FULL',
@@ -78,13 +78,13 @@ interface FormModalProps {
 }
 
 export default function FormModal({
-                                    modalType,
-                                    contentType,
-                                    visible,
-                                    setVisible,
-                                    initialData,
-                                    organizationPid,
-                                  }: FormModalProps) {
+  modalType,
+  contentType,
+  visible,
+  setVisible,
+  initialData,
+  organizationPid,
+}: FormModalProps) {
   const { t } = useTranslation('common');
   const { isSmall } = useBreakpoints();
   const router = useRouter();
@@ -222,7 +222,7 @@ export default function FormModal({
             pid = resultSchemaRevision.data.pid;
           }
           break;
-        case ModalType.McsrCopy:
+        case ModalType.MscrCopy:
           if (
             contentType == Type.Schema &&
             resultSchemaMscrCopy.isSuccess &&
@@ -546,8 +546,6 @@ export default function FormModal({
     );
   }
 
-  console.log('contentType', contentType, 'modalType', modalType);
-
   return (
     <Modal
       appElementId="__next"
@@ -567,9 +565,9 @@ export default function FormModal({
                 contentType == Type.Schema
                   ? modalType == ModalType.RegisterNewFull
                     ? SpinnerType.SchemaRegistrationModal
-                    : modalType == ModalType.MscrCopy ?
-                      SpinnerType.MscrCopyModal :
-                      SpinnerType.SchemaRevisionModal
+                    : modalType == ModalType.MscrCopy
+                      ? SpinnerType.MscrCopyModal
+                      : SpinnerType.SchemaRevisionModal
                   : modalType == ModalType.RegisterNewFull
                     ? SpinnerType.CrosswalkRegistrationModal
                     : modalType == ModalType.RegisterNewMscr
