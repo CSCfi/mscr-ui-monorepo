@@ -12,8 +12,8 @@
     "publish": "Publish",
     "save": "Save",
     "schema-actions": "Schema actions",
-    "setRootSelection": "Set custom root",
-    "unsetRootSelection": "Reset root selection"
+    "set-root-selection": "Set custom root",
+    "unset-root-selection": "Reset root selection"
   },
   "actionmenu": {
     "delete-crosswalk": "Delete crosswalk",
@@ -192,7 +192,8 @@
   "link-opens-new-window-external": "",
   "mappings-accordion": {
     "clear": "Clear",
-    "filter-from-mappings": "Filter from mappings"
+    "filter-from-mappings": "Filter from mappings",
+    "select-linked-nodes": "Select linked nodes from schema trees"
   },
   "metadata": {
     "contact": "Contact",
@@ -243,8 +244,10 @@
     "make-longer-query": "Query needs to be at least two characters",
     "make-query-and-choose": "Use the search to see type selection",
     "no-results": "No results with the current query",
+    "reset-custom-root-node": "Reset custom root node",
     "select-a-node": "Nothing to show just now. Select an entity to view information.",
     "selected-node-info": "Selected node info",
+    "set-as-root-node": "Set as root node",
     "type-search": "Search for data types",
     "type-search-results-title": "Type search results",
     "type-to-search": "Type to search",

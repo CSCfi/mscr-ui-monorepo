@@ -1,5 +1,5 @@
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
-import { Dropdown, DropdownItem, ToggleButton, Button } from 'suomifi-ui-components';
+import { Dropdown, DropdownItem, Button } from 'suomifi-ui-components';
 import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { InfoIcon } from '@app/common/components/shared-icons';
@@ -7,8 +7,11 @@ import { useTranslation } from 'next-i18next';
 import { DropdownWrapper } from '@app/common/components/schema-info/schema-info.styles';
 import TypeSelector from '@app/common/components/schema-info/schema-tree/node-info/type-selector';
 import { IconLinkExternal } from 'suomifi-icons';
-import {setConfirmModalState, setNodeSelection} from '@app/common/components/actionmenu/actionmenu.slice';
-import {useStoreDispatch} from '@app/store';
+import {
+  setConfirmModalState,
+  setSelectedRootNode,
+} from '@app/common/components/actionmenu/actionmenu.slice';
+import { useStoreDispatch } from '@app/store';
 
 export default function NodeInfo(props: {
   treeData: RenderTree[];
@@ -38,9 +41,7 @@ export default function NodeInfo(props: {
     }
   }, [props.treeData, props.currentlySelectedNodeId]);
 
-
   const handleDropDownSelect = (nodeId: string) => {
-    console.log('nodeid', nodeId);
     const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
     setSelectedNode(newSelectedNode ?? selectedNode);
   };
@@ -68,7 +69,10 @@ export default function NodeInfo(props: {
   }, [isLeafNode, props.isNodeEditable, selectedNode]);
 
   function processHtmlLinks(input: string | undefined) {
-    if (input && (input.startsWith('http://') || input.startsWith('https://'))) {
+    if (
+      input &&
+      (input.startsWith('http://') || input.startsWith('https://'))
+    ) {
       return (
         <a href={input} target="_blank" rel="noreferrer">
           {input} <IconLinkExternal />
@@ -78,13 +82,17 @@ export default function NodeInfo(props: {
     return input;
   }
 
-  function setAsRootNode(node: any) {
-    dispatch(setNodeSelection(node));
+  function setAsRootNode(node: RenderTree | undefined) {
+    dispatch(setSelectedRootNode(node));
     if (node) {
-      dispatch(setConfirmModalState({ key: 'setRootNodeSelection', value: true }));
+      dispatch(
+        setConfirmModalState({ key: 'setRootNodeSelection', value: true })
+      );
     } else {
-      dispatch(setConfirmModalState({ key: 'unsetRootNodeSelection', value: true }));
-      }
+      dispatch(
+        setConfirmModalState({ key: 'unsetRootNodeSelection', value: true })
+      );
+    }
   }
 
   return (
@@ -136,12 +144,28 @@ export default function NodeInfo(props: {
               </Dropdown>
             </DropdownWrapper>
           )}
-          {props.isNodeEditable && selectedNode && selectedNode?.elementPath !== 'ROOT' && !isLeafNode && !props.hasCustomRoot &&<Button variant="secondary" className="mb-1" onClick={() => setAsRootNode(selectedNode)}>
-              Set as root node
-          </Button>}
-          {props.isNodeEditable && props.hasCustomRoot && <Button variant="secondary" className="mb-1" onClick={() => setAsRootNode(undefined)}>
-              Reset custom root node
-          </Button>}
+          {props.isNodeEditable &&
+            selectedNode &&
+            selectedNode?.elementPath !== 'ROOT' &&
+            !isLeafNode &&
+            !props.hasCustomRoot && (
+              <Button
+                variant="secondary"
+                className="mb-1"
+                onClick={() => setAsRootNode(selectedNode)}
+              >
+                {t('node-info.set-as-root-node')}
+              </Button>
+            )}
+          {props.isNodeEditable && props.hasCustomRoot && (
+            <Button
+              variant="secondary"
+              className="mb-1"
+              onClick={() => setAsRootNode(undefined)}
+            >
+              {t('node-info.reset-custom-root-node')}
+            </Button>
+          )}
           <div>
             <div className="row">
               {props.treeData.length > 1 && (
@@ -162,7 +186,8 @@ export default function NodeInfo(props: {
                 </div>
               ))}
               {/*TODO: finish implementation and remove false*/}
-              {false && props.isNodeEditable &&
+              {false &&
+                props.isNodeEditable &&
                 isLeafNode &&
                 nodeTypeAttribute !== '' && (
                   <div className="col-12" key={self.crypto.randomUUID()}>

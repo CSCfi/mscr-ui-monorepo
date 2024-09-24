@@ -7,7 +7,6 @@ import Box from '@mui/material/Box';
 import SchemaTree from '@app/common/components/schema-info/schema-tree';
 import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
-import { cloneDeep } from 'lodash';
 import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
 import { useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
@@ -55,14 +54,14 @@ export default function SchemaInfo(props: {
   const [treeExpandedArray, setTreeExpandedArray] = useState<string[]>([]);
   // These are used by datamodel
   const [selectedTreeNodes, setSelectedTreeNodes] = useState<RenderTree[]>([]);
-  const [currentlySelectedNodeId, setCurrentlySelectedNodeId] = useState<string | undefined>(undefined);
+  const [currentlySelectedNodeId, setCurrentlySelectedNodeId] = useState<
+    string | undefined
+  >(undefined);
 
   const [isTreeDataFetched, setTreeDataFetched] = useState<boolean>(false);
 
   const [showAttributeNames, setShowAttributeNames] = useState(true);
-  const [treeDataOriginal, setTreeDataOriginal] = useState<RenderTree[]>(
-    []
-  );
+  const [treeDataOriginal, setTreeDataOriginal] = useState<RenderTree[]>([]);
 
   useEffect(() => {
     if (getSchemaData?.content) {
@@ -78,8 +77,6 @@ export default function SchemaInfo(props: {
           setTreeData(res);
           setTreeDataFetched(true);
           setNodeIdToNodeDictionary(nodeIdToShallowNode);
-
-
           //refetchOriginalSourceSchemaData();
         }
       });
@@ -166,7 +163,9 @@ export default function SchemaInfo(props: {
       // Get element by id sometimes returns a null reference. Added artificial delay to mitigate the problem.
       if (props?.scrollToSelectedNodeId) {
         setCurrentlySelectedNodeId(props?.scrollToSelectedNodeId);
-        setTimeout(() => {  scrollToElement(props.isSourceTree, props.scrollToSelectedNodeId); }, 10);
+        setTimeout(() => {
+          scrollToElement(props.isSourceTree, props.scrollToSelectedNodeId);
+        }, 10);
       }
     }
   }
@@ -224,11 +223,20 @@ export default function SchemaInfo(props: {
     }
   };
 
-  function scrollToElement(isSourceTree: boolean | undefined, elementId: string | undefined) {
+  function scrollToElement(
+    isSourceTree: boolean | undefined,
+    elementId: string | undefined
+  ) {
     if (elementId) {
-      const elementRef = document.getElementById(isSourceTree ? 'source-' + elementId : 'target-' + elementId);
+      const elementRef = document.getElementById(
+        isSourceTree ? 'source-' + elementId : 'target-' + elementId
+      );
       if (elementRef) {
-        elementRef.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+        elementRef.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'nearest',
+        });
       }
     }
   }
@@ -241,9 +249,9 @@ export default function SchemaInfo(props: {
             title={
               getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                  data: getSchemaData.metadata.label,
-                  lang,
-                })
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
                 : t('schema-tree.no-label')
             }
             placement="bottom-start"
@@ -251,9 +259,9 @@ export default function SchemaInfo(props: {
             <SchemaHeading variant="h2">
               {getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                  data: getSchemaData.metadata.label,
-                  lang,
-                })
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
                 : t('schema-tree.no-label')}
             </SchemaHeading>
           </Tooltip>

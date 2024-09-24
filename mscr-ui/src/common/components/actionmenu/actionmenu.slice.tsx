@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState, AppThunk } from '@app/store';
+import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
 
 export interface MenuList {
   editMetadata: boolean;
@@ -50,8 +51,8 @@ export interface ConfirmState {
   publish: boolean;
   remove: boolean;
   saveMetadata: boolean;
-  setRootNodeSelection: any;
-  unsetRootNodeSelection: any;
+  setRootNodeSelection: boolean;
+  unsetRootNodeSelection: boolean;
 }
 
 const initialConfirmState: ConfirmState = {
@@ -70,8 +71,15 @@ const initialModalList: ModalList = {
   form: initialFormState,
 };
 
-const initialState = {
-  nodeSelections: undefined,
+interface ActionMenuState {
+  selectedRootNode: undefined | RenderTree;
+  isCrosswalk: boolean;
+  menuList: MenuList;
+  modal: ModalList;
+}
+
+const initialState: ActionMenuState = {
+  selectedRootNode: undefined,
   isCrosswalk: false,
   menuList: initialMenuList,
   modal: initialModalList,
@@ -81,10 +89,10 @@ export const actionmenuSlice = createSlice({
   name: 'actionmenu',
   initialState: initialState,
   reducers: {
-    setNodeSelections(state, action) {
+    setSelectedRootNode(state, action) {
       return {
         ...state,
-        nodeSelections: action.payload,
+        selectedRootNode: action.payload,
       };
     },
     setIsCrosswalk(state, action) {
@@ -148,13 +156,13 @@ export function setIsCrosswalk(isCrosswalk?: boolean): AppThunk {
     dispatch(actionmenuSlice.actions.setIsCrosswalk(isCrosswalk ?? false));
 }
 
-export function selectNodeSelection() {
-  return (state: AppState) => state.actionmenu.nodeSelections;
+export function selectSelectedRootNode() {
+  return (state: AppState) => state.actionmenu.selectedRootNode;
 }
 
-export function setNodeSelection(nodeSelections: any): AppThunk {
+export function setSelectedRootNode(newRootNode: RenderTree | undefined): AppThunk {
   return (dispatch) =>
-    dispatch(actionmenuSlice.actions.setNodeSelections(nodeSelections));
+    dispatch(actionmenuSlice.actions.setSelectedRootNode(newRootNode));
 }
 
 export function selectMenuList() {

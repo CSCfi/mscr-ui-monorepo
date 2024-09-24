@@ -22,14 +22,14 @@ export function updateActionMenu(
   if (!contentData || contentData.state === State.Removed) {
     return;
   }
-  if (contentData?.customRoot) {
+  if ('customRoot' in contentData && contentData?.customRoot) {
     dispatch(setMenuList(['unsetRootNodeSelection']));
   }
   dispatch(setIsCrosswalk(contentType === Type.Crosswalk));
   if (isMscrCopyAvailable) {
     dispatch(setMenuList(['mscrCopy']));
   }
-    if (!hasEditPermission) return;
+  if (!hasEditPermission) return;
   dispatch(setMenuList(['editMetadata']));
 
   switch (contentData.state) {

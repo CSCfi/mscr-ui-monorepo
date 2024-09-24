@@ -4,7 +4,7 @@ import {
   useDeleteSchemaMutation,
   useGetSchemaWithRevisionsQuery,
   usePatchSchemaMutation,
-  usePatchSchemaRootSelectionMutation
+  usePatchSchemaRootSelectionMutation,
 } from '@app/common/components/schema/schema.slice';
 import MetadataAndFiles from './metadata-and-files';
 import { createTheme, ThemeProvider } from '@mui/material';
@@ -14,11 +14,15 @@ import { State } from '@app/common/interfaces/state.interface';
 import { Type } from '@app/common/interfaces/search.interface';
 import { Text } from 'suomifi-ui-components';
 import HasPermission from '@app/common/utils/has-permission';
-import { Format, formatsAvailableForMscrCopy } from '@app/common/interfaces/format.interface';
-import {AppState, useStoreDispatch} from '@app/store';
+import {
+  Format,
+  formatsAvailableForMscrCopy,
+} from '@app/common/interfaces/format.interface';
+import { useStoreDispatch } from '@app/store';
 import {
   selectConfirmModalState,
-  selectFormModalState, selectMenuList, selectNodeSelection,
+  selectFormModalState,
+  selectSelectedRootNode,
   setConfirmModalState,
   setFormModalState,
 } from '@app/common/components/actionmenu/actionmenu.slice';
@@ -32,7 +36,7 @@ import FormModal, { ModalType } from '@app/modules/form';
 import Tabmenu from '@app/common/components/tabmenu';
 import MetadataStub from '@app/modules/form/metadata-form/metadata-stub';
 import { selectIsEditContentActive } from '@app/common/components/content-view/content-view.slice';
-import {useRouter} from "next/router";
+import { useRouter } from 'next/router';
 
 export default function SchemaView({ schemaId }: { schemaId: string }) {
   const { t } = useTranslation('common');
@@ -40,8 +44,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   const confirmModalIsOpen = useSelector(selectConfirmModalState());
   const formModalIsOpen = useSelector(selectFormModalState());
   const isEditContentActive = useSelector(selectIsEditContentActive());
-  const nodeSelection = useSelector(selectNodeSelection());
-  const menuState = useSelector(selectMenuList());
+  const nodeSelection = useSelector(selectSelectedRootNode());
   const [patchSchema] = usePatchSchemaMutation();
   const [deleteSchema] = useDeleteSchemaMutation();
   const [patchSchemaRootSelection] = usePatchSchemaRootSelectionMutation();
@@ -59,9 +62,12 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     action: 'EDIT_CONTENT',
     owner: schemaData?.owner,
   });
-  const isNodeEditable = isEditContentActive && hasEditPermission && schemaData?.format === Format.Mscr;
+  const isNodeEditable =
+    isEditContentActive &&
+    hasEditPermission &&
+    schemaData?.format === Format.Mscr;
   const hasCopyPermission = HasPermission({ action: 'MAKE_MSCR_COPY' });
-  const router = useRouter();// Force refresh the page
+  const router = useRouter(); // Force refresh the page
   const isMscrCopyAvailable =
     hasCopyPermission &&
     schemaData &&
@@ -111,7 +117,10 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
 
   const setSchemaRootSelection = () => {
     if (schemaData) {
-      patchSchemaRootSelection({schemaId: schemaData?.pid, value: nodeSelection ? nodeSelection.properties['@id'] : ''})
+      patchSchemaRootSelection({
+        schemaId: schemaData?.pid,
+        value: nodeSelection ? nodeSelection.properties['@id'] : '',
+      })
         .unwrap()
         .then(() => {
           dispatch(
@@ -124,7 +133,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
           router.reload();
         });
     }
-  }
+  };
 
   const changeSchemaState = (
     payload: StatePayload,
@@ -226,7 +235,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
                     pid={schemaId}
                     format={schemaData.format}
                     isNodeEditable={isNodeEditable}
-                    hasCustomRoot={schemaData?.customRoot}
+                    hasCustomRoot={!!schemaData?.customRoot}
                   />
                 ),
               },
@@ -312,11 +321,16 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
         )}
         {confirmModalIsOpen.setRootNodeSelection && (
           <ConfirmModal
-            actionText={t('action.setRootSelection')}
+            actionText={t('action.set-root-selection')}
             cancelText={t('action.cancel')}
             confirmAction={patchSchemaRoot}
             onClose={() =>
-              dispatch(setConfirmModalState({ key: 'setRootNodeSelection', value: false }))
+              dispatch(
+                setConfirmModalState({
+                  key: 'setRootNodeSelection',
+                  value: false,
+                })
+              )
             }
             heading={t('confirm-modal.heading')}
             text1={t('confirm-modal.set-root-selection')}
@@ -324,11 +338,16 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
         )}
         {confirmModalIsOpen.unsetRootNodeSelection && (
           <ConfirmModal
-            actionText={t('action.unsetRootSelection')}
+            actionText={t('action.unset-root-selection')}
             cancelText={t('action.cancel')}
             confirmAction={patchSchemaRoot}
             onClose={() =>
-              dispatch(setConfirmModalState({ key: 'unsetRootNodeSelection', value: false }))
+              dispatch(
+                setConfirmModalState({
+                  key: 'unsetRootNodeSelection',
+                  value: false,
+                })
+              )
             }
             heading={t('confirm-modal.heading')}
             text1={t('confirm-modal.unset-root-selection')}

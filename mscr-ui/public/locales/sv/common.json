@@ -12,8 +12,8 @@
     "publish": "",
     "save": "",
     "schema-actions": "",
-    "setRootSelection": "",
-    "unsetRootSelection": ""
+    "set-root-selection": "",
+    "unset-root-selection": ""
   },
   "actionmenu": {
     "delete-crosswalk": "",
@@ -192,7 +192,8 @@
   "link-opens-new-window-external": "",
   "mappings-accordion": {
     "clear": "",
-    "filter-from-mappings": ""
+    "filter-from-mappings": "",
+    "select-linked-nodes": ""
   },
   "metadata": {
     "contact": "",
@@ -243,8 +244,10 @@
     "make-longer-query": "",
     "make-query-and-choose": "",
     "no-results": "",
+    "reset-custom-root-node": "",
     "select-a-node": "",
     "selected-node-info": "",
+    "set-as-root-node": "",
     "type-search": "",
     "type-search-results-title": "",
     "type-to-search": "",

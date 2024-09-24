@@ -44,7 +44,9 @@ export default function SchemaTree({
   nodes,
   treeSelectedArray,
   treeExpanded,
-  performTreeAction, showQname, isSourceTree
+  performTreeAction,
+  showQname,
+  isSourceTree,
 }: {
   nodes: RenderTree;
   treeSelectedArray: string[];
@@ -62,9 +64,6 @@ export default function SchemaTree({
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     performTreeAction('treeToggle', nodeIds);
   };
-
-
-
 
   // console.log('TREEVIEW DATA', nodes, treeSelectedArray);
   return (

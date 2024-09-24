@@ -75,6 +75,7 @@ function Row(props: {
   rowcount: number;
   mappingFunctions: any;
 }) {
+  const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
 
   function selectFromTrees(row: any, mappingId: any, isSourceTree: boolean) {
@@ -100,7 +101,7 @@ function Row(props: {
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title="Select linked nodes from schema trees"
+                        title={t('mappings-accordion.select-linked-nodes')}
                         onClick={(e) => {
                           selectFromTrees(props.row, mapping.id, true);
                           e.stopPropagation();
@@ -202,7 +203,7 @@ function Row(props: {
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title="Select linked nodes from schema trees"
+                        title={t('mappings-accordion.select-linked-nodes')}
                         onClick={(e) => {
                           selectFromTrees(props.row, mapping.id, false);
                           e.stopPropagation();

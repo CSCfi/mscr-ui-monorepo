@@ -14,7 +14,7 @@ export default function SchemaVisualization({
   pid: string;
   format: Format;
   isNodeEditable: boolean;
-  hasCustomRoot: boolean
+  hasCustomRoot: boolean;
 }) {
   const { t } = useTranslation('common');
   const filterLabel = t('schema-tree.search-schema');
