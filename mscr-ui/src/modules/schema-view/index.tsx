@@ -293,7 +293,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
           initialData={schemaData}
         />
         <FormModal
-          modalType={ModalType.McsrCopy}
+          modalType={ModalType.MscrCopy}
           contentType={Type.Schema}
           visible={formModalIsOpen.mscrCopy}
           setVisible={(value) =>
