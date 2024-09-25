@@ -11,7 +11,9 @@
     "invalidate": "",
     "publish": "",
     "save": "",
-    "schema-actions": ""
+    "schema-actions": "",
+    "set-root-selection": "",
+    "unset-root-selection": ""
   },
   "actionmenu": {
     "delete-crosswalk": "",
@@ -28,7 +30,8 @@
     "mscr-copy": "",
     "publish-crosswalk": "",
     "publish-schema": "",
-    "revision": ""
+    "revision": "",
+    "unset-root-node-selection": ""
   },
   "and": "",
   "association": "",
@@ -74,7 +77,9 @@
     "publish-crosswalk1": "",
     "publish-crosswalk2": "",
     "publish-schema": "",
-    "save": ""
+    "save": "",
+    "set-root-selection": "",
+    "unset-root-selection": ""
   },
   "confirm-page-leave": "",
   "content-form": {
@@ -187,7 +192,8 @@
   "link-opens-new-window-external": "",
   "mappings-accordion": {
     "clear": "",
-    "filter-from-mappings": ""
+    "filter-from-mappings": "",
+    "select-linked-nodes": ""
   },
   "metadata": {
     "contact": "",
@@ -238,8 +244,10 @@
     "make-longer-query": "",
     "make-query-and-choose": "",
     "no-results": "",
+    "reset-custom-root-node": "",
     "select-a-node": "",
     "selected-node-info": "",
+    "set-as-root-node": "",
     "type-search": "",
     "type-search-results-title": "",
     "type-to-search": "",
@@ -266,7 +274,8 @@
     "schema-finish-editing": "",
     "schema-invalidated": "",
     "schema-published": "",
-    "schema-saved": ""
+    "schema-saved": "",
+    "set-root-selection": ""
   },
   "organization": "",
   "organizations-and-roles": "",
