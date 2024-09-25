@@ -73,6 +73,7 @@ export default function PersonalWorkspace({
           state: info.state,
           numberOfRevisions: info.numberOfRevisions.toString(),
           pid: info.handle ?? t('metadata.not-available'),
+          format: info.format,
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
           linkUrl: <Link href={linkUrl} passHref><a aria-label={linkLabel}>{t('workspace.view')}</a></Link>,
         };
