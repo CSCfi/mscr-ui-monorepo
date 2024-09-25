@@ -185,9 +185,7 @@ export default function NodeInfo(props: {
                   </div>
                 </div>
               ))}
-              {/*TODO: finish implementation and remove false*/}
-              {false &&
-                props.isNodeEditable &&
+              {props.isNodeEditable &&
                 isLeafNode &&
                 nodeTypeAttribute !== '' && (
                   <div className="col-12" key={self.crypto.randomUUID()}>
