@@ -178,7 +178,7 @@ export default function NodeInfo(props: {
               )}
 
               {nodeAttributes.map((attrib) => (
-                <div className="col-12" key={self.crypto.randomUUID()}>
+                <div className="col-12" key={self.crypto.randomUUID()} hidden={(attrib.name === '@id' ? true : false)}>
                   <div className="">{processHtmlLinks(attrib.name)}:</div>
                   <div className="attribute-font">
                     {processHtmlLinks(attrib.value)}
