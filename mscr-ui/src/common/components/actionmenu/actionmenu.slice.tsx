@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState, AppThunk } from '@app/store';
+import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
 
 export interface MenuList {
   editMetadata: boolean;
@@ -12,6 +13,7 @@ export interface MenuList {
   version: boolean;
   mscrCopy: boolean;
   deleteDraft: boolean;
+  unsetRootNodeSelection: boolean;
 }
 
 const initialMenuList: MenuList = {
@@ -24,6 +26,7 @@ const initialMenuList: MenuList = {
   publish: false,
   remove: false,
   version: false,
+  unsetRootNodeSelection: false,
 };
 
 export interface ModalList {
@@ -48,6 +51,8 @@ export interface ConfirmState {
   publish: boolean;
   remove: boolean;
   saveMetadata: boolean;
+  setRootNodeSelection: boolean;
+  unsetRootNodeSelection: boolean;
 }
 
 const initialConfirmState: ConfirmState = {
@@ -57,6 +62,8 @@ const initialConfirmState: ConfirmState = {
   publish: false,
   remove: false,
   saveMetadata: false,
+  setRootNodeSelection: false,
+  unsetRootNodeSelection: false,
 };
 
 const initialModalList: ModalList = {
@@ -64,7 +71,15 @@ const initialModalList: ModalList = {
   form: initialFormState,
 };
 
-const initialState = {
+interface ActionMenuState {
+  selectedRootNode: undefined | RenderTree;
+  isCrosswalk: boolean;
+  menuList: MenuList;
+  modal: ModalList;
+}
+
+const initialState: ActionMenuState = {
+  selectedRootNode: undefined,
   isCrosswalk: false,
   menuList: initialMenuList,
   modal: initialModalList,
@@ -74,6 +89,12 @@ export const actionmenuSlice = createSlice({
   name: 'actionmenu',
   initialState: initialState,
   reducers: {
+    setSelectedRootNode(state, action) {
+      return {
+        ...state,
+        selectedRootNode: action.payload,
+      };
+    },
     setIsCrosswalk(state, action) {
       return {
         ...state,
@@ -133,6 +154,15 @@ export function selectIsCrosswalk() {
 export function setIsCrosswalk(isCrosswalk?: boolean): AppThunk {
   return (dispatch) =>
     dispatch(actionmenuSlice.actions.setIsCrosswalk(isCrosswalk ?? false));
+}
+
+export function selectSelectedRootNode() {
+  return (state: AppState) => state.actionmenu.selectedRootNode;
+}
+
+export function setSelectedRootNode(newRootNode: RenderTree | undefined): AppThunk {
+  return (dispatch) =>
+    dispatch(actionmenuSlice.actions.setSelectedRootNode(newRootNode));
 }
 
 export function selectMenuList() {

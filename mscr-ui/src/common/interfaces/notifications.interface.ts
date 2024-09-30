@@ -24,4 +24,5 @@ export type NotificationKeys =
   | 'CROSSWALK_ADD'
   | 'SCHEMA_ADD'
   | 'CROSSWALK_COPY'
-  | 'SCHEMA_COPY';
+  | 'SCHEMA_COPY'
+  | 'SCHEMA_SET_ROOT_SELECTION';

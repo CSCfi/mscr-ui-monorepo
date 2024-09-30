@@ -74,6 +74,12 @@ export const schemaApi = createApi({
         },
       }),
     }),
+    patchSchemaRootSelection: builder.mutation<Schema, { schemaId: string; value: string }>({
+      query: (value) => ({
+        url: value.value ? `/schema/${value.schemaId}/rootResource?value=${encodeURIComponent(value.value)}` : `/schema/${value.schemaId}/rootResource`,
+        method: 'PATCH',
+      }),
+    }),
     patchSchema: builder.mutation<
       Metadata,
       {
@@ -178,6 +184,7 @@ export const {
   usePutSchemaRevisionMutation,
   usePutSchemaMscrCopyMutation,
   usePatchSchemaMutation,
+  usePatchSchemaRootSelectionMutation,
   useGetTypesSearchResultsQuery,
   usePatchDataTypeMutation,
   util: { getRunningQueriesThunk },
