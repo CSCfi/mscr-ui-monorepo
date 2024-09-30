@@ -216,6 +216,7 @@
     "pid": "",
     "schema-details": "",
     "source-schema": "",
+    "soure-url": "",
     "state": "",
     "stub-crosswalk-details": "",
     "stub-schema-details": "",
@@ -372,7 +373,6 @@
   "site-tools": "",
   "skip-link-main": "",
   "skip-link-search-results": "",
-  "sourceURL": "",
   "statuses": {
     "draft": "",
     "incomplete": "",

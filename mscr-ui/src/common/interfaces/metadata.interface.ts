@@ -30,7 +30,7 @@ export interface Metadata {
   namespace?: string;
   prefix?: string;
   fileMetadata?: FileData[];
-  sourceUrl?: string;
+  sourceURL?: string;
 }
 
 export interface FileData {

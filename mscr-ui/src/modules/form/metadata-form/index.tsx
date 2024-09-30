@@ -269,11 +269,11 @@ export default function MetadataForm({
 
           <MetadataRow container>
             <Grid item xs={4}>
-              <MetadataLabel>{t('sourceURL')}</MetadataLabel>
+              <MetadataLabel>{t('metadata.soure-url')}</MetadataLabel>
             </Grid>
             <Grid item xs={8}>
               <MetadataAttribute>
-                {metadata.sourceUrl ?? t('metadata.not-available')}
+                {metadata.sourceURL ?? t('metadata.not-available')}
               </MetadataAttribute>
             </Grid>
           </MetadataRow>

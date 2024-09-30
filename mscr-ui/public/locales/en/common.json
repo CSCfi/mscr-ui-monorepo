@@ -216,6 +216,7 @@
     "pid": "PID",
     "schema-details": "Schema details",
     "source-schema": "Source schema",
+    "soure-url": "Source URL",
     "state": "State",
     "stub-crosswalk-details": "Deleted crosswalk",
     "stub-schema-details": "Deleted schema",
@@ -372,7 +373,6 @@
   "site-tools": "",
   "skip-link-main": "Skip to main content",
   "skip-link-search-results": "",
-  "sourceURL": "",
   "statuses": {
     "draft": "Draft",
     "incomplete": "Incomplete",
