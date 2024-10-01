@@ -58,13 +58,14 @@ import { NotificationKeys } from '@app/common/interfaces/notifications.interface
 import { InputErrors, validateForm } from '@app/modules/form/validate-form';
 import generatePayload from '@app/modules/form/generate-payload';
 import { resetContentView } from '@app/common/components/content-view/content-view.slice';
+import { CloseButton } from '@app/modules/form/form.styles';
 
 export enum ModalType {
   RegisterNewFull = 'REGISTER_NEW_FULL',
   RegisterNewMscr = 'REGISTER_NEW_MSCR',
   RevisionFull = 'REVISION_FULL',
   RevisionMscr = 'REVISION_MSCR',
-  McsrCopy = 'MSCR_COPY',
+  MscrCopy = 'MSCR_COPY',
 }
 
 interface FormModalProps {
@@ -115,7 +116,7 @@ export default function FormModal({
     if (!initialData) return;
     const existingData: FormType = {
       format:
-        modalType == ModalType.McsrCopy ? Format.Mscr : initialData.format,
+        modalType == ModalType.MscrCopy ? Format.Mscr : initialData.format,
       languages: [
         {
           labelText: t('language-english-with-suffix'),
@@ -221,7 +222,7 @@ export default function FormModal({
             pid = resultSchemaRevision.data.pid;
           }
           break;
-        case ModalType.McsrCopy:
+        case ModalType.MscrCopy:
           if (
             contentType == Type.Schema &&
             resultSchemaMscrCopy.isSuccess &&
@@ -275,7 +276,7 @@ export default function FormModal({
           case ModalType.RevisionMscr:
             notificationKey = 'SCHEMA_REVISION';
             break;
-          case ModalType.McsrCopy:
+          case ModalType.MscrCopy:
             notificationKey = 'SCHEMA_COPY';
         }
       } else {
@@ -289,7 +290,7 @@ export default function FormModal({
           case ModalType.RevisionMscr:
             notificationKey = 'CROSSWALK_REVISION';
             break;
-          case ModalType.McsrCopy:
+          case ModalType.MscrCopy:
             notificationKey = 'CROSSWALK_COPY';
         }
       }
@@ -382,7 +383,7 @@ export default function FormModal({
         });
       } else if (
         initialData &&
-        modalType == ModalType.McsrCopy &&
+        modalType == ModalType.MscrCopy &&
         contentType == Type.Schema
       ) {
         Promise.all([
@@ -564,12 +565,14 @@ export default function FormModal({
                 contentType == Type.Schema
                   ? modalType == ModalType.RegisterNewFull
                     ? SpinnerType.SchemaRegistrationModal
-                    : SpinnerType.SchemaRevisionModal
+                    : modalType == ModalType.MscrCopy
+                      ? SpinnerType.MscrCopyModal
+                      : SpinnerType.SchemaRevisionModal
                   : modalType == ModalType.RegisterNewFull
-                  ? SpinnerType.CrosswalkRegistrationModal
-                  : modalType == ModalType.RegisterNewMscr
-                  ? SpinnerType.CrosswalkCreationModal
-                  : SpinnerType.CrosswalkRevisionModal
+                    ? SpinnerType.CrosswalkRegistrationModal
+                    : modalType == ModalType.RegisterNewMscr
+                      ? SpinnerType.CrosswalkCreationModal
+                      : SpinnerType.CrosswalkRevisionModal
               }
             ></SpinnerOverlay>
           )}
@@ -582,31 +585,31 @@ export default function FormModal({
               {contentType == Type.Schema
                 ? modalType == ModalType.RegisterNewFull
                   ? t('content-form.title.schema-register')
-                  : modalType == ModalType.McsrCopy
-                  ? t('content-form.title.schema-mscr-copy')
-                  : t('content-form.title.schema-revision')
+                  : modalType == ModalType.MscrCopy
+                    ? t('content-form.title.schema-mscr-copy')
+                    : t('content-form.title.schema-revision')
                 : modalType == ModalType.RegisterNewFull
-                ? t('content-form.title.crosswalk-register')
-                : modalType == ModalType.RegisterNewMscr
-                ? t('content-form.title.crosswalk-create')
-                : modalType == ModalType.McsrCopy
-                ? t('content-form.title.crosswalk-mscr-copy')
-                : t('content-form.title.crosswalk-revision')}
+                  ? t('content-form.title.crosswalk-register')
+                  : modalType == ModalType.RegisterNewMscr
+                    ? t('content-form.title.crosswalk-create')
+                    : modalType == ModalType.MscrCopy
+                      ? t('content-form.title.crosswalk-mscr-copy')
+                      : t('content-form.title.crosswalk-revision')}
             </ModalTitle>
           </div>
           <div className="col-4">
-            <Button
+            <CloseButton
               style={{ float: 'right' }}
               variant="secondaryNoBorder"
               icon={<IconClose />}
               aria-label="t('cancel')"
               onClick={() => handleClose()}
-            ></Button>
+            ></CloseButton>
           </div>
         </div>
 
         {(modalType == ModalType.RegisterNewFull ||
-          modalType == ModalType.RevisionFull) &&
+            modalType == ModalType.RevisionFull) &&
           renderFileDropArea()}
 
         {contentType == Type.Schema && (
@@ -622,7 +625,7 @@ export default function FormModal({
             hasInitialData={
               modalType == ModalType.RevisionMscr ||
               modalType == ModalType.RevisionFull ||
-              modalType == ModalType.McsrCopy
+              modalType == ModalType.MscrCopy
             }
           />
         )}
@@ -634,7 +637,7 @@ export default function FormModal({
             hasInitialData={
               modalType == ModalType.RevisionMscr ||
               modalType == ModalType.RevisionFull ||
-              modalType == ModalType.McsrCopy
+              modalType == ModalType.MscrCopy
             }
             userPosted={userPosted}
             disabled={
@@ -656,16 +659,16 @@ export default function FormModal({
           {contentType == Type.Schema
             ? modalType == ModalType.RegisterNewFull
               ? t('content-form.button.schema-register')
-              : modalType == ModalType.McsrCopy
-              ? t('content-form.button.mscr-copy')
-              : t('content-form.button.schema-revision')
+              : modalType == ModalType.MscrCopy
+                ? t('content-form.button.mscr-copy')
+                : t('content-form.button.schema-revision')
             : modalType == ModalType.RegisterNewFull
-            ? t('content-form.button.crosswalk-register')
-            : modalType == ModalType.RegisterNewMscr
-            ? t('content-form.button.crosswalk-create')
-            : modalType == ModalType.McsrCopy
-            ? t('content-form.button.mscr-copy')
-            : t('content-form.button.crosswalk-revision')}
+              ? t('content-form.button.crosswalk-register')
+              : modalType == ModalType.RegisterNewMscr
+                ? t('content-form.button.crosswalk-create')
+                : modalType == ModalType.MscrCopy
+                  ? t('content-form.button.mscr-copy')
+                  : t('content-form.button.crosswalk-revision')}
         </Button>
         <Button variant="secondary" onClick={() => handleClose()}>
           {t('cancel')}

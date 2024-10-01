@@ -75,7 +75,18 @@ function Row(props: {
   rowcount: number;
   mappingFunctions: any;
 }) {
+  const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
+
+  function selectFromTrees(row: any, mappingId: any, isSourceTree: boolean) {
+    props.callBackFunction.performAccordionAction(
+      row,
+      'selectFromTreesByMapping',
+      mappingId,
+      '',
+      isSourceTree
+    );
+  };
 
   return (
     <>
@@ -90,13 +101,9 @@ function Row(props: {
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title="Select linked node from source tree"
+                        title={t('mappings-accordion.select-linked-nodes')}
                         onClick={(e) => {
-                          props.callBackFunction.performAccordionAction(
-                            props.row,
-                            props.row.source.length > 1 ? 'selectFromSourceTreeById' : 'selectFromSourceTreeByMapping',
-                            mapping.id
-                          );
+                          selectFromTrees(props.row, mapping.id, true);
                           e.stopPropagation();
                         }}
                       >{props.showAttributeNames ? mapping.label : mapping.id}</StyledButton>
@@ -196,13 +203,9 @@ function Row(props: {
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title="Select linked node from target tree"
+                        title={t('mappings-accordion.select-linked-nodes')}
                         onClick={(e) => {
-                          props.callBackFunction.performAccordionAction(
-                            props.row,
-                            props.row.target.length > 1 ? 'selectFromTargetTreeById' : 'selectFromTargetTreeByMapping',
-                            mapping.id
-                          );
+                          selectFromTrees(props.row, mapping.id, false);
                           e.stopPropagation();
                         }}
                       >{props.showAttributeNames ? mapping.label : mapping.id}</StyledButton>

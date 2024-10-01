@@ -74,4 +74,5 @@ export const FileWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${(props) => props.theme.suomifi.spacing.l};
+  min-height: 421px;
 `;

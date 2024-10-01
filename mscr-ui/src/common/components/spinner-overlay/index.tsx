@@ -2,6 +2,7 @@ import { RotatingLines } from 'react-loader-spinner';
 
 export enum SpinnerType {
   SchemaRegistrationModal = 'schema-registration-modal',
+  MscrCopyModal = 'mscr-copy-modal',
   CrosswalkRegistrationModal = 'crosswalk-registration-modal',
   CrosswalkCreationModal = 'crosswalk-creation-modal',
   SchemaRevisionModal = 'schema-revision-modal',

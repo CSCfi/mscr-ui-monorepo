@@ -21,8 +21,8 @@ export interface SchemaWithContent {
 
 export interface SchemaWithVersionInfo extends Schema {
   revisions: ContentRevision[];
+  customRoot?: string;
 }
-
 
 // ToDo: Proper typing
 export interface SchemaFormType {

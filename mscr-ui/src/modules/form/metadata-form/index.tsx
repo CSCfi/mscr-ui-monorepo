@@ -110,6 +110,7 @@ export default function MetadataForm({
       contact: formData.contact,
       versionLabel: formData.versionLabel,
       visibility: formData.visibility as Visibility,
+      namespace: formData.namespace,
     };
   };
 
@@ -132,6 +133,7 @@ export default function MetadataForm({
       visibility: metadata.visibility ?? Visibility.Private,
       versionLabel: metadata.versionLabel ?? '',
       contact: metadata.contact ?? '',
+      namespace: metadata.namespace ?? '',
     };
     setFormData(formValuesFromData);
   }, [metadata, lang]);
@@ -182,6 +184,25 @@ export default function MetadataForm({
               )}
               {!isEditModeActive && (
                 <MetadataAttribute>{formData.label}</MetadataAttribute>
+              )}
+            </Grid>
+          </MetadataRow>
+
+          <MetadataRow container>
+            <Grid item xs={4}>
+              <MetadataLabel>{t('metadata.name-space-label')}:</MetadataLabel>
+            </Grid>
+            <Grid item xs={8}>
+              {isEditModeActive && (
+                <TextInput
+                  labelText={t('metadata.name-space-label')}
+                  labelMode={'hidden'}
+                  onChange={(value) => updateFormData('namespace', value)}
+                  value={formData.namespace}
+                />
+              )}
+              {!isEditModeActive && (
+                <MetadataAttribute>{formData.namespace}</MetadataAttribute>
               )}
             </Grid>
           </MetadataRow>
@@ -242,6 +263,17 @@ export default function MetadataForm({
             <Grid item xs={8}>
               <MetadataAttribute>
                 {metadata.handle ?? t('metadata.not-available')}
+              </MetadataAttribute>
+            </Grid>
+          </MetadataRow>
+
+          <MetadataRow container>
+            <Grid item xs={4}>
+              <MetadataLabel>{t('metadata.source-url')}</MetadataLabel>
+            </Grid>
+            <Grid item xs={8}>
+              <MetadataAttribute>
+                {metadata.sourceURL ?? t('metadata.not-available')}
               </MetadataAttribute>
             </Grid>
           </MetadataRow>
