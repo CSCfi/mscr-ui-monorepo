@@ -17,7 +17,7 @@ import {
   SchemaHeading,
   SearchWrapper,
   TreeviewWrapper,
-  TreeWrapper
+  TreeWrapper,
 } from '@app/common/components/schema-info/schema-info.styles';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
@@ -269,9 +269,7 @@ export default function SchemaInfo(props: {
 
       <TreeviewWrapper className="row gx-0">
         <TreeWrapper className="col-7 px-0">
-          <SpinnerOverlay
-            animationVisible={!isTreeDataFetched}
-          />
+          <SpinnerOverlay animationVisible={!isTreeDataFetched} />
           <div className="d-flex justify-content-between mb-2 ps-3 pe-2">
             {isTreeDataFetched && (
               <>

@@ -30,9 +30,7 @@ import {
   Format,
 } from '@app/common/interfaces/format.interface';
 import FileDropAreaMscr from '@app/common/components/file-drop-area-mscr';
-import SpinnerOverlay, {
-  delay,
-} from '@app/common/components/spinner-overlay';
+import SpinnerOverlay, { delay } from '@app/common/components/spinner-overlay';
 import { Schema } from '@app/common/interfaces/schema.interface';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
 import { useStoreDispatch } from '@app/store';
@@ -553,9 +551,7 @@ export default function FormModal({
       variant={isSmall ? 'smallScreen' : 'default'}
       style={{ position: 'relative' }}
     >
-      <SpinnerOverlay
-        animationVisible={submitAnimationVisible}
-      />
+      <SpinnerOverlay animationVisible={submitAnimationVisible} />
       <ModalContent>
         <div id={'modalTop'}></div>
 
