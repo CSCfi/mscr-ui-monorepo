@@ -269,6 +269,17 @@ export default function MetadataForm({
 
           <MetadataRow container>
             <Grid item xs={4}>
+              <MetadataLabel>{t('metadata.source-url')}</MetadataLabel>
+            </Grid>
+            <Grid item xs={8}>
+              <MetadataAttribute>
+                {metadata.sourceURL ?? t('metadata.not-available')}
+              </MetadataAttribute>
+            </Grid>
+          </MetadataRow>
+
+          <MetadataRow container>
+            <Grid item xs={4}>
               <MetadataLabel>{t('metadata.format')}:</MetadataLabel>
             </Grid>
             <Grid item xs={8}>

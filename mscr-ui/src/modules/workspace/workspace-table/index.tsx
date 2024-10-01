@@ -5,7 +5,7 @@ import { State } from '@app/common/interfaces/state.interface';
 
 export interface ContentRow {
   label: string;
-  namespace?: string;
+  //namespace?: string;
   state: State;
   numberOfRevisions: string;
   pid: string;
@@ -28,7 +28,7 @@ export default function WorkspaceTable({
 
   const headings = [
     t('workspace.label'),
-    ...((contentType == Type.Schema) ? [t('workspace.namespace')] : []),
+    // ...((contentType == Type.Schema) ? [t('workspace.namespace')] : []),
     t('workspace.state'),
     t('workspace.numberOfRevisions'),
     t('workspace.pid'),
