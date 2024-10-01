@@ -32,7 +32,6 @@ import {
 import FileDropAreaMscr from '@app/common/components/file-drop-area-mscr';
 import SpinnerOverlay, {
   delay,
-  SpinnerType,
 } from '@app/common/components/spinner-overlay';
 import { Schema } from '@app/common/interfaces/schema.interface';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
@@ -552,31 +551,12 @@ export default function FormModal({
       visible={visible}
       onEscKeyDown={() => handleClose()}
       variant={isSmall ? 'smallScreen' : 'default'}
+      style={{ position: 'relative' }}
     >
+      <SpinnerOverlay
+        animationVisible={submitAnimationVisible}
+      />
       <ModalContent>
-        <>
-          {submitAnimationVisible && (
-            <SpinnerOverlay
-              animationVisible={submitAnimationVisible}
-              type={
-                // Picking the right scaling breakpoints for the spinner
-                // Todo: differentiate crosswalk revision with and without file upload
-                // Todo: mscr copy type
-                contentType == Type.Schema
-                  ? modalType == ModalType.RegisterNewFull
-                    ? SpinnerType.SchemaRegistrationModal
-                    : modalType == ModalType.MscrCopy
-                      ? SpinnerType.MscrCopyModal
-                      : SpinnerType.SchemaRevisionModal
-                  : modalType == ModalType.RegisterNewFull
-                    ? SpinnerType.CrosswalkRegistrationModal
-                    : modalType == ModalType.RegisterNewMscr
-                      ? SpinnerType.CrosswalkCreationModal
-                      : SpinnerType.CrosswalkRevisionModal
-              }
-            ></SpinnerOverlay>
-          )}
-        </>
         <div id={'modalTop'}></div>
 
         <div className="row">

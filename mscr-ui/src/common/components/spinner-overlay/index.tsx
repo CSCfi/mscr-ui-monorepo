@@ -1,41 +1,32 @@
 import { RotatingLines } from 'react-loader-spinner';
+import { StyledOverlay } from '@app/common/components/spinner-overlay/spinner-overlay.styles';
+import { defaultSuomifiTheme } from 'suomifi-ui-components';
+import { useTranslation } from 'next-i18next';
+import { useBreakpoints } from 'yti-common-ui/components/media-query';
 
-export enum SpinnerType {
-  SchemaRegistrationModal = 'schema-registration-modal',
-  MscrCopyModal = 'mscr-copy-modal',
-  CrosswalkRegistrationModal = 'crosswalk-registration-modal',
-  CrosswalkCreationModal = 'crosswalk-creation-modal',
-  SchemaRevisionModal = 'schema-revision-modal',
-  CrosswalkRevisionModal = 'crosswalk-revision-modal',
-  SchemaTreeSingle = 'schema-tree-single',
-  SchemaTreeDouble = 'schema-tree-double',
-}
-
-export const delay = async (ms) => {
-  return new Promise((resolve) =>
-    setTimeout(resolve, ms));
+export const delay = async (ms: number | undefined) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export default function SpinnerOverlay(props: {
-  type: SpinnerType;
+export default function SpinnerOverlay({
+  animationVisible,
+}: {
   animationVisible: boolean;
 }) {
+  const { t } = useTranslation('common');
+  const { breakpoint } = useBreakpoints();
 
-  const classes = `modal-busy-overlay ${props.type}`;
-  return(<>
-    {props.animationVisible && (
-      <div className={classes}>
-        <RotatingLines
-          visible={true}
-          height="190"
-          width="190"
-          strokeColor="#2a6ebb"
-          strokeWidth="4"
-          animationDuration="1"
-          ariaLabel="loading"
-          wrapperStyle={{}}
-          wrapperClass=""
-        />
-      </div>)}
-  </>);
+  if (!animationVisible) return <></>;
+
+  return (
+    <StyledOverlay $breakpoint={breakpoint}>
+      <RotatingLines
+        width="190"
+        strokeColor={defaultSuomifiTheme.colors.highlightBase}
+        strokeWidth="4"
+        animationDuration="1"
+        ariaLabel={t('loading-circle-label')}
+      />
+    </StyledOverlay>
+  );
 }
