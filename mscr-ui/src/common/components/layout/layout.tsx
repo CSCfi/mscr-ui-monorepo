@@ -4,7 +4,7 @@ import {
   ContentContainer,
   SiteContainer,
   MarginContainer,
-  FlexContainer
+  FlexContainer,
 } from './layout.styles';
 import { useTranslation } from 'next-i18next';
 import SmartHeader from '../smart-header';
@@ -16,8 +16,11 @@ import SideNavigationPanel from '../side-navigation';
 import { MscrUser } from '@app/common/interfaces/mscr-user.interface';
 import SearchScreen from 'src/modules/search/search-screen';
 import ActionPanel from '@app/common/components/action-panel';
-import useUrlState, { initialUrlState } from '@app/common/utils/hooks/use-url-state';
+import useUrlState, {
+  initialUrlState,
+} from '@app/common/utils/hooks/use-url-state';
 import { ReactNode } from 'react';
+import SpinnerRouterListener from '@app/common/components/spinner-router-listener';
 
 export default function Layout({
   children,
@@ -44,13 +47,11 @@ export default function Layout({
       <SiteContainer>
         <SmartHeader
           user={user}
-          fakeableUsers={generateFakeableUsers(
-            i18n.language,
-            fakeableUsers
-          )}
+          fakeableUsers={generateFakeableUsers(i18n.language, fakeableUsers)}
         />
         {user && !user.anonymous ? (
           <FlexContainer>
+            <SpinnerRouterListener />
             <ContentContainer>
               {alerts && alerts}
               <MarginContainer
@@ -58,24 +59,27 @@ export default function Layout({
                 className={showSearchScreen ? 'hidden' : ''}
               >
                 <ActionPanel isActionMenu={isActionMenu} />
-                {showSearchScreen && <SearchScreen/>}
+                {showSearchScreen && <SearchScreen />}
                 {children}
               </MarginContainer>
             </ContentContainer>
-            <SideNavigationPanel user={user}/>
+            <SideNavigationPanel user={user} />
           </FlexContainer>
         ) : (
-          <ContentContainer className={'w-100'}>
-            {alerts && alerts}
-            <MarginContainer
-              $breakpoint={breakpoint}
-              className={showSearchScreen ? 'hidden' : ''}
-            >
-              <ActionPanel isActionMenu={isActionMenu} />
-              {showSearchScreen && <SearchScreen />}
-              {children}
-            </MarginContainer>
-          </ContentContainer>
+          <>
+            <SpinnerRouterListener />
+            <ContentContainer className={'w-100'}>
+              {alerts && alerts}
+              <MarginContainer
+                $breakpoint={breakpoint}
+                className={showSearchScreen ? 'hidden' : ''}
+              >
+                <ActionPanel isActionMenu={isActionMenu} />
+                {showSearchScreen && <SearchScreen />}
+                {children}
+              </MarginContainer>
+            </ContentContainer>
+          </>
         )}
       </SiteContainer>
     </ThemeProvider>
