@@ -16,8 +16,10 @@
     "unset-root-selection": "Reset root selection"
   },
   "actionmenu": {
+    "activate-edit-mode-to-delete-mapping": "Activate edit mode to delete mapping",
     "delete-crosswalk": "Delete crosswalk",
     "delete-draft": "Delete draft",
+    "delete-mapping": "Delete mapping",
     "delete-schema": "Delete schema",
     "deprecate-crosswalk": "Deprecate crosswalk",
     "deprecate-schema": "Deprecate schema",
@@ -63,6 +65,7 @@
     "no-upper-associations": "",
     "no-upper-attributes": ""
   },
+  "confirm": "Confirm",
   "confirm-modal": {
     "delete-crosswalk": "Are you sure you want to delete the crosswalk?",
     "delete-draft": "Are you sure you want to delete the draft?",
@@ -71,6 +74,7 @@
     "delete-schema": "Are you sure you want to delete the schema?",
     "deprecate-crosswalk": "Are you sure you want to deprecate the crosswalk?",
     "deprecate-schema": "Are you sure you want to deprecate the schema?",
+    "do-you-want-to-delete-mapping": "Do you want to delete mapping?",
     "heading": "Confirmation",
     "invalidate-crosswalk": "Are you sure you want to invalidate the crosswalk?",
     "invalidate-schema": "Are you sure you want to invalidate the schema?",
@@ -367,7 +371,7 @@
   "site-open-new-email": "",
   "site-register": "",
   "site-services": "",
-  "site-title": "Metadata Schema and Crosswalk Regisrtry",
+  "site-title": "Metadata Schema and Crosswalk Registry",
   "site-to-login": "Sign in",
   "site-tools": "",
   "skip-link-main": "Skip to main content",
