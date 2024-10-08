@@ -190,6 +190,17 @@
   "library": "",
   "library-variant": "",
   "link-opens-new-window-external": "",
+  "loading-circle-label": "",
+  "mapping-modal": {
+    "add-mapping": "Add mapping",
+    "edit-mapping": "Edit mapping",
+    "exact-match": "Exact match",
+    "mapping-operation": "Mapping operation",
+    "no-notes-set": "No notes set. Add free form notes here.",
+    "notes": "Notes",
+    "operation-not-selected": "Operation not selected",
+    "predicate": "Predicate"
+  },
   "mappings-accordion": {
     "clear": "Clear",
     "filter-from-mappings": "Filter from mappings",
