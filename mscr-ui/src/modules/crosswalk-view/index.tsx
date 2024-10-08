@@ -12,7 +12,7 @@ import {
   usePatchCrosswalkMutation
 } from '@app/common/components/crosswalk/crosswalk.slice';
 import HasPermission from '@app/common/utils/has-permission';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { updateActionMenu } from '@app/common/components/schema-and-crosswalk-actionmenu/update-action-menu';
 import { Type } from '@app/common/interfaces/search.interface';
 import { State } from '@app/common/interfaces/state.interface';
@@ -24,18 +24,20 @@ import { Text } from 'suomifi-ui-components';
 import Tabmenu from '@app/common/components/tabmenu';
 import MetadataStub from '@app/modules/form/metadata-form/metadata-stub';
 import MetadataAndFiles from '@app/modules/crosswalk-editor/tabs/metadata-and-files';
-import * as React from 'react';
 import VersionHistory from '@app/common/components/version-history';
 import ConfirmModal from '@app/common/components/confirmation-modal';
 import FormModal, { ModalType } from '@app/modules/form';
 import { Format } from '@app/common/interfaces/format.interface';
 import CrosswalkEditor from '@app/modules/crosswalk-editor';
+import SpinnerOverlay from '@app/common/components/spinner-overlay';
+import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
 
 export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) {
   const { t } = useTranslation('common');
   const dispatch = useStoreDispatch();
   const confirmModalIsOpen = useSelector(selectModal()).confirm;
   const formModalIsOpen = useSelector(selectModal()).form;
+  const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
   const [patchCrosswalk] = usePatchCrosswalkMutation();
   const [deleteCrosswalk] = useDeleteCrosswalkMutation();
 
@@ -131,12 +133,11 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
   });
 
   if (isLoading) {
+    setTimeout(() => setLoadingSpinnerVisible(true), 500);
     return (
-      <div className="d-flex justify-content-center">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
+      <SpinnerWrapper>
+        <SpinnerOverlay animationVisible={loadingSpinnerVisible} transparentBackground={true} />
+      </SpinnerWrapper>
     );
   } else if (isError) {
     if ('status' in error && error.status === 404) {

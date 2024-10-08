@@ -10,11 +10,7 @@ import { useBreakpoints } from 'yti-common-ui/components/media-query';
 import { ButtonBlock } from '@app/modules/workspace/workspace.styles';
 import Pagination from '@app/common/components/pagination';
 import useUrlState from '@app/common/utils/hooks/use-url-state';
-import {
-  mscrSearchApi,
-  useGetPersonalContentQuery,
-} from '@app/common/components/mscr-search/mscr-search.slice';
-import { useStoreDispatch } from '@app/store';
+import { useGetPersonalContentQuery } from '@app/common/components/mscr-search/mscr-search.slice';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { useEffect, useMemo, useState } from 'react';
@@ -24,6 +20,8 @@ import WorkspaceTable, {
 import { ModalVisibilityButton } from '@app/modules/form/modal-visibility-button';
 import FormModal, { ModalType } from '@app/modules/form';
 import Link from 'next/link';
+import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
+import SpinnerOverlay from '@app/common/components/spinner-overlay';
 
 export default function PersonalWorkspace({
   contentType,
@@ -35,7 +33,6 @@ export default function PersonalWorkspace({
   const lang = router.locale ?? '';
   const { isSmall } = useBreakpoints();
   const { urlState } = useUrlState();
-  const dispatch = useStoreDispatch();
   const pageSize = 20;
   const [registerCrosswalkModalVisible, setRegisterCrosswalkModalVisible] =
     useState(false);
@@ -43,6 +40,7 @@ export default function PersonalWorkspace({
     useState(false);
   const [registerSchemaModalVisible, setRegisterSchemaModalVisible] =
     useState(false);
+  const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
   const [content, setContent] = useState(new Array<ContentRow>());
   const { data, isLoading } = useGetPersonalContentQuery({
     type: contentType,
@@ -75,7 +73,11 @@ export default function PersonalWorkspace({
           pid: info.handle ?? t('metadata.not-available'),
           format: info.format,
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
-          linkUrl: <Link href={linkUrl} passHref><a aria-label={linkLabel}>{t('workspace.view')}</a></Link>,
+          linkUrl: (
+            <Link href={linkUrl} passHref>
+              <a aria-label={linkLabel}>{t('workspace.view')}</a>
+            </Link>
+          ),
         };
       });
     } else {
@@ -87,19 +89,16 @@ export default function PersonalWorkspace({
     setContent(fetchedContent);
   }, [fetchedContent]);
 
-  // Need to decide what data we want to fetch loading the application
-  const refetchInfo = () => {
-    setTimeout(
-      () =>
-        dispatch(
-          mscrSearchApi.util.invalidateTags(['PersonalContent', 'MscrSearch'])
-        ),
-      300
-    );
-  };
-
   if (isLoading) {
-    return <div> Is Loading </div>; //ToDo: A loading circle or somesuch
+    setTimeout(() => setLoadingSpinnerVisible(true), 500);
+    return (
+      <SpinnerWrapper>
+        <SpinnerOverlay
+          animationVisible={loadingSpinnerVisible}
+          transparentBackground={true}
+        />
+      </SpinnerWrapper>
+    );
   } else {
     return (
       <main id="main">

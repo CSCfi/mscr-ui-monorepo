@@ -17,12 +17,11 @@ import {
   SchemaHeading,
   SearchWrapper,
   TreeviewWrapper,
+  TreeWrapper,
 } from '@app/common/components/schema-info/schema-info.styles';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import SpinnerOverlay, {
-  SpinnerType,
-} from '@app/common/components/spinner-overlay';
+import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
 
 export default function SchemaInfo(props: {
@@ -269,7 +268,8 @@ export default function SchemaInfo(props: {
       </div>
 
       <TreeviewWrapper className="row gx-0">
-        <div className="col-7 px-0">
+        <TreeWrapper className="col-7 px-0">
+          <SpinnerOverlay animationVisible={!isTreeDataFetched} />
           <div className="d-flex justify-content-between mb-2 ps-3 pe-2">
             {isTreeDataFetched && (
               <>
@@ -319,16 +319,6 @@ export default function SchemaInfo(props: {
                 overflowY: 'auto',
               }}
             >
-              <div className="d-flex justify-content-center">
-                <SpinnerOverlay
-                  animationVisible={!isTreeDataFetched}
-                  type={
-                    props.isSingleTree
-                      ? SpinnerType.SchemaTreeSingle
-                      : SpinnerType.SchemaTreeDouble
-                  }
-                />
-              </div>
               {isTreeDataFetched && (
                 <SchemaTree
                   nodes={treeData[0]}
@@ -341,7 +331,7 @@ export default function SchemaInfo(props: {
               )}
             </Box>
           </div>
-        </div>
+        </TreeWrapper>
         <NodeInfoWrapper className="col-5 px-0">
           <NodeInfo
             treeData={selectedTreeNodes}

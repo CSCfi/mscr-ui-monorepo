@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import {
   useDeleteSchemaMutation,
@@ -37,6 +37,8 @@ import Tabmenu from '@app/common/components/tabmenu';
 import MetadataStub from '@app/modules/form/metadata-form/metadata-stub';
 import { selectIsEditContentActive } from '@app/common/components/content-view/content-view.slice';
 import { useRouter } from 'next/router';
+import SpinnerOverlay from '@app/common/components/spinner-overlay';
+import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
 
 export default function SchemaView({ schemaId }: { schemaId: string }) {
   const { t } = useTranslation('common');
@@ -44,6 +46,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   const confirmModalIsOpen = useSelector(selectConfirmModalState());
   const formModalIsOpen = useSelector(selectFormModalState());
   const isEditContentActive = useSelector(selectIsEditContentActive());
+  const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
   const nodeSelection = useSelector(selectSelectedRootNode());
   const [patchSchema] = usePatchSchemaMutation();
   const [deleteSchema] = useDeleteSchemaMutation();
@@ -179,12 +182,11 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   });
 
   if (isLoading) {
+    setTimeout(() => setLoadingSpinnerVisible(true), 500);
     return (
-      <div className="d-flex justify-content-center">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
+      <SpinnerWrapper>
+        <SpinnerOverlay animationVisible={loadingSpinnerVisible} transparentBackground={true} />
+      </SpinnerWrapper>
     );
   } else if (isError) {
     if ('status' in error && error.status === 404) {

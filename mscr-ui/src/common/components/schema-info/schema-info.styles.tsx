@@ -16,6 +16,11 @@ export const TreeviewWrapper = styled.div`
   border-radius: 5px;
 `;
 
+export const TreeWrapper = styled.div`
+  // Position set to relative so loading spinner position can be set to absolute
+  position: relative;
+`;
+
 export const ExpandButtonWrapper = styled.div`
   margin-top: 37px;
   margin-right: 15px;
