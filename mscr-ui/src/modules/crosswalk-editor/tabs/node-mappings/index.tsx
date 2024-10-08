@@ -14,7 +14,11 @@ import {
   ModalTitle,
 } from 'suomifi-ui-components';
 import NodeListingAccordion from "@app/modules/crosswalk-editor/tabs/node-mappings/node-listing-accordion";
-import {MidColumnWrapper} from "@app/modules/crosswalk-editor/tabs/node-mappings/node-mappings.styles";
+import {
+  MidColumnWrapper,
+  StyledModal,
+  StyledModalContent
+} from '@app/modules/crosswalk-editor/tabs/node-mappings/node-mappings.styles';
 import {cloneDeep} from 'lodash';
 import {useRef} from 'react';
 import {highlightOperation} from "@app/modules/crosswalk-editor/mappings-accordion";
@@ -507,13 +511,13 @@ export default function NodeMappings(props: {
 
   return (
     <>
-      <Modal
+      <StyledModal
         appElementId="__next"
         visible={visible}
         onEscKeyDown={() => closeModal()}
-        className="row bg-white edit-mapping-modal"
+        className="row"
       >
-        <ModalContent className="edit-mapping-modal-content">
+        <StyledModalContent>
           <ModalTitle>{props.isPatchMappingOperation ? t('mapping-modal.edit-mapping') : t('mapping-modal.add-mapping')}</ModalTitle>
           {false && isErrorBarVisible &&
               <ValidationErrorBar hideErrorBarCallback={() => setIsErrorBarVisible(false)}
@@ -521,7 +525,7 @@ export default function NodeMappings(props: {
                                   mappingFunctions={props.mappingFunctions}></ValidationErrorBar>
           }
           <div className="col flex-column d-flex justify-content-between">
-            <div className="row bg-white">
+            <div className="row">
               {/* SOURCE OPERATIONS */}
               <div className="col-4">
                 <NodeListingAccordion
@@ -537,57 +541,55 @@ export default function NodeMappings(props: {
               </div>
 
               {/* MID COLUMN */}
-              <div className="col-4 d-flex flex-column bg-light-blue">
-                <MidColumnWrapper>
-                  <div>
-                    <Dropdown
-                      className='mt-2 node-info-dropdown'
-                      labelText={t('mapping-modal.mapping-operation')}
-                      ref={onMappingFunctionRefChange}
-                      visualPlaceholder={t('mapping-modal.operation-not-selected')}
-                      value={mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id}
-                      onChange={(newValue) => updateMappingOperationSelection(newValue)}
-                    >
-                      {mappingFunctions?.map((rt : {uri: string; name: string}) => (
-                        <DropdownItem key={rt.uri} value={rt.uri}>
-                          {rt.name}
-                        </DropdownItem>
-                      ))}
-                    </Dropdown>
-                  </div>
-                  {generateMappingOperationFields(mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id)}
+              <MidColumnWrapper className="col-4 d-flex flex-column">
+                <div>
+                  <Dropdown
+                    className='mt-2 node-info-dropdown'
+                    labelText={t('mapping-modal.mapping-operation')}
+                    ref={onMappingFunctionRefChange}
+                    visualPlaceholder={t('mapping-modal.operation-not-selected')}
+                    value={mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id}
+                    onChange={(newValue) => updateMappingOperationSelection(newValue)}
+                  >
+                    {mappingFunctions?.map((rt : {uri: string; name: string}) => (
+                      <DropdownItem key={rt.uri} value={rt.uri}>
+                        {rt.name}
+                      </DropdownItem>
+                    ))}
+                  </Dropdown>
+                </div>
+                {generateMappingOperationFields(mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id)}
 
-                  <div>
-                    <br/>
-                    <Dropdown
-                      className="mt-2 mb-4 node-info-dropdown"
-                      labelText={t('mapping-modal.predicate')}
-                      visualPlaceholder={t('mapping-modal.exact-match')}
-                      value={predicateValue}
-                      ref={onPredicateRefChange}
-                      // autoFocus
-                      //defaultValue={mappingNodes ? mappingNodes[0].predicate : ''}
-                      onChange={(newValue) => {
-                        setPredicateValue(newValue);
-                      }}
-                    >
-                      {predicateValues.map((rt) => (
-                        <DropdownItem key={rt.id} value={rt.id}>
-                          {rt.name}
-                        </DropdownItem>
-                      ))}
-                    </Dropdown>
-
-                  </div>
-                  <Textarea
-                    onChange={(event) => setNotesValue(event.target.value)}
-                    labelText={t('mapping-modal.notes')}
-                    visualPlaceholder={t('mapping-modal.no-notes-set')}
-                    value={notesValue}
-                  />
+                <div>
                   <br/>
-                </MidColumnWrapper>
-              </div>
+                  <Dropdown
+                    className="mt-2 mb-4 node-info-dropdown"
+                    labelText={t('mapping-modal.predicate')}
+                    visualPlaceholder={t('mapping-modal.exact-match')}
+                    value={predicateValue}
+                    ref={onPredicateRefChange}
+                    // autoFocus
+                    //defaultValue={mappingNodes ? mappingNodes[0].predicate : ''}
+                    onChange={(newValue) => {
+                      setPredicateValue(newValue);
+                    }}
+                  >
+                    {predicateValues.map((rt) => (
+                      <DropdownItem key={rt.id} value={rt.id}>
+                        {rt.name}
+                      </DropdownItem>
+                    ))}
+                  </Dropdown>
+
+                </div>
+                <Textarea
+                  onChange={(event) => setNotesValue(event.target.value)}
+                  labelText={t('mapping-modal.notes')}
+                  visualPlaceholder={t('mapping-modal.no-notes-set')}
+                  value={notesValue}
+                />
+                <br/>
+              </MidColumnWrapper>
 
               {/* TARGET OPERATIONS */}
               <div className="col-4">
@@ -604,10 +606,13 @@ export default function NodeMappings(props: {
               </div>
             </div>
           </div>
-        </ModalContent>
+        </StyledModalContent>
         <ModalFooter>
-          <Button disabled={sourceOperationValueErrors.length > 0} style={{height: 'min-content'}}
-                  onClick={() => save()}>
+          <Button
+            disabled={sourceOperationValueErrors.length > 0}
+            style={{height: 'min-content'}}
+            onClick={() => save()}
+          >
             {t('action.save')}
           </Button>
           <Button
@@ -618,7 +623,7 @@ export default function NodeMappings(props: {
             {t('action.cancel')}
           </Button>
         </ModalFooter>
-      </Modal>
+      </StyledModal>
     </>
   );
 }

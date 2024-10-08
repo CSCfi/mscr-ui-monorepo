@@ -399,7 +399,7 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
         <Table aria-label="collapsible table w-100">
           <TableHead className="gx-0">
             <TableRow className="row gx-0">
-              <StyledTableHeadingCell className="col-12 bg-light-blue">
+              <StyledTableHeadingCell className="col-12">
                 <span
                   className="fw-bold ps-3">{props.isSourceAccordion ? props.isOneToManyMapping ? 'Source' : 'Sources' : props.isOneToManyMapping ? 'Targets' : 'Target'}</span>
               </StyledTableHeadingCell>
