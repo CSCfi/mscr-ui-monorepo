@@ -61,8 +61,6 @@ import styled from 'styled-components';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion/function-tooltip-box";
 import ConfirmModal from "@app/common/components/confirmation-modal";
-import {setConfirmModalState} from "@app/common/components/actionmenu/actionmenu.slice";
-import {useStoreDispatch} from "@app/store";
 
 export interface highlightOperation {
   operationId: string;
@@ -95,11 +93,11 @@ function Row(props: {
   };
 
   function performDeleteMappingAction() {
-      setIsDeleteMappingConfirmModalOpen(false);
-        props.callBackFunction.performAccordionAction(
-          props.row,
-          'removeMapping'
-        );
+    setIsDeleteMappingConfirmModalOpen(false);
+    props.callBackFunction.performAccordionAction(
+      props.row,
+      'removeMapping'
+    );
   }
 
   return (
@@ -267,15 +265,13 @@ function Row(props: {
                   </Sbutton>
                 </Tooltip>
                 {isDeleteMappingConfirmModalOpen && <ConfirmModal
-                  heading={t('actionmenu.delete-mapping')}
+                  heading={t('confirm-modal.heading')}
                   actionText={t('confirm')}
                   cancelText={t('cancel')}
                   confirmAction={performDeleteMappingAction}
                   onClose={() => {
                     setIsDeleteMappingConfirmModalOpen(false);
-
                   }}
-                  heading={t('confirm-modal.heading')}
                   text1={t('confirm-modal.do-you-want-to-delete-mapping')}
                 />}
               </>
