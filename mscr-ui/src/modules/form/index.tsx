@@ -551,38 +551,30 @@ export default function FormModal({
       variant={isSmall ? 'smallScreen' : 'default'}
       style={{ position: 'relative' }}
     >
+      <CloseButton
+        variant="secondaryNoBorder"
+        icon={<IconClose />}
+        aria-label="t('cancel')"
+        onClick={() => handleClose()}
+      />
       <SpinnerOverlay animationVisible={submitAnimationVisible} />
       <ModalContent>
         <div id={'modalTop'}></div>
-
-        <div className="row">
-          <div className="col-8">
-            <ModalTitle>
-              {contentType == Type.Schema
-                ? modalType == ModalType.RegisterNewFull
-                  ? t('content-form.title.schema-register')
-                  : modalType == ModalType.MscrCopy
-                    ? t('content-form.title.schema-mscr-copy')
-                    : t('content-form.title.schema-revision')
-                : modalType == ModalType.RegisterNewFull
-                  ? t('content-form.title.crosswalk-register')
-                  : modalType == ModalType.RegisterNewMscr
-                    ? t('content-form.title.crosswalk-create')
-                    : modalType == ModalType.MscrCopy
-                      ? t('content-form.title.crosswalk-mscr-copy')
-                      : t('content-form.title.crosswalk-revision')}
-            </ModalTitle>
-          </div>
-          <div className="col-4">
-            <CloseButton
-              style={{ float: 'right' }}
-              variant="secondaryNoBorder"
-              icon={<IconClose />}
-              aria-label="t('cancel')"
-              onClick={() => handleClose()}
-            ></CloseButton>
-          </div>
-        </div>
+        <ModalTitle>
+          {contentType == Type.Schema
+            ? modalType == ModalType.RegisterNewFull
+              ? t('content-form.title.schema-register')
+              : modalType == ModalType.MscrCopy
+                ? t('content-form.title.schema-mscr-copy')
+                : t('content-form.title.schema-revision')
+            : modalType == ModalType.RegisterNewFull
+              ? t('content-form.title.crosswalk-register')
+              : modalType == ModalType.RegisterNewMscr
+                ? t('content-form.title.crosswalk-create')
+                : modalType == ModalType.MscrCopy
+                  ? t('content-form.title.crosswalk-mscr-copy')
+                  : t('content-form.title.crosswalk-revision')}
+        </ModalTitle>
 
         {(modalType == ModalType.RegisterNewFull ||
             modalType == ModalType.RevisionFull) &&
