@@ -16,8 +16,10 @@
     "unset-root-selection": ""
   },
   "actionmenu": {
+    "activate-edit-mode-to-delete-mapping": "",
     "delete-crosswalk": "",
     "delete-draft": "",
+    "delete-mapping": "",
     "delete-schema": "",
     "deprecate-crosswalk": "",
     "deprecate-schema": "",
@@ -63,6 +65,7 @@
     "no-upper-associations": "",
     "no-upper-attributes": ""
   },
+  "confirm": "",
   "confirm-modal": {
     "delete-crosswalk": "",
     "delete-draft": "",
@@ -71,6 +74,7 @@
     "delete-schema": "",
     "deprecate-crosswalk": "",
     "deprecate-schema": "",
+    "do-you-want-to-delete-mapping": "",
     "heading": "",
     "invalidate-crosswalk": "",
     "invalidate-schema": "",

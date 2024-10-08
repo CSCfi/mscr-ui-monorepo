@@ -60,6 +60,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import styled from 'styled-components';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion/function-tooltip-box";
+import ConfirmModal from "@app/common/components/confirmation-modal";
 
 export interface highlightOperation {
   operationId: string;
@@ -78,6 +79,9 @@ function Row(props: {
   const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
 
+  const [isDeleteMappingConfirmModalOpen, setIsDeleteMappingConfirmModalOpen] =
+    React.useState<boolean>(false);
+
   function selectFromTrees(row: any, mappingId: any, isSourceTree: boolean) {
     props.callBackFunction.performAccordionAction(
       row,
@@ -87,6 +91,14 @@ function Row(props: {
       isSourceTree
     );
   };
+
+  function performDeleteMappingAction() {
+    setIsDeleteMappingConfirmModalOpen(false);
+    props.callBackFunction.performAccordionAction(
+      props.row,
+      'removeMapping'
+    );
+  }
 
   return (
     <>
@@ -239,22 +251,29 @@ function Row(props: {
                   </Sbutton>
                 </Tooltip>
                 <Tooltip
-                  title={props.isEditModeActive ? 'Delete mapping' : 'Activate edit mode to delete mapping'}
+                  title={props.isEditModeActive ? t('actionmenu.delete-mapping') : t('actionmenu.activate-edit-mode-to-delete-mapping')}
                   placement="bottom"
                 >
                   <Sbutton
                     disabled={!(props.isEditModeActive)}
                     className="ms-2"
                     onClick={(e) => {
-                      props.callBackFunction.performAccordionAction(
-                        props.row,
-                        'removeMapping'
-                      );
+                      setIsDeleteMappingConfirmModalOpen(true);
                     }}
                   >
                     Delete
                   </Sbutton>
                 </Tooltip>
+                {isDeleteMappingConfirmModalOpen && <ConfirmModal
+                  heading={t('confirm-modal.heading')}
+                  actionText={t('confirm')}
+                  cancelText={t('cancel')}
+                  confirmAction={performDeleteMappingAction}
+                  onClose={() => {
+                    setIsDeleteMappingConfirmModalOpen(false);
+                  }}
+                  text1={t('confirm-modal.do-you-want-to-delete-mapping')}
+                />}
               </>
               {/*              <Tooltip
                 title={open ? 'Hide details' : 'Show details'}
