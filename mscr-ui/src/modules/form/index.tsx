@@ -639,7 +639,7 @@ export default function FormModal({
                   : t('content-form.button.crosswalk-revision')}
         </Button>
         <Button variant="secondary" onClick={() => handleClose()}>
-          {t('cancel')}
+          {userPosted ? t('close') : t('cancel')}
         </Button>
       </ModalFooter>
     </Modal>
