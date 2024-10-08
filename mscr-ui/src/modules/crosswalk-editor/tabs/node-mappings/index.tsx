@@ -515,7 +515,6 @@ export default function NodeMappings(props: {
         appElementId="__next"
         visible={visible}
         onEscKeyDown={() => closeModal()}
-        className="row"
       >
         <StyledModalContent>
           <ModalTitle>{props.isPatchMappingOperation ? t('mapping-modal.edit-mapping') : t('mapping-modal.add-mapping')}</ModalTitle>
