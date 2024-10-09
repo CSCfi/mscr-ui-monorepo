@@ -17,8 +17,12 @@ export const WideMultiSelect = styled(MultiSelect)`
 
 export const CloseButton = styled(Button)`
   max-width: 55px;
-  &&:hover {
+  position: absolute;
+  z-index: 700;
+  right: 0;
+  &&:hover, &&:focus {
     background: none;
+    position: absolute;
   }
 `;
 
