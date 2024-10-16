@@ -41,19 +41,6 @@ body {
   width: 20% !important;
 }
 
-/* EDIT MAPPING MODAL */
-.edit-mapping-modal {
-  width: 1000px !important;
-  .bg-light-blue {
-    background: #d5e4f6 !important;
-  }
-  .edit-mapping-modal-content {
-    font-size: 0.9rem;
-    padding: 30px 30px 30px 30px !important;
-    height: 600px !important;
-  }
-}
-
 .empty-mappings-table {
   display: flex;
   font-size: 0.9rem;
@@ -238,14 +225,6 @@ body {
 
   .selection-active {
     color: #548fcb;
-  }
-
-  .bg-light-blue {
-    background: #d5e4f6;
-  }
-
-  .bg-white {
-    background: #fff;
   }
 
   .selected-accordion-row {

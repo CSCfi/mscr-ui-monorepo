@@ -194,6 +194,17 @@
   "library": "",
   "library-variant": "",
   "link-opens-new-window-external": "",
+  "loading-circle-label": "",
+  "mapping-modal": {
+    "add-mapping": "",
+    "edit-mapping": "",
+    "exact-match": "",
+    "mapping-operation": "",
+    "no-notes-set": "",
+    "notes": "",
+    "operation-not-selected": "",
+    "predicate": ""
+  },
   "mappings-accordion": {
     "clear": "",
     "filter-from-mappings": "",
