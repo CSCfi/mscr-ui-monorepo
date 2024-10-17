@@ -24,12 +24,6 @@ import {useRef} from 'react';
 import {highlightOperation} from "@app/modules/crosswalk-editor/mappings-accordion";
 import { useTranslation } from 'next-i18next';
 
-interface mappingOperationValue {
-  operationId: string;
-  parameterId: string;
-  value: string;
-}
-
 export default function NodeMappings(props: {
   nodeSelections: CrosswalkConnectionNew[];
   performMappingsModalAction: any;
@@ -125,7 +119,6 @@ export default function NodeMappings(props: {
 
   const [isMappingOperationValuesInit, setMappingOperationValuesInit] = useState<boolean>(false);
   const [isErrorBarVisible, setIsErrorBarVisible] = useState<boolean>(true);
-  const [mappingOperationValues, setMappingOperationValues] = useState<mappingOperationValue[] | undefined>(undefined);
   const [mappingOperationSelection, setMappingOperationSelection] = useState<string | undefined>(undefined);
   const [mappingOperationFormatted, setMappingOperationFormatted] = useState([] as any);
   const [mappingFunctions, setMappingFunctions] = useState([] as any);
@@ -435,23 +428,8 @@ export default function NodeMappings(props: {
   function updateMappingOperationValue(operationKey: string, parameter: string, newValue: string) {
     setMappingOperationSelection(operationKey);
 
-    if (mappingOperationValues) {
-      const newValues = mappingOperationValues.map(operation => {
-        if (operation.parameterId === parameter && operation.operationId === operationKey) {
-          operation.value = newValue;
-          operation.operationId = operationKey;
-        }
-        return operation;
-      });
-      setMappingOperationValues(newValues);
-    } else {
-      const operations: mappingOperationValue[] = [];
-      operations.push({operationId: operationKey, parameterId: parameter, value: newValue});
-      setMappingOperationValues(operations);
-    }
-
-    let formattedParams = generateMappingFunctionDefaultParams(operationKey);
-    formattedParams[parameter] = newValue;
+    const originalParams = mappingOperationFormatted?.id === operationKey ? mappingOperationFormatted.params : generateMappingFunctionDefaultParams(operationKey);
+    const formattedParams = {...originalParams, [parameter]: newValue };
     let processing: any = {
       id: operationKey,
       params: formattedParams,
@@ -468,17 +446,10 @@ export default function NodeMappings(props: {
   }
 
   function isMappingOperationValueValid(parameterName: string) {
-
-    let ret = false;
-    if (mappingOperationValues) {
-      mappingOperationValues.filter(x => x.parameterId === parameterName).map(x => {
-          if (x.value) {
-            ret = x.value.length > 0;
-          }
-        }
-      );
-      return ret;
+    if (mappingOperationFormatted && 'params' in mappingOperationFormatted) {
+      return mappingOperationFormatted.params[parameterName]?.length > 0;
     }
+    return false;
   }
 
   function generateMappingOperationFields(operationKey: string | undefined) {
