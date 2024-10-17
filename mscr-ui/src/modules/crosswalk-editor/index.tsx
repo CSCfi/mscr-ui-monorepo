@@ -77,7 +77,7 @@ export default function CrosswalkEditor({
   const [lastPatchMappingReqId, setLastPatchMappingReqId] =
     useState<string>('');
   const [lastDeleteMappingPid, setLastDeleteMappingPid] = useState<string>('');
-  const [showAttributeNames, setShowAttributeNames] = useState(true);
+  const [showAttributeNames, setShowAttributeNames] = useState(false);
   const [sourceTreeSelection, setSourceTreeSelection] = useState<string[]>([]);
   const [targetTreeSelection, setTargetTreeSelection] = useState<string[]>([]);
   const [isOneToManyMapping, setIsOneToManyMapping] = useState<boolean>(false);

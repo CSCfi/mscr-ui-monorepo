@@ -113,12 +113,12 @@ function Row(props: {
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title={t('mappings-accordion.select-linked-nodes')}
+                        title={props.showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
                         onClick={(e) => {
                           selectFromTrees(props.row, mapping.id, true);
                           e.stopPropagation();
                         }}
-                      >{props.showAttributeNames ? mapping.label : mapping.id}</StyledButton>
+                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id)}</StyledButton>
 
                       <HorizontalLineStart>
                         <div></div>
@@ -215,12 +215,12 @@ function Row(props: {
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title={t('mappings-accordion.select-linked-nodes')}
+                        title={props.showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
                         onClick={(e) => {
                           selectFromTrees(props.row, mapping.id, false);
                           e.stopPropagation();
                         }}
-                      >{props.showAttributeNames ? mapping.label : mapping.id}</StyledButton>
+                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id)}</StyledButton>
                     </div>
                   </div>
                 </>)
@@ -340,6 +340,55 @@ function Row(props: {
   );
 }
 
+function extractPath(strings: string[]): string {
+  let returnString = "";
+  for (let i = 0; i < strings.length; i++) {
+    if (strings.length === i - 1) {
+      returnString = returnString + "/" + strings[i];
+    } else {
+      let separator = "/";
+      if (i === 0) {
+        separator = ""
+      }
+      if (i % 2 === 0) {
+        returnString = returnString + separator + strings[i];
+      }
+    }
+  }
+  return returnString;
+}
+
+function returnFullPath(id: string) : string {
+  let returnString = id.substring(id?.indexOf("#root-Root-") + "#root-Root-".length);
+  let strings;
+  if (returnString) {
+    strings = returnString.split("-");
+    returnString = "";
+    if (strings.length > 1) {
+      returnString = extractPath(strings);
+    } else {
+      returnString = strings[0];
+    }
+  }
+  return returnString;
+}
+
+function returnPath(id: string) : string {
+  let returnString = id.substring(id?.indexOf("#root-Root-") + "#root-Root-".length);
+  let strings;
+  if (returnString) {
+    strings = returnString.split("-");
+    returnString = "";
+    if (strings.length > 5) {
+      returnString = strings[0] + "/{" + (strings.length - 3) / 2 + "}/" + strings[strings.length - 1];
+    } else if (strings.length > 1) {
+      returnString = extractPath(strings);
+    } else {
+      returnString = strings[0];
+    }
+  }
+  return returnString;
+}
 function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAttributeNames: boolean) {
   let results: NodeMapping[] = [];
   const searchString = value.toLowerCase();
@@ -365,7 +414,7 @@ function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAtt
 export default function MappingsAccordion(props: any) {
   const {t} = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
-  const [showAttributeNames, setShowAttributeNames] = React.useState<boolean>(true);
+  const [showAttributeNames, setShowAttributeNames] = React.useState<boolean>(false);
   useEffect(() => {
     setMappingData(props.nodeMappings);
     setShowAttributeNames(props.showAttributeNames);
