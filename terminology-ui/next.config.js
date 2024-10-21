@@ -13,7 +13,7 @@ module.exports = (phase, { defaultConfig }) => {
   }
 
   let config = {
-    basePath: '',
+    basePath: '/vocabularies',
     experimental: {
       scrollRestoration: true,
     },
@@ -24,15 +24,7 @@ module.exports = (phase, { defaultConfig }) => {
     i18n,
     eslint: {
       dirs: ['src'],
-      ignoreDuringBuilds: true,
     },
-    typescript: {
-      // !! WARN !!
-      // Dangerously allow production builds to successfully complete even if
-      // your project has type errors.
-      // !! WARN !!
-      ignoreBuildErrors: false,
-    },    
     async redirects() {
       return [
         {
