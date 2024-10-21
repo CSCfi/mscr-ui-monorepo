@@ -29,7 +29,7 @@
     "finish-editing": "Finish editing",
     "invalidate-crosswalk": "Invalidate crosswalk",
     "invalidate-schema": "Invalidate schema",
-    "mscr-copy": "Make MSCR copy",
+    "mscr-copy": "Covert to MSCR Format",
     "publish-crosswalk": "Publish crosswalk",
     "publish-schema": "Publish schema",
     "revision": "Add new revision",
