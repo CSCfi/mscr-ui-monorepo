@@ -8,7 +8,7 @@ export default withIronSessionApiRoute(
 
     // but SSO should first return to auth callback
     //target = '/api/auth/callback?target=' + target;
-    target = '/vocabularies/api/auth/callback?target=' + target;
+    target = '/api/auth/callback?target=' + target;
 
     const path = `/Shibboleth.sso/Login?target=${encodeURIComponent(target)}`;
     res.redirect(path);
