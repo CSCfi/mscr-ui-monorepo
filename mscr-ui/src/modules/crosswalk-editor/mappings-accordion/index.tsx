@@ -352,6 +352,9 @@ function extractPath(strings: string[]): string {
       if (i === 0) {
         separator = ""
       }
+      if (i === strings.length - 2 || i === strings.length - 3) {
+        separator = "/ ";
+      }
       if (i % 2 === 0) {
         returnString = returnString + separator + strings[i];
       }
@@ -385,8 +388,8 @@ function returnPath(id: string, label: string, schemaFormat: string) : string {
     if (returnString) {
       strings = returnString.split("-");
       returnString = "";
-      if (strings.length > 5) {
-        returnString = strings[0] + "/{" + (strings.length - 3) / 2 + "}/" + strings[strings.length - 1];
+      if (strings.length > 7) {
+        returnString = strings[0] + "/{" + (strings.length - 5) / 2 + "}/" + strings[strings.length - 2] + "/ " + strings[strings.length - 1];
       } else if (strings.length > 1) {
         returnString = extractPath(strings);
       } else {
