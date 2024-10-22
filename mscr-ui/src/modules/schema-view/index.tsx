@@ -69,7 +69,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     isEditContentActive &&
     hasEditPermission &&
     schemaData?.format === Format.Mscr;
-  const hasCopyPermission = HasPermission({ action: 'MAKE_MSCR_COPY' });
+  const hasCopyPermission = HasPermission({ action: 'MAKE_MSCR_COPY', owner: schemaData?.owner});
   const router = useRouter(); // Force refresh the page
   const isMscrCopyAvailable =
     hasCopyPermission &&

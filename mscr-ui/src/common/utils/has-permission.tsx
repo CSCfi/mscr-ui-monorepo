@@ -77,9 +77,7 @@ export default function HasPermission({ action, owner }: hasPermissionProps) {
 }
 
 export function checkPermission({ user, action, owner }: checkPermissionProps) {
-  if (action == 'MAKE_MSCR_COPY') {
-    return true;
-  } else if (action == 'EDIT_CONTENT') {
+  if (action == 'EDIT_CONTENT'||'MAKE_MSCR_COPY') {
     if (owner?.includes(user.id)) {
       //user is the owner, Check for personal Contents
       return true;
