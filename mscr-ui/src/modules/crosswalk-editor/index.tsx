@@ -24,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { selectIsEditContentActive } from '@app/common/components/content-view/content-view.slice';
 import { State } from '@app/common/interfaces/state.interface';
 import Tooltip from '@mui/material/Tooltip';
+import {useGetFrontendSchemaQuery, useGetSchemaQuery} from "@app/common/components/schema/schema.slice";
 
 export default function CrosswalkEditor({
   crosswalkId,
@@ -124,9 +125,11 @@ export default function CrosswalkEditor({
 
   useEffect(() => {
     if (crosswalkData?.sourceSchema) {
+      console.log("Marko: crosswalk-editor: sourceSchemaUrn=" + crosswalkData.sourceSchema);
       setSourceSchemaUrn(crosswalkData.sourceSchema);
     }
     if (crosswalkData?.targetSchema) {
+      console.log("Marko: crosswalk-editor: targetSchemaUrn=" + crosswalkData.targetSchema);
       setTargetSchemaUrn(crosswalkData.targetSchema);
     }
   }, [crosswalkData]);
@@ -140,6 +143,25 @@ export default function CrosswalkEditor({
     // refetch: refetchMappings,
   } = useGetMappingsQuery(crosswalkId);
 
+  let sourceSchemaFormat, targetSchemaFormat;
+  if (crosswalkData?.sourceSchema) {
+    const sourceSchema = getSchema(crosswalkData.sourceSchema);
+    console.log("Marko: crosswalk-editor: sourceSchema=" + JSON.stringify(sourceSchema));
+    /*const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
+      useGetFrontendSchemaQuery(crosswalkData.sourceSchema);
+    console.log("Marko: crosswalk-editor: source schema data=" + JSON.stringify(getSchemaData)
+      + ", getSchemaDataIsSuccess=" + getSchemaDataIsSuccess);*/
+    sourceSchemaFormat = sourceSchema?.format;
+  }
+  if (crosswalkData?.targetSchema) {
+    const targetSchema = getSchema(crosswalkData.targetSchema);
+    console.log("Marko: crosswalk-editor: targetSchema=" + JSON.stringify(targetSchema));
+    /*const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
+      useGetFrontendSchemaQuery(crosswalkData.targetSchema);
+    console.log("Marko: crosswalk-editor: target schema data=" + JSON.stringify(getSchemaData)
+      + ", getSchemaDataIsSuccess=" + getSchemaDataIsSuccess);*/
+    targetSchemaFormat = targetSchema?.format;
+  }
   useEffect(() => {
     if (mappingsFromBackend) {
       const nodeMappings = mappingsFromBackend as NodeMapping[];
@@ -177,6 +199,13 @@ export default function CrosswalkEditor({
       setNodeMappings(() => [...newMappings]);
       //
     }
+  }
+
+  function getSchema(schemaPid: string) {
+    const {data: schemaData} = useGetSchemaQuery(
+      schemaPid ?? '',
+    );
+    return schemaData;
   }
 
   function addMappingToAccordion(response: any, isPutOperation: boolean) {
@@ -544,6 +573,7 @@ export default function CrosswalkEditor({
             showAttributeNames={showAttributeNames}
             mappingFunctions={mappingFunctions}
             performAccordionAction={performCallbackFromAccordionAction}
+            schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
           />
         </div>
       </div>

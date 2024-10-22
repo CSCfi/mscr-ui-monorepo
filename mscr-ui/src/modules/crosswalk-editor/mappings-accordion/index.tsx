@@ -61,6 +61,7 @@ import styled from 'styled-components';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion/function-tooltip-box";
 import ConfirmModal from "@app/common/components/confirmation-modal";
+import {useGetSchemaQuery} from "@app/common/components/schema/schema.slice";
 
 export interface highlightOperation {
   operationId: string;
@@ -75,6 +76,7 @@ function Row(props: {
   showAttributeNames: boolean;
   rowcount: number;
   mappingFunctions: any;
+  schemaFormats: any;
 }) {
   const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
@@ -118,7 +120,7 @@ function Row(props: {
                           selectFromTrees(props.row, mapping.id, true);
                           e.stopPropagation();
                         }}
-                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id)}</StyledButton>
+                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label, props.schemaFormats?.sourceSchemaFormat)}</StyledButton>
 
                       <HorizontalLineStart>
                         <div></div>
@@ -220,7 +222,7 @@ function Row(props: {
                           selectFromTrees(props.row, mapping.id, false);
                           e.stopPropagation();
                         }}
-                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id)}</StyledButton>
+                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label, props.schemaFormats?.targetSchemaFormat)}</StyledButton>
                     </div>
                   </div>
                 </>)
@@ -373,21 +375,58 @@ function returnFullPath(id: string) : string {
   return returnString;
 }
 
-function returnPath(id: string) : string {
-  let returnString = id.substring(id?.indexOf("#root-Root-") + "#root-Root-".length);
-  let strings;
-  if (returnString) {
-    strings = returnString.split("-");
-    returnString = "";
-    if (strings.length > 5) {
-      returnString = strings[0] + "/{" + (strings.length - 3) / 2 + "}/" + strings[strings.length - 1];
-    } else if (strings.length > 1) {
-      returnString = extractPath(strings);
-    } else {
-      returnString = strings[0];
+function returnPath(id: string, label: string, schemaFormat: string) : string {
+  console.log('Marko: returnPath: alussa id=' + id + ", label='" + label + "' schemaFormat='" + schemaFormat);
+  let returnString = '';
+  if (schemaFormat === 'XSD' || schemaFormat === 'CSV' || schemaFormat === 'JSONSCHEMA' || schemaFormat ==='SKOSRDF'
+  || schemaFormat ==='ENUM'  || schemaFormat === 'MSCR') {
+    returnString = id.substring(id?.indexOf("#root-Root-") + "#root-Root-".length);
+    let strings;
+    if (returnString) {
+      strings = returnString.split("-");
+      returnString = "";
+      if (strings.length > 5) {
+        returnString = strings[0] + "/{" + (strings.length - 3) / 2 + "}/" + strings[strings.length - 1];
+      } else if (strings.length > 1) {
+        returnString = extractPath(strings);
+      } else {
+        returnString = strings[0];
+      }
     }
+    return returnString;
+  } else {
+    let className = '';
+    if (schemaFormat === 'RDFS' || schemaFormat === 'OWL') {
+      if (id.lastIndexOf('#') === -1) {
+        returnString = id.substring(id.lastIndexOf('/') + 1);
+      } else {
+        className = id.substring(id?.lastIndexOf('/') + 1, label.lastIndexOf('#')) + ':';
+        console.log('Marko: returnPath: className = ' + className);
+        let itemName = id.substring(id.lastIndexOf('#') + 1);
+        console.log('Marko: returnPath: itemName = ' + itemName);
+        returnString = className + itemName;
+      }
+    } else if (schemaFormat === 'SHACL') {
+      let strings = id.substring(id?.indexOf("#root/Root/") + 1).split('/');
+      returnString = extractPath(strings);
+      console.log('Marko: SHACL: returnString=' + returnString);
+      if (returnString.lastIndexOf('/') !== returnString.indexOf('/')) {
+        let lastIndex = returnString.lastIndexOf('/');
+        let endString = returnString.substring(lastIndex + 1);
+        console.log('Marko: SHACL: endString = ' + endString + ', lastIndex=' + lastIndex);
+        let secondLastIndex = returnString.substring(0, lastIndex).lastIndexOf('/');
+        let secondEndString = returnString.substring(secondLastIndex + 1, lastIndex);
+        console.log('Marko: SHACL: secondEndString = ' + secondEndString);
+        returnString = secondEndString + "/" + endString;
+        console.log('Marko: SHACL: returnString = ' + returnString + ', length= ' + returnString.length + ', secondLastIndex=' + secondLastIndex);
+      }
+      returnString = returnString.replaceAll('/', ':');
+      console.log('Marko: SHACL: lopussa returnString= ' + returnString);
+    } else if (schemaFormat === 'OWL') {
+
+    }
+    return returnString;
   }
-  return returnString;
 }
 function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAttributeNames: boolean) {
   let results: NodeMapping[] = [];
@@ -415,9 +454,11 @@ export default function MappingsAccordion(props: any) {
   const {t} = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
   const [showAttributeNames, setShowAttributeNames] = React.useState<boolean>(false);
+  const [schemaFormats, setSchemaFormats] = React.useState<{}>({sourceSchemaFormat: undefined, targetSchemaFormat: undefined});
   useEffect(() => {
     setMappingData(props.nodeMappings);
     setShowAttributeNames(props.showAttributeNames);
+    setSchemaFormats(props.schemaFormats);
   }, [props]);
   const nodeMappingsInput = props.nodeMappings;
   return (
@@ -473,6 +514,14 @@ export default function MappingsAccordion(props: any) {
           {mappingData?.length > 0 && (
             <TableBody>
               {mappingData.map((row: NodeMapping) => {
+                {
+                  console.log("Marko: testi, row=" + JSON.stringify(row));
+                  console.log("Marko: row.id=" + row.id + ", row.pid=" + row.pid + ", row.notes=" + row.notes + ", row.predicate=" + row.predicate
+                + ", row.isPartOf=" + row.isPartOf + ", row.depends_on=" + row.depends_on + ", row.filter=" + JSON.stringify(row.filter)
+                  + ", row.oneOf" + JSON.stringify(row.oneOf) + ", row.processing=" + JSON.stringify(row.processing)
+                  + ", row.source=" + JSON.stringify(row.source) + ", row.sourceDescription=" + row.sourceDescription +
+                  "row.sourceType=" + row.sourceType + ", row.target=" + JSON.stringify(row.target)
+                  + ", row.targetDescription=" + row.targetDescription + ", row.targetType=" + row.targetType);}
                 return (
                   <Row
                     key={row.pid}
@@ -483,6 +532,7 @@ export default function MappingsAccordion(props: any) {
                     showAttributeNames={showAttributeNames}
                     rowcount={mappingData.length}
                     mappingFunctions={props.mappingFunctions}
+                    schemaFormats={schemaFormats}
                   />
                 );
               })}
