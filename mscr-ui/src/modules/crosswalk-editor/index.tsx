@@ -24,6 +24,9 @@ import { useSelector } from 'react-redux';
 import { selectIsEditContentActive } from '@app/common/components/content-view/content-view.slice';
 import { State } from '@app/common/interfaces/state.interface';
 import Tooltip from '@mui/material/Tooltip';
+import {useGetFrontendSchemaQuery, useGetSchemaQuery} from "@app/common/components/schema/schema.slice";
+import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
+import {Format} from "@app/common/interfaces/format.interface";
 
 export default function CrosswalkEditor({
   crosswalkId,
@@ -77,7 +80,7 @@ export default function CrosswalkEditor({
   const [lastPatchMappingReqId, setLastPatchMappingReqId] =
     useState<string>('');
   const [lastDeleteMappingPid, setLastDeleteMappingPid] = useState<string>('');
-  const [showAttributeNames, setShowAttributeNames] = useState(true);
+  const [showAttributeNames, setShowAttributeNames] = useState(false);
   const [sourceTreeSelection, setSourceTreeSelection] = useState<string[]>([]);
   const [targetTreeSelection, setTargetTreeSelection] = useState<string[]>([]);
   const [isOneToManyMapping, setIsOneToManyMapping] = useState<boolean>(false);
@@ -140,6 +143,22 @@ export default function CrosswalkEditor({
     // refetch: refetchMappings,
   } = useGetMappingsQuery(crosswalkId);
 
+  let sourceSchemaFormat: Format | undefined, targetSchemaFormat: Format | undefined;
+  let sourceSchemaData: SchemaWithContent | undefined, targetSchemaData: SchemaWithContent | undefined;
+  if (crosswalkData?.sourceSchema) {
+    const sourceSchema = getSchema(crosswalkData.sourceSchema);
+    const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
+      useGetFrontendSchemaQuery(crosswalkData.sourceSchema);
+    sourceSchemaFormat = sourceSchema?.format;
+    sourceSchemaData = getSchemaData;
+  }
+  if (crosswalkData?.targetSchema) {
+    const targetSchema = getSchema(crosswalkData.targetSchema);
+    const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
+      useGetFrontendSchemaQuery(crosswalkData.targetSchema);
+    targetSchemaFormat = targetSchema?.format;
+    targetSchemaData = getSchemaData;
+  }
   useEffect(() => {
     if (mappingsFromBackend) {
       const nodeMappings = mappingsFromBackend as NodeMapping[];
@@ -177,6 +196,13 @@ export default function CrosswalkEditor({
       setNodeMappings(() => [...newMappings]);
       //
     }
+  }
+
+  function getSchema(schemaPid: string) {
+    const {data: schemaData} = useGetSchemaQuery(
+      schemaPid ?? '',
+    );
+    return schemaData;
   }
 
   function addMappingToAccordion(response: any, isPutOperation: boolean) {
@@ -544,6 +570,8 @@ export default function CrosswalkEditor({
             showAttributeNames={showAttributeNames}
             mappingFunctions={mappingFunctions}
             performAccordionAction={performCallbackFromAccordionAction}
+            schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
+            schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
           />
         </div>
       </div>
