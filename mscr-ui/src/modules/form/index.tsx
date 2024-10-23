@@ -407,7 +407,6 @@ export default function FormModal({
 
   // Continuously updating validation after submitting
   useEffect(() => {
-    console.log("Marko: schema-form index: formdata=" + JSON.stringify(formData));
     if (!userPosted || !formData) {
       return;
     }

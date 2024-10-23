@@ -1,67 +1,44 @@
 import * as React from 'react';
+import {useEffect} from 'react';
 import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import TableCell, {tableCellClasses} from '@mui/material/TableCell';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
-import AddLinkIcon from '@mui/icons-material/AddLink';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
-import {
-  Button as Sbutton,
-  Tooltip as Stooltip,
-  DropdownItem,
-  Heading,
-  SearchInput,
-  Textarea,
-  TextInput
-} from 'suomifi-ui-components';
-import Button from '@mui/material/Button';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import CheckIcon from '@mui/icons-material/Check';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import TableCell from '@mui/material/TableCell';
+import {Button as Sbutton, SearchInput} from 'suomifi-ui-components';
 import Tooltip from '@mui/material/Tooltip';
 
 import {NodeMapping} from '@app/common/interfaces/crosswalk-connection.interface';
-import {FunctionIcon, InfoIcon} from '@app/common/components/shared-icons';
-import {useEffect} from 'react';
+import {InfoIcon} from '@app/common/components/shared-icons';
 import {useTranslation} from 'next-i18next';
 import {
+  AccordionContainer,
   EmptyBlock,
-  HorizontalLineStart,
   HorizontalLineMidEnd,
   HorizontalLineMidStart,
+  HorizontalLineStart,
+  HorizontalLineStartSecond,
   HorizontalLineTarget,
-  IconCircle,
-  IconCircleMid,
-  IconLetterWrap,
+  HorizontalLineTargetEnd,
+  HorizontalLineTargetStart,
   IconSpacer,
   SearchWrapper,
-  StooltipContainer,
   StyledArrowRightIcon,
   StyledButton,
+  StyledTableActionsCell,
   StyledTableButtonCell,
   StyledTableCell,
-  StyledTableTargetCell,
-  StyledTableActionsCell,
   StyledTableRow,
+  StyledTableTargetCell,
   TableCellPadder,
-  VerticalLine, HorizontalLineTargetStart, HorizontalLineTargetEnd, HorizontalLineStartSecond, AccordionContainer
+  VerticalLine
 } from '@app/modules/crosswalk-editor/mappings-accordion/mappings-accordion.styles';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import styled from 'styled-components';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion/function-tooltip-box";
 import ConfirmModal from "@app/common/components/confirmation-modal";
-import {useGetSchemaQuery} from "@app/common/components/schema/schema.slice";
+import {Format} from "@app/common/interfaces/format.interface";
+import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
 
 export interface highlightOperation {
   operationId: string;
@@ -76,7 +53,8 @@ function Row(props: {
   showAttributeNames: boolean;
   rowcount: number;
   mappingFunctions: any;
-  schemaFormats: any;
+  schemaFormats: {sourceSchemaFormat: Format | undefined, targetSchemaFormat: Format | undefined};
+  schemaDatas: {sourceSchemaData: SchemaWithContent | undefined, targetSchemaData: SchemaWithContent | undefined};
 }) {
   const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
@@ -120,7 +98,8 @@ function Row(props: {
                           selectFromTrees(props.row, mapping.id, true);
                           e.stopPropagation();
                         }}
-                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label, props.schemaFormats?.sourceSchemaFormat)}</StyledButton>
+                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
+                        props.schemaFormats?.sourceSchemaFormat, props.schemaDatas?.sourceSchemaData)}</StyledButton>
 
                       <HorizontalLineStart>
                         <div></div>
@@ -222,7 +201,8 @@ function Row(props: {
                           selectFromTrees(props.row, mapping.id, false);
                           e.stopPropagation();
                         }}
-                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label, props.schemaFormats?.targetSchemaFormat)}</StyledButton>
+                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
+                        props.schemaFormats?.targetSchemaFormat, props.schemaDatas?.targetSchemaData)}</StyledButton>
                     </div>
                   </div>
                 </>)
@@ -352,7 +332,7 @@ function extractPath(strings: string[]): string {
       if (i === 0) {
         separator = ""
       }
-      if (i === strings.length - 2 || i === strings.length - 3) {
+      if (i === strings.length - 2 || i === strings.length - 3 && strings.length > 3) {
         separator = "/ ";
       }
       if (i % 2 === 0) {
@@ -378,11 +358,10 @@ function returnFullPath(id: string) : string {
   return returnString;
 }
 
-function returnPath(id: string, label: string, schemaFormat: string) : string {
-  console.log('Marko: returnPath: alussa id=' + id + ", label='" + label + "' schemaFormat='" + schemaFormat);
+function returnPath(id: string, label: string, schemaFormat: Format | undefined, schemaData: SchemaWithContent | undefined) : string {
   let returnString = '';
-  if (schemaFormat === 'XSD' || schemaFormat === 'CSV' || schemaFormat === 'JSONSCHEMA' || schemaFormat ==='SKOSRDF'
-  || schemaFormat ==='ENUM'  || schemaFormat === 'MSCR') {
+  if (schemaFormat === Format.Xsd || schemaFormat === Format.Csv || schemaFormat === Format.Jsonschema || schemaFormat === Format.Skosrdf
+  || schemaFormat === Format.Enum || schemaFormat === Format.Mscr) {
     returnString = id.substring(id?.indexOf("#root-Root-") + "#root-Root-".length);
     let strings;
     if (returnString) {
@@ -399,34 +378,41 @@ function returnPath(id: string, label: string, schemaFormat: string) : string {
     return returnString;
   } else {
     let className = '';
-    if (schemaFormat === 'RDFS' || schemaFormat === 'OWL') {
+    if (schemaFormat === Format.Rdfs || schemaFormat === Format.Owl) {
       if (id.lastIndexOf('#') === -1) {
         returnString = id.substring(id.lastIndexOf('/') + 1);
       } else {
         className = id.substring(id?.lastIndexOf('/') + 1, label.lastIndexOf('#')) + ':';
-        console.log('Marko: returnPath: className = ' + className);
         let itemName = id.substring(id.lastIndexOf('#') + 1);
-        console.log('Marko: returnPath: itemName = ' + itemName);
         returnString = className + itemName;
       }
-    } else if (schemaFormat === 'SHACL') {
-      let strings = id.substring(id?.indexOf("#root/Root/") + 1).split('/');
-      returnString = extractPath(strings);
-      console.log('Marko: SHACL: returnString=' + returnString);
-      if (returnString.lastIndexOf('/') !== returnString.indexOf('/')) {
-        let lastIndex = returnString.lastIndexOf('/');
-        let endString = returnString.substring(lastIndex + 1);
-        console.log('Marko: SHACL: endString = ' + endString + ', lastIndex=' + lastIndex);
-        let secondLastIndex = returnString.substring(0, lastIndex).lastIndexOf('/');
-        let secondEndString = returnString.substring(secondLastIndex + 1, lastIndex);
-        console.log('Marko: SHACL: secondEndString = ' + secondEndString);
-        returnString = secondEndString + "/" + endString;
-        console.log('Marko: SHACL: returnString = ' + returnString + ', length= ' + returnString.length + ', secondLastIndex=' + secondLastIndex);
+    } else if (schemaFormat === Format.Shacl) {
+      let definitions = schemaData?.content?.definitions;
+      if (definitions) {
+        let keys = Object.keys(definitions);
+        if (keys && keys.length > 0) {
+          for (let i = 0; i < keys.length; i++) {
+            let value = definitions[keys[i]];
+            let secondLevelKeys = Object.keys(value);
+            for (let k = 0; k < secondLevelKeys.length; k += 1) {
+              if (secondLevelKeys[k] === 'properties') {
+                let secondLevelValue = value[secondLevelKeys[k]];
+                let thirdLevelKeys = Object.keys(secondLevelValue);
+                for (let j = 0; j < thirdLevelKeys.length; j += 1) {
+                  if (thirdLevelKeys[j] === id) {
+                    for (let l = 0; l < secondLevelKeys.length; l += 1) {
+                      if (secondLevelKeys[l] === 'title') {
+                        let titleValue = value[secondLevelKeys[l]];
+                        returnString = titleValue + ':' + label;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-      returnString = returnString.replaceAll('/', ':');
-      console.log('Marko: SHACL: lopussa returnString= ' + returnString);
-    } else if (schemaFormat === 'OWL') {
-
     }
     return returnString;
   }
@@ -458,10 +444,12 @@ export default function MappingsAccordion(props: any) {
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
   const [showAttributeNames, setShowAttributeNames] = React.useState<boolean>(false);
   const [schemaFormats, setSchemaFormats] = React.useState<{}>({sourceSchemaFormat: undefined, targetSchemaFormat: undefined});
+  const [schemaDatas, setSchemaDatas] = React.useState<{}>({sourceSchemaData: undefined, targetSchemaData: undefined});
   useEffect(() => {
     setMappingData(props.nodeMappings);
     setShowAttributeNames(props.showAttributeNames);
     setSchemaFormats(props.schemaFormats);
+    setSchemaDatas(props.schemaDatas);
   }, [props]);
   const nodeMappingsInput = props.nodeMappings;
   return (
@@ -517,14 +505,6 @@ export default function MappingsAccordion(props: any) {
           {mappingData?.length > 0 && (
             <TableBody>
               {mappingData.map((row: NodeMapping) => {
-                {
-                  console.log("Marko: testi, row=" + JSON.stringify(row));
-                  console.log("Marko: row.id=" + row.id + ", row.pid=" + row.pid + ", row.notes=" + row.notes + ", row.predicate=" + row.predicate
-                + ", row.isPartOf=" + row.isPartOf + ", row.depends_on=" + row.depends_on + ", row.filter=" + JSON.stringify(row.filter)
-                  + ", row.oneOf" + JSON.stringify(row.oneOf) + ", row.processing=" + JSON.stringify(row.processing)
-                  + ", row.source=" + JSON.stringify(row.source) + ", row.sourceDescription=" + row.sourceDescription +
-                  "row.sourceType=" + row.sourceType + ", row.target=" + JSON.stringify(row.target)
-                  + ", row.targetDescription=" + row.targetDescription + ", row.targetType=" + row.targetType);}
                 return (
                   <Row
                     key={row.pid}
@@ -536,6 +516,7 @@ export default function MappingsAccordion(props: any) {
                     rowcount={mappingData.length}
                     mappingFunctions={props.mappingFunctions}
                     schemaFormats={schemaFormats}
+                    schemaDatas={schemaDatas}
                   />
                 );
               })}

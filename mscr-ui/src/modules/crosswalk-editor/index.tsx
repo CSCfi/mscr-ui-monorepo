@@ -25,6 +25,8 @@ import { selectIsEditContentActive } from '@app/common/components/content-view/c
 import { State } from '@app/common/interfaces/state.interface';
 import Tooltip from '@mui/material/Tooltip';
 import {useGetFrontendSchemaQuery, useGetSchemaQuery} from "@app/common/components/schema/schema.slice";
+import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
+import {Format} from "@app/common/interfaces/format.interface";
 
 export default function CrosswalkEditor({
   crosswalkId,
@@ -125,11 +127,9 @@ export default function CrosswalkEditor({
 
   useEffect(() => {
     if (crosswalkData?.sourceSchema) {
-      console.log("Marko: crosswalk-editor: sourceSchemaUrn=" + crosswalkData.sourceSchema);
       setSourceSchemaUrn(crosswalkData.sourceSchema);
     }
     if (crosswalkData?.targetSchema) {
-      console.log("Marko: crosswalk-editor: targetSchemaUrn=" + crosswalkData.targetSchema);
       setTargetSchemaUrn(crosswalkData.targetSchema);
     }
   }, [crosswalkData]);
@@ -143,24 +143,21 @@ export default function CrosswalkEditor({
     // refetch: refetchMappings,
   } = useGetMappingsQuery(crosswalkId);
 
-  let sourceSchemaFormat, targetSchemaFormat;
+  let sourceSchemaFormat: Format | undefined, targetSchemaFormat: Format | undefined;
+  let sourceSchemaData: SchemaWithContent | undefined, targetSchemaData: SchemaWithContent | undefined;
   if (crosswalkData?.sourceSchema) {
     const sourceSchema = getSchema(crosswalkData.sourceSchema);
-    console.log("Marko: crosswalk-editor: sourceSchema=" + JSON.stringify(sourceSchema));
-    /*const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
+    const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
       useGetFrontendSchemaQuery(crosswalkData.sourceSchema);
-    console.log("Marko: crosswalk-editor: source schema data=" + JSON.stringify(getSchemaData)
-      + ", getSchemaDataIsSuccess=" + getSchemaDataIsSuccess);*/
     sourceSchemaFormat = sourceSchema?.format;
+    sourceSchemaData = getSchemaData;
   }
   if (crosswalkData?.targetSchema) {
     const targetSchema = getSchema(crosswalkData.targetSchema);
-    console.log("Marko: crosswalk-editor: targetSchema=" + JSON.stringify(targetSchema));
-    /*const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
+    const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
       useGetFrontendSchemaQuery(crosswalkData.targetSchema);
-    console.log("Marko: crosswalk-editor: target schema data=" + JSON.stringify(getSchemaData)
-      + ", getSchemaDataIsSuccess=" + getSchemaDataIsSuccess);*/
     targetSchemaFormat = targetSchema?.format;
+    targetSchemaData = getSchemaData;
   }
   useEffect(() => {
     if (mappingsFromBackend) {
@@ -574,6 +571,7 @@ export default function CrosswalkEditor({
             mappingFunctions={mappingFunctions}
             performAccordionAction={performCallbackFromAccordionAction}
             schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
+            schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
           />
         </div>
       </div>
