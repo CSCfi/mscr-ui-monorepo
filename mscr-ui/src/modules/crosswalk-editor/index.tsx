@@ -549,6 +549,7 @@ export default function CrosswalkEditor({
       <div className="col-12 mt-4">
         <div className="d-flex justify-content-between">
           <div className="align-self-end pe-1">
+            {/*TODO: Checkbox can be removed as deprecated when all new style titles work*/}
             <Checkbox
               checked={showAttributeNames}
               onClick={(newState) => {
