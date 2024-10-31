@@ -117,7 +117,8 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "",
-    "search-from-target-schema": ""
+    "search-from-target-schema": "",
+    "show-node-titles": ""
   },
   "crosswalk-form": {
     "all": "",

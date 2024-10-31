@@ -117,7 +117,8 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "Search from source schema",
-    "search-from-target-schema": "Search from target schema"
+    "search-from-target-schema": "Search from target schema",
+    "show-node-titles": "Show simple node titles"
   },
   "crosswalk-form": {
     "all": "All",
