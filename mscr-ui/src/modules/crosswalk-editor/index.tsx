@@ -86,7 +86,10 @@ export default function CrosswalkEditor({
   const [isOneToManyMapping, setIsOneToManyMapping] = useState<boolean>(false);
   const [isPatchMappingOperation, setIsMappingPatchOperation] =
     useState<boolean>(false);
-  const [scrollToSelectedNodeId, setScrollToSelectedNodeId] = useState<
+  const [scrollToSelectedSourceNodeId, setScrollToSelectedSourceNodeId] = useState<
+    string | undefined
+  >('');
+  const [scrollToSelectedTargetNodeId, setScrollToSelectedTargetNodeId] = useState<
     string | undefined
   >('');
   const [mappingToBeEdited, setMappingToBeEdited] = useState<
@@ -395,6 +398,21 @@ export default function CrosswalkEditor({
     }
   };
 
+  function handleScrolling(mapping: NodeMapping, nodeId? : string) {
+    if (nodeId === undefined) {
+      setScrollToSelectedSourceNodeId(nodeId);
+      setScrollToSelectedTargetNodeId(nodeId);
+    } else {
+      if (nodeId === mapping.source[0].id) {
+        setScrollToSelectedSourceNodeId(nodeId);
+        setScrollToSelectedTargetNodeId(mapping.target[0].id);
+      } else {
+        setScrollToSelectedTargetNodeId(nodeId);
+        setScrollToSelectedSourceNodeId(mapping.source[0].id);
+      }
+    }
+  }
+
   const performCallbackFromAccordionAction = (
     mapping: NodeMapping,
     action: string,
@@ -402,22 +420,29 @@ export default function CrosswalkEditor({
     mappingOrHighlightOperationId?: string,
     isSourceTree?: boolean
   ) => {
-    setScrollToSelectedNodeId('');
+    setScrollToSelectedSourceNodeId('');
+    setScrollToSelectedTargetNodeId('');
     // TODO: implement add notes from accordion if needed?
     if (action === 'remove') {
       removeMapping(mapping);
     } else if (action === 'selectFromTreesByMapping') {
-      setScrollToSelectedNodeId(nodeId);
+      if (isSourceTree === true) {
+        setScrollToSelectedSourceNodeId(nodeId);
+        setScrollToSelectedTargetNodeId(mapping.target[0].id);
+      } else {
+        setScrollToSelectedTargetNodeId(nodeId);
+        setScrollToSelectedSourceNodeId(mapping.source[0].id);
+      }
       selectFromTreeByNodeMapping(mapping, true);
       selectFromTreeByNodeMapping(mapping, false);
     } else if (action === 'openMappingDetails') {
-      setScrollToSelectedNodeId(nodeId);
+      handleScrolling(mapping, nodeId);
       setIsMappingPatchOperation(true);
       setPatchPid(mapping.pid ? mapping.pid : '');
       selectFromTreeByNodeMapping(mapping, true);
       selectFromTreeByNodeMapping(mapping, false);
     } else if (action === 'highlightFunctionField') {
-      setScrollToSelectedNodeId(nodeId);
+      handleScrolling(mapping, nodeId);
       setHighlightOperation({
         operationId: mappingOrHighlightOperationId
           ? mappingOrHighlightOperationId
@@ -429,7 +454,7 @@ export default function CrosswalkEditor({
       selectFromTreeByNodeMapping(mapping, true);
       selectFromTreeByNodeMapping(mapping, false);
     } else if (action === 'removeMapping') {
-      setScrollToSelectedNodeId(nodeId);
+      handleScrolling(mapping, nodeId);
       removeMapping(mapping.pid);
     }
   };
@@ -495,7 +520,7 @@ export default function CrosswalkEditor({
               treeSelection={sourceTreeSelection}
               caption={t('crosswalk-editor.search-from-source-schema')}
               schemaUrn={sourceSchemaUrn}
-              scrollToSelectedNodeId={scrollToSelectedNodeId}
+              scrollToSelectedNodeId={scrollToSelectedSourceNodeId}
             />
           </div>
 
@@ -541,7 +566,7 @@ export default function CrosswalkEditor({
               treeSelection={targetTreeSelection}
               caption={t('crosswalk-editor.search-from-target-schema')}
               schemaUrn={targetSchemaUrn}
-              scrollToSelectedNodeId={scrollToSelectedNodeId}
+              scrollToSelectedNodeId={scrollToSelectedTargetNodeId}
             />
           </div>
         </div>
