@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button as Sbutton } from 'suomifi-ui-components';
+import { Button as Sbutton, Checkbox } from 'suomifi-ui-components';
 import MappingsAccordion, {
   highlightOperation,
 } from '@app/modules/crosswalk-editor/mappings-accordion';
@@ -549,14 +549,15 @@ export default function CrosswalkEditor({
       <div className="col-12 mt-4">
         <div className="d-flex justify-content-between">
           <div className="align-self-end pe-1">
-            {/*                        // TODO: this can be shown when attribute qnames are available for accordion. Those are temporarily replaced with attribute ids.
-                        <Checkbox
-                          checked={showAttributeNames}
-                          onClick={(newState) => {
-                            setShowAttributeNames(newState.checkboxState);
-                          }}
-                        >Show node titles
-                        </Checkbox>*/}
+            {/*TODO: Checkbox can be removed as deprecated when all new style titles work*/}
+            <Checkbox
+              checked={showAttributeNames}
+              onClick={(newState) => {
+                setShowAttributeNames(newState.checkboxState);
+              }}
+            >
+              {t('crosswalk-editor.show-node-titles')}
+            </Checkbox>
           </div>
         </div>
 
