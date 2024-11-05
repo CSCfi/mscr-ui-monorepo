@@ -7,6 +7,7 @@ import {
   formatsAvailableForSchemaRegistration,
 } from '@app/common/interfaces/format.interface';
 
+
 export interface InputErrors {
   languageAmount: boolean;
   titleAmount: string[];
@@ -77,6 +78,7 @@ export function validateForm(
       errors.fileData = true;
     }
     // Format should be provided
+    console.log(formData.format);
     if (!formData.format) {
       errors.format = true;
     }

@@ -18,6 +18,7 @@ import { useTranslation } from 'next-i18next';
 import getApiError from '@app/common/utils/getApiErrors';
 import { useRouter } from 'next/router';
 import {
+  usePutMscrSchemaRevisionMutation,
   usePutSchemaFullMutation,
   usePutSchemaMscrCopyMutation,
   usePutSchemaRevisionMutation,
@@ -100,6 +101,8 @@ export default function FormModal({
   const [putCrosswalkFull, resultCrosswalkFull] = usePutCrosswalkFullMutation();
   const [putSchemaRevision, resultSchemaRevision] =
     usePutSchemaRevisionMutation();
+  const [putMscrSchemaRevision, resultMscrSchemaRevision] =
+    usePutMscrSchemaRevisionMutation();
   const [putCrosswalkRevision, resultCrosswalkRevision] =
     usePutCrosswalkRevisionMutation();
   const [putCrosswalkFullRevision, resultCrosswalkFullRevision] =
@@ -113,7 +116,7 @@ export default function FormModal({
     if (!initialData) return;
     const existingData: FormType = {
       format:
-        modalType == ModalType.MscrCopy ? Format.Mscr : initialData.format,
+        modalType == ModalType.MscrCopy||ModalType.RevisionMscr ? Format.Mscr : initialData.format,
       languages: [
         {
           labelText: t('language-english-with-suffix'),
@@ -202,6 +205,10 @@ export default function FormModal({
             resultCrosswalkRevision.data
           ) {
             pid = resultCrosswalkRevision.data.pid;
+          } else if(contentType == Type.Schema &&
+            resultMscrSchemaRevision.isSuccess &&
+            resultMscrSchemaRevision.data) {
+              pid = resultMscrSchemaRevision.data.pid;
           }
           break;
         case ModalType.RevisionFull:
@@ -228,6 +235,15 @@ export default function FormModal({
             pid = resultSchemaMscrCopy.data.pid;
           }
           break;
+        case ModalType.RevisionMscr:
+          if (
+            contentType == Type.Schema &&
+            resultMscrSchemaRevision.isSuccess &&
+            resultMscrSchemaRevision.data
+          ) {
+            pid = resultMscrSchemaRevision.data.pid;
+          }
+          break;
         // TODO: MscrCopy API slice and then pid retrieval for crosswalk here
       }
       return pid;
@@ -247,6 +263,8 @@ export default function FormModal({
       resultSchemaMscrCopy.isSuccess,
       resultSchemaRevision.data,
       resultSchemaRevision.isSuccess,
+      resultMscrSchemaRevision.data,
+      resultMscrSchemaRevision.isSuccess
     ]
   );
 
@@ -325,6 +343,7 @@ export default function FormModal({
       fileData,
       fileUri
     );
+    console.log(formErrors);
     setErrors(formErrors);
 
     if (
@@ -352,6 +371,7 @@ export default function FormModal({
       } else if (formData.format !== Format.Mscr) {
         return;
       }
+      console.log(newFormData);
 
       // Choose the api call and parameters according to content type and modal type
       let makeApiCall;
@@ -363,7 +383,7 @@ export default function FormModal({
             setSubmitAnimationVisible(false);
           }
         );
-      } else if (modalType == ModalType.RegisterNewMscr) {
+      } else if (modalType == ModalType.RegisterNewMscr) {//what is register new MSCR?
         Promise.all([spinnerDelay(), putCrosswalk(payload)]).then((_values) => {
           setSubmitAnimationVisible(false);
         });
@@ -400,8 +420,19 @@ export default function FormModal({
         ]).then((_values) => {
           setSubmitAnimationVisible(false);
         });
+      // Creating revision of MSCR format schemas
+      } else if (initialData &&
+        modalType == ModalType.RevisionMscr &&
+        contentType == Type.Schema) {
+        console.log("creating mscr revision"+initialData.format )
+          Promise.all([
+            spinnerDelay(),
+            putMscrSchemaRevision({ pid: initialData.pid, data: payload }),
+          ]).then((_values) => {
+            setSubmitAnimationVisible(false);
+          });
       }
-      // Missing scenarios: MSCR copy of a crosswalk, revision of an MSCR copy
+      // Missing scenarios: MSCR copy of a crosswalk
     }
   };
 
