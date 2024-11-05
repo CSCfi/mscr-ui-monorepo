@@ -28,6 +28,9 @@ body {
   }
 }
 
+.fi-select-item-list_content_wrapper:has(li[id$="SHACL"]) {
+  max-height: 160px;
+}
 
 .fi-dropdown_popover {
   margin-top: 0px !important;
