@@ -111,12 +111,12 @@ export default function FormModal({
     usePutSchemaMscrCopyMutation();
   const [submitAnimationVisible, setSubmitAnimationVisible] =
     useState<boolean>(false);
-
+  
   const formDataFromInitialData = useCallback(() => {
     if (!initialData) return;
     const existingData: FormType = {
       format:
-        modalType == ModalType.MscrCopy||ModalType.RevisionMscr ? Format.Mscr : initialData.format,
+        modalType == ModalType.MscrCopy? Format.Mscr : initialData.format,
       languages: [
         {
           labelText: t('language-english-with-suffix'),
@@ -205,10 +205,12 @@ export default function FormModal({
             resultCrosswalkRevision.data
           ) {
             pid = resultCrosswalkRevision.data.pid;
-          } else if(contentType == Type.Schema &&
+          } else if (
+            contentType == Type.Schema &&
             resultMscrSchemaRevision.isSuccess &&
-            resultMscrSchemaRevision.data) {
-              pid = resultMscrSchemaRevision.data.pid;
+            resultMscrSchemaRevision.data
+          ) {
+            pid = resultMscrSchemaRevision.data.pid;
           }
           break;
         case ModalType.RevisionFull:
@@ -343,7 +345,7 @@ export default function FormModal({
       fileData,
       fileUri
     );
-    console.log(formErrors);
+
     setErrors(formErrors);
 
     if (
@@ -371,7 +373,7 @@ export default function FormModal({
       } else if (formData.format !== Format.Mscr) {
         return;
       }
-      console.log(newFormData);
+     
 
       // Choose the api call and parameters according to content type and modal type
       let makeApiCall;
@@ -424,7 +426,6 @@ export default function FormModal({
       } else if (initialData &&
         modalType == ModalType.RevisionMscr &&
         contentType == Type.Schema) {
-        console.log("creating mscr revision"+initialData.format )
           Promise.all([
             spinnerDelay(),
             putMscrSchemaRevision({ pid: initialData.pid, data: payload }),

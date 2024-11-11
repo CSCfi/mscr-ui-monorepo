@@ -78,7 +78,6 @@ export function validateForm(
       errors.fileData = true;
     }
     // Format should be provided
-    console.log(formData.format);
     if (!formData.format) {
       errors.format = true;
     }

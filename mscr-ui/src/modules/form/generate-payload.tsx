@@ -16,6 +16,7 @@ export default function generatePayload(
 ): Partial<Metadata> {
   const organizations: Organization[] = [];
   if (user && organizationPid && organizationPid !== '') {
+    console.log(organizationPid);
     const ownerOrg = user?.organizations.find((x) => x.id == organizationPid);
     if (ownerOrg) organizations.push(ownerOrg);
   }
