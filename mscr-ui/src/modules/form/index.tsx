@@ -237,15 +237,6 @@ export default function FormModal({
             pid = resultSchemaMscrCopy.data.pid;
           }
           break;
-        case ModalType.RevisionMscr:
-          if (
-            contentType == Type.Schema &&
-            resultMscrSchemaRevision.isSuccess &&
-            resultMscrSchemaRevision.data
-          ) {
-            pid = resultMscrSchemaRevision.data.pid;
-          }
-          break;
         // TODO: MscrCopy API slice and then pid retrieval for crosswalk here
       }
       return pid;
