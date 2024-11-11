@@ -360,7 +360,7 @@ function returnFullPath(id: string) : string {
 
 function returnPath(id: string, label: string, schemaFormat: Format | undefined, schemaData: SchemaWithContent | undefined) : string {
   let returnString = '';
-  if (schemaFormat === Format.Xsd || schemaFormat === Format.Csv || schemaFormat === Format.Jsonschema || schemaFormat === Format.Skosrdf
+  if (schemaFormat === Format.Xsd || schemaFormat === Format.Csv || schemaFormat === Format.Jsonschema
   || schemaFormat === Format.Enum || schemaFormat === Format.Mscr) {
     returnString = id.substring(id?.indexOf("#root-Root-") + "#root-Root-".length);
     let strings;
@@ -376,36 +376,26 @@ function returnPath(id: string, label: string, schemaFormat: Format | undefined,
       }
     }
     return returnString;
-  } else {
+
     let className = '';
-    if (schemaFormat === Format.Rdfs || schemaFormat === Format.Owl) {
-      if (id.lastIndexOf('#') === -1) {
-        returnString = id.substring(id.lastIndexOf('/') + 1);
-      } else {
-        className = id.substring(id?.lastIndexOf('/') + 1, label.lastIndexOf('#')) + ':';
-        let itemName = id.substring(id.lastIndexOf('#') + 1);
-        returnString = className + itemName;
-      }
     } else if (schemaFormat === Format.Shacl) {
       let definitions = schemaData?.content?.definitions;
       if (definitions) {
         let keys = Object.keys(definitions);
         if (keys && keys.length > 0) {
+          outer:
           for (let i = 0; i < keys.length; i++) {
             let value = definitions[keys[i]];
             let secondLevelKeys = Object.keys(value);
             for (let k = 0; k < secondLevelKeys.length; k += 1) {
-              if (secondLevelKeys[k] === 'properties') {
-                let secondLevelValue = value[secondLevelKeys[k]];
-                let thirdLevelKeys = Object.keys(secondLevelValue);
-                for (let j = 0; j < thirdLevelKeys.length; j += 1) {
-                  if (thirdLevelKeys[j] === id) {
-                    for (let l = 0; l < secondLevelKeys.length; l += 1) {
-                      if (secondLevelKeys[l] === 'title') {
-                        let titleValue = value[secondLevelKeys[l]];
-                        returnString = titleValue + ':' + label;
-                      }
-                    }
+              if (secondLevelKeys[k] === 'title') {
+                let titleValue = value[secondLevelKeys[k]];
+                if (titleValue === label) {
+                  if (value && value.qname && value.qname.length > label.length) {
+                    let parentString = value.qname.substring(0, value.qname.length - (label.length + 1));
+                    parentString = parentString.substring(parentString.lastIndexOf('/') + 1);
+                    returnString = parentString + ':' + label;
+                    break outer;
                   }
                 }
               }
@@ -413,9 +403,10 @@ function returnPath(id: string, label: string, schemaFormat: Format | undefined,
           }
         }
       }
+      return returnString;
+    } else {
+      return label;
     }
-    return returnString;
-  }
 }
 function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAttributeNames: boolean) {
   let results: NodeMapping[] = [];
