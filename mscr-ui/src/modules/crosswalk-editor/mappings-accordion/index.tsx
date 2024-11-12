@@ -412,19 +412,27 @@ function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAtt
   let results: NodeMapping[] = [];
   const searchString = value.toLowerCase();
   nodeMappingsInput.forEach(item => {
-      if (item?.notes && item.notes.toLowerCase().includes(searchString)) {
+      let itemFound = false
+      if (item?.notes && item.notes.toLowerCase().includes(searchString) && !itemFound) {
         results.push(item);
+        itemFound = true;
       }
-      item.source.forEach(src => {
-        if (src.label.toLowerCase().includes(searchString)) {
-          results.push(item);
-        }
-      });
-      item.target.forEach(src => {
-        if (src.label.toLowerCase().includes(searchString)) {
-          results.push(item);
-        }
-      });
+      if (!itemFound) {
+        item.source.forEach(src => {
+          if (src.label.toLowerCase().includes(searchString) && !itemFound) {
+            results.push(item);
+            itemFound = true;
+          }
+        });
+      }
+      if (!itemFound) {
+        item.target.forEach(src => {
+          if (src.label.toLowerCase().includes(searchString) && !itemFound) {
+            results.push(item);
+            itemFound = true;
+          }
+        });
+      }
     }
   );
   return results;

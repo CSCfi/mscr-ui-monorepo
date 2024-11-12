@@ -6,12 +6,14 @@ import { InfoIcon } from '@app/common/components/shared-icons';
 import { useTranslation } from 'next-i18next';
 import { DropdownWrapper } from '@app/common/components/schema-info/schema-info.styles';
 import TypeSelector from '@app/common/components/schema-info/schema-tree/node-info/type-selector';
-import { IconLinkExternal } from 'suomifi-icons';
 import {
   setConfirmModalState,
   setSelectedRootNode,
 } from '@app/common/components/actionmenu/actionmenu.slice';
 import { useStoreDispatch } from '@app/store';
+import processHtmlLinks from '@app/common/utils/process-html-links';
+import { ConstantAttribute } from '@app/common/interfaces/node.interface';
+import RenderAttribute from '@app/common/components/schema-info/schema-tree/node-info/render-attribute';
 
 export default function NodeInfo(props: {
   treeData: RenderTree[];
@@ -46,11 +48,6 @@ export default function NodeInfo(props: {
     setSelectedNode(newSelectedNode ?? selectedNode);
   };
 
-  interface ConstantAttribute {
-    name: string;
-    value: string | undefined;
-  }
-
   useEffect(() => {
     if (selectedNode && selectedNode.properties) {
       const nodeProperties: ConstantAttribute[] = [];
@@ -59,28 +56,17 @@ export default function NodeInfo(props: {
           setNodeTypeAttribute(value as string);
           continue;
         }
+        let propertyValue;
+        if (typeof value === 'string') propertyValue = value.toString();
+        if (Array.isArray(value)) propertyValue = value;
         nodeProperties.push({
           name: key,
-          value: typeof value === 'string' ? value.toString() : undefined,
+          value: propertyValue,
         });
       }
       setNodeAttributes(nodeProperties);
     }
   }, [isLeafNode, props.isNodeEditable, selectedNode]);
-
-  function processHtmlLinks(input: string | undefined) {
-    if (
-      input &&
-      (input.startsWith('http://') || input.startsWith('https://'))
-    ) {
-      return (
-        <a href={input} target="_blank" rel="noreferrer">
-          {input} <IconLinkExternal />
-        </a>
-      );
-    }
-    return input;
-  }
 
   function setAsRootNode(node: RenderTree | undefined) {
     dispatch(setSelectedRootNode(node));
@@ -178,18 +164,13 @@ export default function NodeInfo(props: {
               )}
 
               {nodeAttributes.map((attrib) => (
-                <div className="col-12" key={self.crypto.randomUUID()} hidden={(attrib.name === '@id' ? true : false)}>
-                  <div className="">{processHtmlLinks(attrib.name)}:</div>
-                  <div className="attribute-font">
-                    {processHtmlLinks(attrib.value)}
-                  </div>
-                </div>
+                <RenderAttribute key={self.crypto.randomUUID()} attribute={attrib} />
               ))}
               {props.isNodeEditable &&
                 isLeafNode &&
                 nodeTypeAttribute !== '' && (
-                  <div className="col-12" key={self.crypto.randomUUID()}>
-                    <div className="">@type:</div>
+                  <div className='col-12' key={self.crypto.randomUUID()}>
+                    <div>@type:</div>
                     <div className="attribute-font">
                       {processHtmlLinks(nodeTypeAttribute)}
                     </div>
