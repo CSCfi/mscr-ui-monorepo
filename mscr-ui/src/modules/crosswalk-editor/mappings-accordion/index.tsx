@@ -380,28 +380,36 @@ function returnPath(id: string, label: string, schemaFormat: Format | undefined,
     let className = '';
     } else if (schemaFormat === Format.Shacl) {
       let definitions = schemaData?.content?.definitions;
+      let titleValue = undefined;
       if (definitions) {
         let keys = Object.keys(definitions);
         if (keys && keys.length > 0) {
-          outer:
           for (let i = 0; i < keys.length; i++) {
             let value = definitions[keys[i]];
             let secondLevelKeys = Object.keys(value);
             for (let k = 0; k < secondLevelKeys.length; k += 1) {
-              if (secondLevelKeys[k] === 'title') {
-                let titleValue = value[secondLevelKeys[k]];
-                if (titleValue === label) {
-                  if (value && value.qname && value.qname.length > label.length) {
-                    let parentString = value.qname.substring(0, value.qname.length - (label.length + 1));
-                    parentString = parentString.substring(parentString.lastIndexOf('/') + 1);
-                    returnString = parentString + ':' + label;
-                    break outer;
+              if (secondLevelKeys[k] === 'properties') {
+                let secondLevelValue = value[secondLevelKeys[k]];
+                let thirdLevelKeys = Object.keys(secondLevelValue);
+                for (let j = 0; j < thirdLevelKeys.length; j += 1) {
+                  if (thirdLevelKeys[j] === id) {
+                    for (let l = 0; l < secondLevelKeys.length; l += 1) {
+                      if (secondLevelKeys[l] === 'title') {
+                        titleValue = value[secondLevelKeys[l]];
+                        returnString = titleValue + ':' + label;
+                      }
+                    }
                   }
                 }
               }
             }
           }
         }
+      }
+      if (!titleValue && label && label.toLowerCase() === 'root') {
+        return label;
+      } else if (!titleValue && label && label.toLowerCase() !== 'root') {
+        return 'ROOT:' + label;
       }
       return returnString;
     } else {
