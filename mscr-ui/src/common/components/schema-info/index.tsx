@@ -321,7 +321,7 @@ export default function SchemaInfo(props: {
             >
               {isTreeDataFetched && (
                 <SchemaTree
-                  nodes={treeData[0]}
+                  nodes={treeData}
                   treeSelectedArray={treeSelectedArray}
                   treeExpanded={treeExpandedArray}
                   performTreeAction={performCallbackFromTreeAction}

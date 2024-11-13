@@ -48,7 +48,7 @@ export default function SchemaTree({
   showQname,
   isSourceTree,
 }: {
-  nodes: RenderTree;
+  nodes: RenderTree[];
   treeSelectedArray: string[];
   treeExpanded: string[];
   performTreeAction: (action: string, nodeIds: string[]) => void;
@@ -78,16 +78,7 @@ export default function SchemaTree({
       defaultExpandIcon={<ChevronRightIcon />}
       multiSelect
     >
-      <TreeItem
-        key={nodes.visualTreeId}
-        nodeId={nodes.id}
-        label={nodes.name}
-        className="linked-tree-item"
-      >
-        {Array.isArray(nodes.children)
-          ? nodes.children.map((node: RenderTree) => toTree(node, showQname))
-          : null}
-      </TreeItem>
+      {nodes.map((node: RenderTree) => toTree(node, showQname))}
     </TreeView>
   );
 }
