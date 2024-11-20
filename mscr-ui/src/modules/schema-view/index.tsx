@@ -351,16 +351,28 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
             text1={t('confirm-modal.unset-root-selection')}
           />
         )}
-        {/*ToDo: When making a revision of an mscr copy is possible, take that into account here (Modaltype.RevisionMscr)*/}
-        <FormModal
-          modalType={ModalType.RevisionFull}
-          contentType={Type.Schema}
-          visible={formModalIsOpen.version}
-          setVisible={(value) =>
-            dispatch(setFormModalState({ key: 'version', value: value }))
-          }
-          initialData={schemaData}
-        />
+        {schemaData.format == Format.Mscr ? (
+          <FormModal
+            modalType={ModalType.RevisionMscr}
+            contentType={Type.Schema}
+            visible={formModalIsOpen.version}
+            setVisible={(value) =>
+              dispatch(setFormModalState({ key: 'version', value: value }))
+            }
+            initialData={schemaData}
+          />
+        ) : (
+          <FormModal
+            modalType={ModalType.RevisionFull}
+            contentType={Type.Schema}
+            visible={formModalIsOpen.version}
+            setVisible={(value) =>
+              dispatch(setFormModalState({ key: 'version', value: value }))
+            }
+            initialData={schemaData}
+          />
+        )}
+
         <FormModal
           modalType={ModalType.MscrCopy}
           contentType={Type.Schema}
