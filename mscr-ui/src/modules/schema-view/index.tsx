@@ -351,7 +351,6 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
             text1={t('confirm-modal.unset-root-selection')}
           />
         )}
-        {/*ToDo: When making a revision of an mscr copy is possible, take that into account here (Modaltype.RevisionMscr)*/}
         {schemaData.format == Format.Mscr ? (
           <FormModal
             modalType={ModalType.RevisionMscr}

@@ -7,7 +7,6 @@ import {
   formatsAvailableForSchemaRegistration,
 } from '@app/common/interfaces/format.interface';
 
-
 export interface InputErrors {
   languageAmount: boolean;
   titleAmount: string[];
