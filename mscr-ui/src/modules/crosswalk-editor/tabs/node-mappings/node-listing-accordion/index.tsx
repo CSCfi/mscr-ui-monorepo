@@ -338,11 +338,11 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
       // Source accordion
       if (props.isOneToManyMapping) {
         let newNode: NodeListingRow = {
-          description: props.nodes[0].source.properties.description,
-          processingSelection: props.nodes[0].sourceProcessing?.id,
-          processing: props.nodes[0].sourceProcessing,
-          type: props.nodes[0].source.properties.type,
-          isSelected: false, notes: undefined, name: props.nodes[0].source.name, id: props.nodes[0].source.id
+          description: props.nodes[0]?.source?.properties?.description,
+          processingSelection: props.nodes[0]?.sourceProcessing?.id,
+          processing: props.nodes[0]?.sourceProcessing,
+          type: props.nodes[0]?.source?.properties?.type,
+          isSelected: false, notes: undefined, name: props.nodes[0]?.source?.name, id: props.nodes[0]?.source?.id
         }
         newNodes.push(newNode);
       } else {
@@ -362,21 +362,21 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
       if (props.isOneToManyMapping) {
         props.nodes.forEach((node: CrosswalkConnectionNew) => {
           let newNode: NodeListingRow = {
-            description: node?.target.properties.description,
+            description: node?.target?.properties?.description,
             processingSelection: node?.targetProcessing?.id,
             processing: node?.targetProcessing,
-            type: node?.target.properties.type,
-            isSelected: false, notes: undefined, name: node.target.name, id: node.target.id
+            type: node?.target?.properties?.type,
+            isSelected: false, notes: undefined, name: node?.target?.name, id: node?.target?.id
           }
           newNodes.push(newNode);
         });
       } else {
         let newNode: NodeListingRow = {
-          description: props.nodes[0].target.properties.description,
-          processingSelection: props.nodes[0].targetProcessing?.id,
-          processing: props.nodes[0].targetProcessing,
-          type: props.nodes[0].target.properties.type,
-          isSelected: false, notes: undefined, name: props.nodes[0].target.name, id: props.nodes[0].target.id
+          description: props.nodes[0]?.target?.properties?.description,
+          processingSelection: props.nodes[0]?.targetProcessing?.id,
+          processing: props.nodes[0]?.targetProcessing,
+          type: props.nodes[0]?.target?.properties?.type,
+          isSelected: false, notes: undefined, name: props.nodes[0]?.target?.name, id: props.nodes[0]?.target?.id
         }
         newNodes.push(newNode);
       }
