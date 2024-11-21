@@ -71,8 +71,6 @@ export default function SchemaInfo(props: {
       generatedTree.then((res) => {
         if (res) {
           setTreeDataOriginal(res);
-          // Expand tree when data is loaded
-          setPartlyExpanded();
           setTreeData(res);
           setTreeDataFetched(true);
           setNodeIdToNodeDictionary(nodeIdToShallowNode);
@@ -81,11 +79,6 @@ export default function SchemaInfo(props: {
       });
     }
   }, [getSchemaDataIsSuccess, getSchemaData]);
-
-  // Expand tree when data is loaded
-  useEffect(() => {
-    setPartlyExpanded();
-  }, [isTreeDataFetched]);
 
   // Expand and select nodes when input changed (from mappings accordion)
   useEffect(() => {
@@ -108,22 +101,16 @@ export default function SchemaInfo(props: {
     setSelectedTreeNodes(selectedNodes);
   }, [treeSelectedArray, nodeIdToNodeDictionary]);
 
-  const setPartlyExpanded = () => {
+  const setFullyExpanded = () => {
     const nodeIdsToExpand: string[] = [];
-    treeData.forEach(({ children, id }) => {
-      if (children && children.length > 0) {
-        nodeIdsToExpand.push(id);
-        if (children.length === 1) {
-          nodeIdsToExpand.push(children[0].id);
-        }
-      }
+    Object.entries(nodeIdToNodeDictionary).map(([nodeId, node]) => {
+      if (node.some((n) => n.children.length > 0)) nodeIdsToExpand.push(nodeId);
     });
     setTreeExpandedArray(nodeIdsToExpand);
   };
 
   function clearTreeSearch() {
     setTreeSelectedArray([]);
-    setPartlyExpanded();
     setSelectedTreeNodes([]);
   }
 
@@ -148,7 +135,7 @@ export default function SchemaInfo(props: {
 
   const handleExpandClick = () => {
     if (treeExpandedArray.length === 0) {
-      setPartlyExpanded();
+      setFullyExpanded();
     } else {
       setTreeExpandedArray([]);
     }
