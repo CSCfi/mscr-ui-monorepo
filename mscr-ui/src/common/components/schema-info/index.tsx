@@ -129,18 +129,51 @@ export default function SchemaInfo(props: {
 
   // Used by tree select and filtering
   function getAllNodeIdsOnPathToLeaf(nodeIds: string[]) {
-    const elementPaths: string[] = [];
-    nodeIds.forEach((nodeId) => {
-      const nodes = nodeIdToNodeDictionary[nodeId];
-      nodes.map((node) => elementPaths.push(node.elementPath));
-    });
-
+    let nodesWithElementPath: {[elementPath: string] : RenderTree[]} = {};
     const nodesToSelect: Set<string> = new Set();
-    elementPaths.forEach((path) => {
-      const nodeIdsOnPath = path.split('.');
-      nodeIdsOnPath.forEach((nodeId) => {
-        nodesToSelect.add(nodeId);
-      });
+    const elementPaths: string[] = [];
+    for (let key in nodeIdToNodeDictionary) {
+      if (nodeIdToNodeDictionary[key]) {
+        let renderTrees = nodeIdToNodeDictionary[key];
+        if (renderTrees && renderTrees.length > 0) {
+          renderTrees.forEach(tree => {
+            if (tree && tree.elementPath) {
+              let treeArray = [];
+              treeArray = nodesWithElementPath[tree.elementPath];
+              if (treeArray && treeArray.length > 0) {
+                treeArray.push(tree);
+              } else {
+                treeArray = [];
+                treeArray.push(tree);
+              }
+              nodesWithElementPath[tree.elementPath] = treeArray;
+            }
+          });
+
+        }
+      }
+    }
+    nodeIds.forEach((nodeId) => {
+      nodesToSelect.add(nodeId);
+      const nodes = nodeIdToNodeDictionary[nodeId];
+      if (nodes && nodes.length > 0) {
+        nodes.map((node) => {
+          if (node.parentElementPath) {
+            let nodeInParentElementPath: string | undefined = node.parentElementPath;
+            while(nodeInParentElementPath !== undefined) {
+              let parentNodeTrees: RenderTree[] = nodesWithElementPath[nodeInParentElementPath];
+              inner:
+              for (let parentNodeTree of parentNodeTrees) {
+                if (parentNodeTree && parentNodeTree.id) {
+                  nodesToSelect.add(parentNodeTree.id);
+                  nodeInParentElementPath = parentNodeTree.parentElementPath
+                  break inner; // there should be only one parent
+                }
+              }
+            }
+          }
+        });
+      }
     });
 
     return Array.from(nodesToSelect);
