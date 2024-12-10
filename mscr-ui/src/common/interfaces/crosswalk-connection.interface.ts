@@ -36,8 +36,7 @@ export interface RenderTree {
     visualTreeId: string;
     id: string;
     properties: any;
-    elementPath: string;
-    parentElementPath: string | undefined;
+    elementPath: string[];
     children: RenderTree[];
     uri: string;
 }
