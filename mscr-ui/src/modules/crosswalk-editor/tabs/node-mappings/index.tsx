@@ -233,7 +233,7 @@ export default function NodeMappings(props: {
       if (action === 'moveNodeUp' && mappingNodes.length > 1) {
         let sourceNodesNew = [...mappingNodes];
         for (let i = 0; i < mappingNodes.length; i += 1) {
-          if (mappingNodes[i].source.id === mappingId) {
+          if ((isSourceNode && mappingNodes[i].source.id === mappingId) || (!isSourceNode && mappingNodes[i].target.id === mappingId)) {
             let first = mappingNodes[i - 1];
             let second = mappingNodes[i];
             sourceNodesNew[i - 1] = second;
@@ -244,7 +244,7 @@ export default function NodeMappings(props: {
       } else if (action === 'moveNodeDown' && mappingNodes.length > 1) {
         let sourceNodesNew = [...mappingNodes];
         for (let i = 0; i < mappingNodes.length; i += 1) {
-          if (mappingNodes[i].source.id === mappingId) {
+          if ((isSourceNode && mappingNodes[i].source.id === mappingId) || (!isSourceNode && mappingNodes[i].target.id === mappingId)) {
             let first = mappingNodes[i];
             let second = mappingNodes[i + 1];
             sourceNodesNew[i] = second;

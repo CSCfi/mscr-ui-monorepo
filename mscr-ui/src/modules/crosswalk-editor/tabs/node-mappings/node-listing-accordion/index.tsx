@@ -207,7 +207,7 @@ function Row(props: {
           <div
             className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center d-none'}>
             <div>
-              <Tooltip className={props.index !== 0 && props.isSourceAccordion ? '' : 'd-none'}
+              <Tooltip className={props.index !== 0 ? '' : 'd-none'}
                        title={'Order node up'}
                        placement="left"
               >
@@ -215,8 +215,8 @@ function Row(props: {
                   onClick={() => moveNode(true)}></StyledArrowCircleUp>
               </Tooltip>
             </div>
-            <div className={props.isSourceAccordion ? '' : 'ms-3'}>
-              {props.index !== props.rowCount - 1 && props.rowCount > 1 && props.isSourceAccordion &&
+            <div>
+              {props.index !== props.rowCount - 1 && props.rowCount > 1 &&
                   <Tooltip
                       title={'Order node down'}
                       placement="left"
