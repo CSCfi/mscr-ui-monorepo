@@ -120,7 +120,7 @@ export default function SchemaInfo(props: {
     nodeIds.forEach((nodeId) => {
       const nodes = nodeIdToNodeDictionary[nodeId];
       nodes.map((node) => {
-        idsOnPath = idsOnPath.concat(node.elementPath);
+        idsOnPath = idsOnPath.concat(node.rootPathIds);
       });
     });
 

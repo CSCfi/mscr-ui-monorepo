@@ -41,7 +41,7 @@ export default function CrosswalkEditor({
   const isEditModeActive = useSelector(selectIsEditContentActive());
 
   const emptyTreeSelection: RenderTree = {
-    elementPath: [],
+    rootPathIds: [],
     name: '',
     id: '',
     visualTreeId: '',
