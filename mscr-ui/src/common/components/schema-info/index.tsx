@@ -116,18 +116,17 @@ export default function SchemaInfo(props: {
 
   // Used by tree select and filtering
   function getAllNodeIdsOnPathToLeaf(nodeIds: string[]) {
-    const elementPaths: string[] = [];
+    let idsOnPath: string[] = [];
     nodeIds.forEach((nodeId) => {
       const nodes = nodeIdToNodeDictionary[nodeId];
-      nodes.map((node) => elementPaths.push(node.elementPath));
+      nodes.map((node) => {
+        idsOnPath = idsOnPath.concat(node.rootPathIds);
+      });
     });
 
     const nodesToSelect: Set<string> = new Set();
-    elementPaths.forEach((path) => {
-      const nodeIdsOnPath = path.split('.');
-      nodeIdsOnPath.forEach((nodeId) => {
-        nodesToSelect.add(nodeId);
-      });
+    idsOnPath.forEach((pathNodeId) => {
+      nodesToSelect.add(pathNodeId);
     });
 
     return Array.from(nodesToSelect);

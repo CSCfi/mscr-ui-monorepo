@@ -4,7 +4,7 @@ let treeIndex = 0;
 
 function createRenderTree(
   input: any,
-  elementPath: string,
+  rootPathIds: string[],
   definitions: any,
   idToNodeDictionary: { [key: string]: RenderTree[] },
 ) {
@@ -16,8 +16,7 @@ function createRenderTree(
       visualTreeId: treeIndex.toString(),
       id: obj.toString(),
       properties: definitions[obj],
-      elementPath: elementPath == '' ? obj.toString() : elementPath + '.' + obj.toString(),
-      parentElementPath: elementPath,
+      rootPathIds: [...rootPathIds, obj.toString()],
       children: [],
       uri: definitions[obj]['@id'],
     };
@@ -29,7 +28,7 @@ function createRenderTree(
       // HAS CHILDREN, OTHERWISE IS LEAF
       newNode.children = createRenderTree(
         input[obj],
-        newNode.elementPath,
+        newNode.rootPathIds,
         definitions,
         idToNodeDictionary,
       );
@@ -47,7 +46,7 @@ export function generateTreeFromJson(jsonInput: any) {
   const generatedTree = new Promise<RenderTree[]>((resolve) => {
     const renderedTree = createRenderTree(
       jsonInput.content.tree,
-      '',
+      [],
       jsonInput.content.definitions,
       nodeIdToShallowNode
     );
