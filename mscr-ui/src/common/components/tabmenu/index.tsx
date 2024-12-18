@@ -5,7 +5,6 @@ import {
   setSelectedTab,
 } from '@app/common/components/content-view/content-view.slice';
 import { useTranslation } from 'next-i18next';
-import { Type } from '@app/common/interfaces/search.interface';
 import { TabIndex, TabText, MscrTabs } from '@app/common/interfaces/tabmenu';
 import { ReactNode } from 'react';
 import {
@@ -13,6 +12,7 @@ import {
   StyledTabs,
 } from '@app/common/components/tabmenu/tabmenu.styles';
 import { setQuery } from '@app/common/components/data-type-registry-search/data-type-registry-search.slice';
+import { Type } from '@app/common/interfaces/type.interface';
 
 interface TabPanel {
   tabIndex: TabIndex;

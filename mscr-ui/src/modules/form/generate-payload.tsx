@@ -2,10 +2,11 @@ import { FormType } from '@app/common/utils/hooks/use-initial-form';
 import { MscrUser } from '@app/common/interfaces/mscr-user.interface';
 import { ModalType } from '@app/modules/form/index';
 import { Organization } from '@app/common/interfaces/organizations.interface';
-import { Type, Visibility } from '@app/common/interfaces/search.interface';
+import { Visibility } from '@app/common/interfaces/search.interface';
 import { State } from '@app/common/interfaces/state.interface';
 import { Format } from '@app/common/interfaces/format.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export default function generatePayload(
   data: FormType,

@@ -1,5 +1,5 @@
 import { Status } from './status.interface';
-import { Type } from './type.interface';
+import { DatamodelType } from './type.interface';
 
 export interface DataModel {
   comment: {
@@ -20,5 +20,5 @@ export interface DataModel {
   modified: string;
   prefix: string;
   status: Status;
-  type: Type;
+  type: DatamodelType;
 }

@@ -18,7 +18,7 @@ import {
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import { Type, Visibility } from '@app/common/interfaces/search.interface';
+import { Visibility } from '@app/common/interfaces/search.interface';
 import { State } from '@app/common/interfaces/state.interface';
 import ConfirmModal from '@app/common/components/confirmation-modal';
 import { useStoreDispatch } from '@app/store';
@@ -44,6 +44,7 @@ import {
   selectConfirmModalState,
   setConfirmModalState,
 } from '@app/common/components/actionmenu/actionmenu.slice';
+import { Type } from '@app/common/interfaces/type.interface';
 
 interface MetadataFormProps {
   type: Type;

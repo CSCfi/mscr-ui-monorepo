@@ -11,7 +11,6 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import VersionHistory from 'src/common/components/version-history';
 import SchemaVisualization from '@app/modules/schema-view/schema-visualization';
 import { State } from '@app/common/interfaces/state.interface';
-import { Type } from '@app/common/interfaces/search.interface';
 import { Text } from 'suomifi-ui-components';
 import HasPermission from '@app/common/utils/has-permission';
 import {
@@ -39,6 +38,7 @@ import { selectIsEditContentActive } from '@app/common/components/content-view/c
 import { useRouter } from 'next/router';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export default function SchemaView({ schemaId }: { schemaId: string }) {
   const { t } = useTranslation('common');

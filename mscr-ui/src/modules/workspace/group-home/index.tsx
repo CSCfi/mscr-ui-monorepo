@@ -1,4 +1,3 @@
-import { Type } from '@app/common/interfaces/search.interface';
 import { useTranslation } from 'next-i18next';
 import { useBreakpoints } from 'yti-common-ui/components/media-query';
 import WorkspaceTable, {
@@ -24,16 +23,19 @@ import Link from 'next/link';
 import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import HasPermission from '@app/common/utils/has-permission';
+import { SubType, Type } from '@app/common/interfaces/type.interface';
 
 interface GroupHomeProps {
   user: MscrUser;
   pid: string;
   contentType: Type;
+  subType?: SubType;
 }
 export default function GroupWorkspace({
   user,
   pid,
   contentType,
+  subType
 }: GroupHomeProps) {
   const hasCreatePermission = HasPermission({
     action: 'CREATE_CONTENT',
@@ -55,6 +57,7 @@ export default function GroupWorkspace({
   const [content, setContent] = useState(new Array<ContentRow>());
   const { data, isLoading } = useGetOrgContentQuery({
     type: contentType,
+    subType,
     pageSize,
     urlState,
     ownerOrg: pid,

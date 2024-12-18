@@ -1,7 +1,7 @@
 import { SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
 import MetadataForm from '@app/modules/form/metadata-form';
-import { Type } from '@app/common/interfaces/search.interface';
 import MetadataFilesTable from '@app/common/components/metadata-files-table';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export default function MetadataAndFiles({
   schemaDetails,

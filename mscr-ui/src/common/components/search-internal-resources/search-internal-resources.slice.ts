@@ -4,7 +4,7 @@ import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
 import { Status } from '@app/common/interfaces/status.interface';
 import { SearchInternalClasses } from '@app/common/interfaces/search-internal-classes.interface';
 import { ResourceType } from '@app/common/interfaces/resource-type.interface';
-import { Type } from '@app/common/interfaces/type.interface';
+import { DatamodelType } from '@app/common/interfaces/type.interface';
 
 export interface InternalResourcesSearchParams {
   query: string;
@@ -16,7 +16,7 @@ export interface InternalResourcesSearchParams {
   sortLang?: string;
   pageSize?: number;
   pageFrom?: number;
-  limitToModelType?: Type;
+  limitToModelType?: DatamodelType;
 }
 
 function createUrl(obj: InternalResourcesSearchParams): string {

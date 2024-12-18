@@ -37,7 +37,6 @@ import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.sl
 import { useStoreDispatch } from '@app/store';
 import SchemaFormFields from '@app/modules/form/schema-form/schema-form-fields';
 import { Crosswalk } from '@app/common/interfaces/crosswalk.interface';
-import { Type } from '@app/common/interfaces/search.interface';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { State } from '@app/common/interfaces/state.interface';
 import {
@@ -57,6 +56,7 @@ import { InputErrors, validateForm } from '@app/modules/form/validate-form';
 import generatePayload from '@app/modules/form/generate-payload';
 import { resetContentView } from '@app/common/components/content-view/content-view.slice';
 import { CloseButton } from '@app/modules/form/form.styles';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export enum ModalType {
   RegisterNewFull = 'REGISTER_NEW_FULL',

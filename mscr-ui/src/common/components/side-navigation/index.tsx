@@ -118,6 +118,34 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
             <MscrSideNavigationLevel3
               className="personal"
               subLevel={3}
+              selected={router.asPath.startsWith(personalCrosswalksPath + '/mappings')}
+              content={
+                <Link
+                  onClick={() => handleNavigate(true)}
+                  href={personalCrosswalksPath}
+                  passHref
+                >
+                  <RouterLink>{t('workspace.mappings')}</RouterLink>
+                </Link>
+              }
+            />
+            <MscrSideNavigationLevel3
+              className="personal"
+              subLevel={3}
+              selected={router.asPath.startsWith(personalCrosswalksPath + '/annotations')}
+              content={
+                <Link
+                  onClick={() => handleNavigate(true)}
+                  href={personalCrosswalksPath}
+                  passHref
+                >
+                  <RouterLink>{t('workspace.annotations')}</RouterLink>
+                </Link>
+              }
+            />
+            <MscrSideNavigationLevel3
+              className="personal"
+              subLevel={3}
               selected={router.asPath.startsWith(personalSchemasPath)}
               content={
                 <Link
@@ -126,6 +154,34 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
                   passHref
                 >
                   <RouterLink>{t('workspace.schemas')}</RouterLink>
+                </Link>
+              }
+            />
+            <MscrSideNavigationLevel3
+              className="personal"
+              subLevel={3}
+              selected={router.asPath.startsWith(personalSchemasPath + '/vocabularies')}
+              content={
+                <Link
+                  onClick={() => handleNavigate(true)}
+                  href={personalSchemasPath}
+                  passHref
+                >
+                  <RouterLink>{t('workspace.vocabularies')}</RouterLink>
+                </Link>
+              }
+            />
+            <MscrSideNavigationLevel3
+              className="personal"
+              subLevel={3}
+              selected={router.asPath.startsWith(personalSchemasPath + '/ontologies')}
+              content={
+                <Link
+                  onClick={() => handleNavigate(true)}
+                  href={personalSchemasPath}
+                  passHref
+                >
+                  <RouterLink>{t('workspace.ontologies')}</RouterLink>
                 </Link>
               }
             />
@@ -173,6 +229,38 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
               <MscrSideNavigationLevel3
                 className="group"
                 subLevel={3}
+                selected={router.asPath.startsWith(
+                  '/' + group.id + '/crosswalks/mappings'
+                )}
+                content={
+                  <Link
+                    onClick={() => handleNavigate()}
+                    href={'/' + group.id + '/crosswalks'}
+                    passHref
+                  >
+                    <RouterLink>{t('workspace.mappings')}</RouterLink>
+                  </Link>
+                }
+              />
+              <MscrSideNavigationLevel3
+                className="group"
+                subLevel={3}
+                selected={router.asPath.startsWith(
+                  '/' + group.id + '/crosswalks/annotations'
+                )}
+                content={
+                  <Link
+                    onClick={() => handleNavigate()}
+                    href={'/' + group.id + '/crosswalks'}
+                    passHref
+                  >
+                    <RouterLink>{t('workspace.annotations')}</RouterLink>
+                  </Link>
+                }
+              />
+              <MscrSideNavigationLevel3
+                className="group"
+                subLevel={3}
                 selected={router.asPath.startsWith('/' + group.id + '/schemas')}
                 content={
                   <Link
@@ -181,6 +269,34 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
                     passHref
                   >
                     <RouterLink>{t('workspace.schemas')}</RouterLink>
+                  </Link>
+                }
+              />
+              <MscrSideNavigationLevel3
+                className="group"
+                subLevel={3}
+                selected={router.asPath.startsWith('/' + group.id + '/schemas/vocabularies')}
+                content={
+                  <Link
+                    onClick={() => handleNavigate()}
+                    href={'/' + group.id + '/schemas'}
+                    passHref
+                  >
+                    <RouterLink>{t('workspace.vocabularies')}</RouterLink>
+                  </Link>
+                }
+              />
+              <MscrSideNavigationLevel3
+                className="group"
+                subLevel={3}
+                selected={router.asPath.startsWith('/' + group.id + '/schemas/ontologies')}
+                content={
+                  <Link
+                    onClick={() => handleNavigate()}
+                    href={'/' + group.id + '/schemas'}
+                    passHref
+                  >
+                    <RouterLink>{t('workspace.ontologies')}</RouterLink>
                   </Link>
                 }
               />

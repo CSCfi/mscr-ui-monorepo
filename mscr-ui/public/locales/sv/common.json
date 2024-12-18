@@ -456,17 +456,21 @@
   },
   "working-version": "",
   "workspace": {
+    "annotations": "",
     "crosswalks": "",
     "group": "",
     "label": "",
+    "mappings": "",
     "navigation": "",
     "no-crosswalks": "",
     "no-schemas": "",
     "numberOfRevisions": "",
+    "ontologies": "",
     "personal": "",
     "pid": "",
     "schemas": "",
     "state": "",
-    "view": ""
+    "view": "",
+    "vocabularies": ""
   }
 }

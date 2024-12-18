@@ -1,8 +1,8 @@
 import { useTranslation } from 'next-i18next';
 import { Format } from '@app/common/interfaces/format.interface';
 import { State } from '@app/common/interfaces/state.interface';
-import { Type } from '@app/common/interfaces/search.interface';
 import { LanguageBlockType } from 'yti-common-ui/components/form/language-selector';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export interface FormType {
   format: Format;

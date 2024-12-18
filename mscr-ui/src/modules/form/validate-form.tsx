@@ -1,11 +1,11 @@
 import { FormType } from '@app/common/utils/hooks/use-initial-form';
-import { Type } from '@app/common/interfaces/search.interface';
 import { ModalType } from '@app/modules/form/index';
 import {
   Format,
   formatsAvailableForCrosswalkRegistration,
   formatsAvailableForSchemaRegistration,
 } from '@app/common/interfaces/format.interface';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export interface InputErrors {
   languageAmount: boolean;

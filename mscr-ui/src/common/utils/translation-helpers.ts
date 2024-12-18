@@ -1,9 +1,9 @@
 import { TFunction } from 'next-i18next';
 import { ResourceType } from '../interfaces/resource-type.interface';
-import { Type } from '../interfaces/type.interface';
+import { DatamodelType } from '../interfaces/type.interface';
 import { NotificationKeys } from '@app/common/interfaces/notifications.interface';
 
-export function translateModelType(type: Type, t: TFunction) {
+export function translateModelType(type: DatamodelType, t: TFunction) {
   switch (type) {
     case 'LIBRARY':
       return t('library');

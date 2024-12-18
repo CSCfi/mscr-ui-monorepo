@@ -6,15 +6,26 @@ import {
   PaginatedQuery,
 } from '@app/common/interfaces/search.interface';
 import { UrlState } from '@app/common/utils/hooks/use-url-state';
+import {
+  formatsRelatedToSubtype,
+  SubType,
+} from '@app/common/interfaces/type.interface';
 
 function createUrl(
   scope: string,
-  { type, pageSize, urlState, ownerOrg }: PaginatedQuery
+  { type, pageSize, urlState, ownerOrg, subType }: PaginatedQuery
 ) {
   const pageFrom = (urlState.page - 1) * pageSize;
-  return `/frontend/mscrSearch${scope}Content?query=&type=${type}${
-    scope === 'Org' ? `&ownerOrg=${ownerOrg}` : ''
-  }&pageSize=${pageSize}&pageFrom=${pageFrom}`;
+  let url = `/frontend/mscrSearch${scope}Content?query=&type=${type}`;
+  if (scope == 'Org' && ownerOrg) {
+    url = `${url}&ownerOrg=${ownerOrg}`;
+  }
+  if (subType != SubType.Schema && subType != SubType.Crosswalk && subType) {
+    for (const format in formatsRelatedToSubtype[subType]) {
+      url = `${url}&format=${format}`;
+    }
+  }
+  return `${url}&pageSize=${pageSize}&pageFrom=${pageFrom}`;
 }
 
 function createSearchUrl(urlState: UrlState) {

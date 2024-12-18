@@ -6,9 +6,9 @@ import {
   VersionHeading,
   VersionHistoryContainer,
 } from '@app/common/components/version-history/version-history.styles';
-import { Type } from '@app/common/interfaces/search.interface';
 import { useRouter } from 'next/router';
 import { State } from '@app/common/interfaces/state.interface';
+import { Type } from '@app/common/interfaces/type.interface';
 
 interface RevisionRow {
   versionLabel: string;

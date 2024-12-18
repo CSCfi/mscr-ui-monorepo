@@ -14,7 +14,6 @@ import {
 import HasPermission from '@app/common/utils/has-permission';
 import { useEffect, useState } from 'react';
 import { updateActionMenu } from '@app/common/components/schema-and-crosswalk-actionmenu/update-action-menu';
-import { Type } from '@app/common/interfaces/search.interface';
 import { State } from '@app/common/interfaces/state.interface';
 import { setIsEditContentActive } from '@app/common/components/content-view/content-view.slice';
 import { NotificationKeys } from '@app/common/interfaces/notifications.interface';
@@ -31,6 +30,7 @@ import { Format } from '@app/common/interfaces/format.interface';
 import CrosswalkEditor from '@app/modules/crosswalk-editor';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) {
   const { t } = useTranslation('common');

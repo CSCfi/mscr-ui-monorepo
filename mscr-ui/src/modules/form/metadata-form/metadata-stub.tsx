@@ -9,12 +9,12 @@ import {
   MetadataRow,
 } from '@app/modules/form/metadata-form/metadata-form.styles';
 import { Grid } from '@mui/material';
-import { Type } from '@app/common/interfaces/search.interface';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import * as React from 'react';
 import FormattedDate from 'yti-common-ui/components/formatted-date';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export default function MetadataStub({
   metadata,

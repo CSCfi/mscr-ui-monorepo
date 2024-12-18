@@ -6,9 +6,9 @@ import {
 import { State } from '@app/common/interfaces/state.interface';
 import { SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
 import { CrosswalkWithVersionInfo } from '@app/common/interfaces/crosswalk.interface';
-import { Type } from '@app/common/interfaces/search.interface';
 import { useStoreDispatch } from '@app/store';
 import { Format } from '@app/common/interfaces/format.interface';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export function updateActionMenu(
   dispatch: ReturnType<typeof useStoreDispatch>,

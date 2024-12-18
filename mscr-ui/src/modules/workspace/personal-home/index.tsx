@@ -1,4 +1,3 @@
-import { Type } from '@app/common/interfaces/search.interface';
 import { useTranslation } from 'next-i18next';
 import Title from 'yti-common-ui/components/title';
 import {
@@ -22,11 +21,14 @@ import FormModal, { ModalType } from '@app/modules/form';
 import Link from 'next/link';
 import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
+import { SubType, Type } from '@app/common/interfaces/type.interface';
 
 export default function PersonalWorkspace({
   contentType,
+  subType
 }: {
   contentType: Type;
+  subType?: SubType;
 }) {
   const { t } = useTranslation('common');
   const router = useRouter();
@@ -44,6 +46,7 @@ export default function PersonalWorkspace({
   const [content, setContent] = useState(new Array<ContentRow>());
   const { data, isLoading } = useGetPersonalContentQuery({
     type: contentType,
+    subType,
     pageSize,
     urlState,
   });

@@ -1,8 +1,8 @@
 import HasPermission from '@app/common/utils/has-permission';
 import MetadataForm from '@app/modules/form/metadata-form';
-import { Type } from '@app/common/interfaces/search.interface';
 import { CrosswalkWithVersionInfo } from '@app/common/interfaces/crosswalk.interface';
 import MetadataFilesTable from '@app/common/components/metadata-files-table';
+import { Type } from '@app/common/interfaces/type.interface';
 
 export default function MetadataAndFiles(props: {
   crosswalkData: CrosswalkWithVersionInfo;
