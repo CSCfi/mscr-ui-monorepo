@@ -132,7 +132,6 @@ export default function NodeInfo(props: {
           )}
           {props.isNodeEditable &&
             selectedNode &&
-            selectedNode?.elementPath !== 'ROOT' &&
             !isLeafNode &&
             !props.hasCustomRoot && (
               <Button

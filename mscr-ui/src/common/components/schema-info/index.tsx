@@ -71,8 +71,6 @@ export default function SchemaInfo(props: {
       generatedTree.then((res) => {
         if (res) {
           setTreeDataOriginal(res);
-          // Expand tree when data is loaded
-          setPartlyExpanded();
           setTreeData(res);
           setTreeDataFetched(true);
           setNodeIdToNodeDictionary(nodeIdToShallowNode);
@@ -81,11 +79,6 @@ export default function SchemaInfo(props: {
       });
     }
   }, [getSchemaDataIsSuccess, getSchemaData]);
-
-  // Expand tree when data is loaded
-  useEffect(() => {
-    setPartlyExpanded();
-  }, [isTreeDataFetched]);
 
   // Expand and select nodes when input changed (from mappings accordion)
   useEffect(() => {
@@ -108,39 +101,32 @@ export default function SchemaInfo(props: {
     setSelectedTreeNodes(selectedNodes);
   }, [treeSelectedArray, nodeIdToNodeDictionary]);
 
-  const setPartlyExpanded = () => {
+  const setFullyExpanded = () => {
     const nodeIdsToExpand: string[] = [];
-    treeData.forEach(({ children, id }) => {
-      if (children && children.length > 0) {
-        nodeIdsToExpand.push(id);
-        if (children.length === 1) {
-          nodeIdsToExpand.push(children[0].id);
-        }
-      }
+    Object.entries(nodeIdToNodeDictionary).map(([nodeId, node]) => {
+      if (node.some((n) => n.children.length > 0)) nodeIdsToExpand.push(nodeId);
     });
     setTreeExpandedArray(nodeIdsToExpand);
   };
 
   function clearTreeSearch() {
     setTreeSelectedArray([]);
-    setPartlyExpanded();
     setSelectedTreeNodes([]);
   }
 
   // Used by tree select and filtering
   function getAllNodeIdsOnPathToLeaf(nodeIds: string[]) {
-    const elementPaths: string[] = [];
+    let idsOnPath: string[] = [];
     nodeIds.forEach((nodeId) => {
       const nodes = nodeIdToNodeDictionary[nodeId];
-      nodes.map((node) => elementPaths.push(node.elementPath));
+      nodes.map((node) => {
+        idsOnPath = idsOnPath.concat(node.rootPathIds);
+      });
     });
 
     const nodesToSelect: Set<string> = new Set();
-    elementPaths.forEach((path) => {
-      const nodeIdsOnPath = path.split('.');
-      nodeIdsOnPath.forEach((nodeId) => {
-        nodesToSelect.add(nodeId);
-      });
+    idsOnPath.forEach((pathNodeId) => {
+      nodesToSelect.add(pathNodeId);
     });
 
     return Array.from(nodesToSelect);
@@ -148,7 +134,7 @@ export default function SchemaInfo(props: {
 
   const handleExpandClick = () => {
     if (treeExpandedArray.length === 0) {
-      setPartlyExpanded();
+      setFullyExpanded();
     } else {
       setTreeExpandedArray([]);
     }
@@ -321,7 +307,7 @@ export default function SchemaInfo(props: {
             >
               {isTreeDataFetched && (
                 <SchemaTree
-                  nodes={treeData[0]}
+                  nodes={treeData}
                   treeSelectedArray={treeSelectedArray}
                   treeExpanded={treeExpandedArray}
                   performTreeAction={performCallbackFromTreeAction}

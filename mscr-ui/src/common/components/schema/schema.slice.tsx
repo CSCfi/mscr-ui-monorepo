@@ -64,6 +64,14 @@ export const schemaApi = createApi({
         },
       })
     }),
+    // this should be the API for creating revisions of schemas in MSCR format
+    putMscrSchemaRevision: builder.mutation<Schema, { pid: string; data: Partial<Metadata> }>({
+      query: ({pid, data }) => ({
+        url: `/schema?action=revisionOf&target=${pid}`,
+        method: 'PUT',
+        data: data,
+      })
+    }),
     putSchemaMscrCopy: builder.mutation<Schema, { pid: string; data: Partial<Metadata> }>({
       query: ({pid, data }) => ({
         url: `/schema?action=mscrCopyOf&target=${pid}`,
@@ -182,6 +190,7 @@ export const {
   useGetSchemasQuery,
   usePutSchemaFullMutation,
   usePutSchemaRevisionMutation,
+  usePutMscrSchemaRevisionMutation,
   usePutSchemaMscrCopyMutation,
   usePatchSchemaMutation,
   usePatchSchemaRootSelectionMutation,

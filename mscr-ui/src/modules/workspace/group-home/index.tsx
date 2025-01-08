@@ -23,6 +23,7 @@ import FormModal, { ModalType } from '@app/modules/form';
 import Link from 'next/link';
 import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
+import HasPermission from '@app/common/utils/has-permission';
 
 interface GroupHomeProps {
   user: MscrUser;
@@ -34,6 +35,10 @@ export default function GroupWorkspace({
   pid,
   contentType,
 }: GroupHomeProps) {
+  const hasCreatePermission = HasPermission({
+    action: 'CREATE_CONTENT',
+    owner: [pid],
+  });
   const { t } = useTranslation('common');
   const router = useRouter();
   const lang = router.locale ?? '';
@@ -122,52 +127,54 @@ export default function GroupWorkspace({
             </TitleDescriptionWrapper>
           }
         />
-        <Separator isLarge />
-        <div>
-          <ButtonBlock>
-            {contentType == 'SCHEMA' ? (
-              <>
-                <ModalVisibilityButton
-                  setVisible={setRegisterSchemaModalVisible}
-                  label={t('content-form.button.schema-register')}
-                />
-                <FormModal
-                  modalType={ModalType.RegisterNewFull}
-                  contentType={Type.Schema}
-                  visible={registerSchemaModalVisible}
-                  setVisible={setRegisterSchemaModalVisible}
-                  organizationPid={pid}
-                />
-              </>
-            ) : (
-              <>
-                <ModalVisibilityButton
-                  setVisible={setRegisterCrosswalkModalVisible}
-                  label={t('content-form.button.crosswalk-register')}
-                />
-                <FormModal
-                  modalType={ModalType.RegisterNewFull}
-                  contentType={Type.Crosswalk}
-                  visible={registerCrosswalkModalVisible}
-                  setVisible={setRegisterCrosswalkModalVisible}
-                  organizationPid={pid}
-                />
-                <ModalVisibilityButton
-                  setVisible={setCreateCrosswalkModalVisible}
-                  label={t('content-form.button.crosswalk-create')}
-                />
-                <FormModal
-                  modalType={ModalType.RegisterNewMscr}
-                  contentType={Type.Crosswalk}
-                  visible={createCrosswalkModalVisible}
-                  setVisible={setCreateCrosswalkModalVisible}
-                  organizationPid={pid}
-                />
-              </>
-            )}
-          </ButtonBlock>
-        </div>
-        <Separator isLarge />
+        {hasCreatePermission &&
+          <div>
+            <Separator isLarge />
+            <ButtonBlock>
+              {contentType == 'SCHEMA' ? (
+                <>
+                  <ModalVisibilityButton
+                    setVisible={setRegisterSchemaModalVisible}
+                    label={t('content-form.button.schema-register')}
+                  />
+                  <FormModal
+                    modalType={ModalType.RegisterNewFull}
+                    contentType={Type.Schema}
+                    visible={registerSchemaModalVisible}
+                    setVisible={setRegisterSchemaModalVisible}
+                    organizationPid={pid}
+                  />
+                </>
+              ) : (
+                <>
+                  <ModalVisibilityButton
+                    setVisible={setRegisterCrosswalkModalVisible}
+                    label={t('content-form.button.crosswalk-register')}
+                  />
+                  <FormModal
+                    modalType={ModalType.RegisterNewFull}
+                    contentType={Type.Crosswalk}
+                    visible={registerCrosswalkModalVisible}
+                    setVisible={setRegisterCrosswalkModalVisible}
+                    organizationPid={pid}
+                  />
+                  <ModalVisibilityButton
+                    setVisible={setCreateCrosswalkModalVisible}
+                    label={t('content-form.button.crosswalk-create')}
+                  />
+                  <FormModal
+                    modalType={ModalType.RegisterNewMscr}
+                    contentType={Type.Crosswalk}
+                    visible={createCrosswalkModalVisible}
+                    setVisible={setCreateCrosswalkModalVisible}
+                    organizationPid={pid}
+                  />
+                </>
+              )}
+            </ButtonBlock>
+            <Separator isLarge />
+          </div>
+        }
         {data?.hits.hits && data?.hits.hits.length < 1 ? (
           <div>
             {contentType == 'SCHEMA'
