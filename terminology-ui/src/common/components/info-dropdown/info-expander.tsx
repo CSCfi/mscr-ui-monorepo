@@ -43,7 +43,6 @@ import { useStoreDispatch } from '@app/store';
 import { setAlert } from '../alert/alert.slice';
 import UpdateWithFileModal from '../update-with-file-modal';
 import StatusMassEdit from '../status-mass-edit';
-import isEmail from 'validator/lib/isEmail';
 
 const Subscription = dynamic(
   () => import('@app/common/components/subscription/subscription')
@@ -114,12 +113,14 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
     link.remove();
   };
 
+  //This is where it is not working
   return (
     <InfoExpanderWrapper id="info-expander">
       <ExpanderTitleButton asHeading="h2">
         {t('vocabulary-info-terminology')}
       </ExpanderTitleButton>
       <ExpanderContent>
+        <p>this is the info bloch</p>
         <MultilingualPropertyBlock
           title={t('vocabulary-info-name')}
           data={data.properties.prefLabel}
@@ -130,6 +131,9 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
           data={data.properties.description}
           id="description"
         />
+        <BasicBlock>
+          <p> this is basic block</p>
+        </BasicBlock>
         <BasicBlock
           title={t('vocabulary-info-information-domain')}
           id="information-domains"
@@ -345,6 +349,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
         <BasicBlock title="URI" id="uri">
           {data.uri}
         </BasicBlock>
+        <p>why not showing</p>
       </ExpanderContent>
     </InfoExpanderWrapper>
   );
