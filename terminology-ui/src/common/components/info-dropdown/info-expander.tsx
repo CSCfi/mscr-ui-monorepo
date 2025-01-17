@@ -8,6 +8,7 @@ import {
   IconDownload,
   IconEdit,
   IconPlus,
+  ModalContent,
   VisuallyHidden,
 } from 'suomifi-ui-components';
 import {
@@ -120,7 +121,6 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
         {t('vocabulary-info-terminology')}
       </ExpanderTitleButton>
       <ExpanderContent>
-        <p>this is the info bloch</p>
         <MultilingualPropertyBlock
           title={t('vocabulary-info-name')}
           data={data.properties.prefLabel}
