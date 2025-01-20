@@ -44,7 +44,7 @@ export default function NodeInfo(props: {
   }, [props.treeData, props.currentlySelectedNodeId]);
 
   const handleDropDownSelect = (nodeId: string) => {
-    const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
+    const newSelectedNode = props.treeData.find((item) => item?.id === nodeId);
     setSelectedNode(newSelectedNode ?? selectedNode);
   };
 
