@@ -16,6 +16,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
   Button,
+  Dropdown,
+  DropdownItem,
   Heading,
   InlineAlert,
   Paragraph,
@@ -171,7 +173,6 @@ export default function EditVocabulary({ terminologyId }: EditVocabularyProps) {
       <FormWrapper>
         <FormTitle>
           <Heading variant="h3">{t('edit-terminology-info')}</Heading>
-
           <Paragraph>
             <Text>{t('info-input-description')}</Text>
           </Paragraph>
@@ -184,9 +185,20 @@ export default function EditVocabulary({ terminologyId }: EditVocabularyProps) {
           initialData={data}
           onChange={enableConfirmation}
         />
-
         <TallerSeparator />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <Dropdown
+            labelText={'Select Vocabulary Status'}
+            visualPlaceholder={'Select Vocabulary Status'}
+            defaultValue={''}
+          >
+            <DropdownItem value={'DRAFT'}>{'DRAFT'}</DropdownItem>
+            <DropdownItem value={'PUBLISHED'}>{'PUBLISHED'}</DropdownItem>
+            <DropdownItem value={'DEPRECATED'}>{'DEPRECATED'}</DropdownItem>
+          </Dropdown>
+        </div>
 
+        <TallerSeparator></TallerSeparator>
         <FormFooter>
           {(authenticatedUser?.anonymous ||
             authenticatedMutUser.data?.anonymous) && (

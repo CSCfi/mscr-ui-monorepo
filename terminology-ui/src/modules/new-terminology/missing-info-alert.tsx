@@ -24,7 +24,7 @@ export default function MissingInfoAlert({ data }: MissingInfoAlertProps) {
           ...renderLanguageAlerts(),
           renderOrganizationAlerts(),
           renderInformationDomainAlerts(),
-          renderPrefixAlerts(),
+          //renderPrefixAlerts(),
           renderStatusAlerts(),
           renderContactAlerts(),
         ].filter((alert) => alert)}
@@ -36,12 +36,11 @@ export default function MissingInfoAlert({ data }: MissingInfoAlertProps) {
 
   function renderAlert() {
     if (
+      //Hiding prefix alerts
       data.languages.length === 0 ||
       data.languages.some((l) => !l.title) ||
       data.contributors.length === 0 ||
       data.infoDomains.length === 0 ||
-      !data.prefix[0] ||
-      data.prefix[1] === false ||
       (Object.keys(data).includes('status') && !data.status) ||
       (data.contact && !isEmail(data.contact))
     ) {

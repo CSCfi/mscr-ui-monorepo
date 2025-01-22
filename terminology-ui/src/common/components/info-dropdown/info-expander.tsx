@@ -120,7 +120,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
       <ExpanderTitleButton asHeading="h2">
         {t('vocabulary-info-terminology')}
       </ExpanderTitleButton>
-      <ExpanderContent>
+      <ModalContent>
         <MultilingualPropertyBlock
           title={t('vocabulary-info-name')}
           data={data.properties.prefLabel}
@@ -131,9 +131,6 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
           data={data.properties.description}
           id="description"
         />
-        <BasicBlock>
-          <p> this is basic block</p>
-        </BasicBlock>
         <BasicBlock
           title={t('vocabulary-info-information-domain')}
           id="information-domains"
@@ -296,7 +293,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
 
         <Separator isLarge />
 
-        {!user.anonymous && (
+        {/*  {!user.anonymous && (
           <>
             <BasicBlock
               title={t('email-subscription')}
@@ -314,7 +311,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
 
             <Separator isLarge />
           </>
-        )}
+        )} */}
 
         <VisuallyHidden as="h3">
           {t('additional-technical-information', { ns: 'common' })}
@@ -349,8 +346,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
         <BasicBlock title="URI" id="uri">
           {data.uri}
         </BasicBlock>
-        <p>why not showing</p>
-      </ExpanderContent>
+      </ModalContent>
     </InfoExpanderWrapper>
   );
 }

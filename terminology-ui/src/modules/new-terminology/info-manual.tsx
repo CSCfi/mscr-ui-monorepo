@@ -155,7 +155,7 @@ export default function InfoManual({
         initialData={initialData}
       /> */}
 
-      <Prefix
+      {/*  <Prefix
         prefix={terminologyData.prefix[0]}
         setPrefix={(value) =>
           handleUpdate({
@@ -177,14 +177,6 @@ export default function InfoManual({
           textInputLabel: t('prefix'),
           uriPreview: t('url-preview'),
         }}
-      />
-
-      {/* <TallerSeparator /> */}
-      {/*   <ContactInfo
-        disabled={disabled}
-        update={handleUpdate}
-        userPosted={userPosted}
-        defaultValue={initialData?.contact}
       /> */}
     </form>
   );
