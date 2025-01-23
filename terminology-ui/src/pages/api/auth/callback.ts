@@ -70,7 +70,6 @@ export default withIronSessionApiRoute(
       });
       // should receive a proper user if correctly authenticated
       user = response.data;
-      console.log(user);
       if (user && user.anonymous) {
         console.warn(
           'User from response appears to be anonymous, login may have failed'

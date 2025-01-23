@@ -1,20 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Paragraph, Text } from 'suomifi-ui-components';
-import ContactInfo from '@app/common/components/terminology-components/contact-info';
-import InformationDomainsSelector from '@app/common/components/terminology-components/information-domains-selector';
-import { TallerSeparator } from './new-terminology.styles';
-import Prefix from 'yti-common-ui/form/prefix';
-import TypeSelector from '@app/common/components/terminology-components/type-selector';
 import { NewTerminologyInfo } from '@app/common/interfaces/new-terminology-info';
 import { useTranslation } from 'next-i18next';
 import { TerminologyDataInitialState } from './terminology-initial-state';
 import { UpdateTerminology } from './update-terminology.interface';
-import StatusSelector from './status-selector';
 import isEmail from 'validator/lib/isEmail';
-import { useGetIfNamespaceInUseMutation } from '@app/common/components/vocabulary/vocabulary.slice';
 import LanguageSelector, {
   LanguageBlockType,
 } from 'yti-common-ui/form/language-selector';
+import StatusSelector from './status-selector';
+import { TallerSeparator } from './new-terminology.styles';
 
 interface InfoManualProps {
   setIsValid: (valid: boolean) => void;
@@ -58,8 +52,6 @@ export default function InfoManual({
     if (!terminologyData) {
       return;
     }
-    console.log(terminologyData);
-
     let valid = true;
 
     if (Object.keys(terminologyData).length < 6) {
@@ -92,7 +84,6 @@ export default function InfoManual({
   }, [terminologyData, setIsValid, setManualData, languages]);
 
   const handleUpdate = ({ key, data }: UpdateTerminology) => {
-    console.log('after update' + key);
     setTerminologyData((values) => ({ ...values, [key]: data }));
     onChange();
   };
@@ -147,6 +138,16 @@ export default function InfoManual({
         noItemsText={''}
         disabled={disabled}
       />
+
+      <TallerSeparator></TallerSeparator>
+
+      {initialData && (
+        <StatusSelector
+          update={handleUpdate}
+          userPosted={userPosted}
+          defaultValue={initialData.status}
+        />
+      )}
 
       {/*  <InformationDomainsSelector
         disabled={disabled}

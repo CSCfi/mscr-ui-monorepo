@@ -186,19 +186,7 @@ export default function EditVocabulary({ terminologyId }: EditVocabularyProps) {
           onChange={enableConfirmation}
         />
         <TallerSeparator />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <Dropdown
-            labelText={'Select Vocabulary Status'}
-            visualPlaceholder={'Select Vocabulary Status'}
-            defaultValue={''}
-          >
-            <DropdownItem value={'DRAFT'}>{'DRAFT'}</DropdownItem>
-            <DropdownItem value={'PUBLISHED'}>{'PUBLISHED'}</DropdownItem>
-            <DropdownItem value={'DEPRECATED'}>{'DEPRECATED'}</DropdownItem>
-          </Dropdown>
-        </div>
 
-        <TallerSeparator></TallerSeparator>
         <FormFooter>
           {(authenticatedUser?.anonymous ||
             authenticatedMutUser.data?.anonymous) && (

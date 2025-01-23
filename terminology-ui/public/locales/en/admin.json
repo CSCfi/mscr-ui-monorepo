@@ -352,7 +352,6 @@
   "update-terminology-description-2": "If you want to add concepts to the vocabulary with a file, select 'Import concepts' in the vocabulary information card.",
   "update-terminology-with-file": "Update vocabulary with a file",
   "updating-terminology": "Updating vocabulary",
-  "url-preview": "URL preview",
   "valid_one": "Valid ({{count}} item)",
   "valid_other": "Valid ({{count}} items)",
   "you-can-copy": "You can copy the vocabulary as a base for a newer version, where the original vocabulary will exist until the newer vocabulary is ready"
