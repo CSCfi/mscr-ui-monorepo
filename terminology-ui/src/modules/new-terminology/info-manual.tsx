@@ -8,7 +8,7 @@ import LanguageSelector, {
   LanguageBlockType,
 } from 'yti-common-ui/form/language-selector';
 import StatusSelector from './status-selector';
-import { TallerSeparator } from './new-terminology.styles';
+import Separator from 'yti-common-ui/separator';
 
 interface InfoManualProps {
   setIsValid: (valid: boolean) => void;
@@ -138,8 +138,6 @@ export default function InfoManual({
         noItemsText={''}
         disabled={disabled}
       />
-
-      <TallerSeparator></TallerSeparator>
 
       {initialData && (
         <StatusSelector
