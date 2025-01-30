@@ -11,10 +11,13 @@ import { Format } from '@app/common/interfaces/format.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
 import { DataTypeResults } from '@app/common/interfaces/data-type.interface';
 
-function createSearchUrl(formatRestrictions: Array<Format>) {
+function createSearchUrl(formatRestrictions: Array<Format>, includePersonalDraft?: boolean) {
   const formatString = formatRestrictions.reduce((filterString, fr) => {
     return `${filterString}&format=${fr}`;
   }, '');
+  if (includePersonalDraft) {
+    return `/frontend/mscrSearch?type=SCHEMA${formatString}&includePersonalPrivate=true&pageSize=100`;
+  }
   return `/frontend/mscrSearch?type=SCHEMA${formatString}&pageSize=100`;
 }
 
@@ -108,9 +111,9 @@ export const schemaApi = createApi({
         method: 'GET',
       }),
     }),
-    getPublicSchemas: builder.query<MscrSearchResults, Array<Format>>({
-      query: (formatRestrictions) => ({
-        url: createSearchUrl(formatRestrictions),
+    getPublicSchemas: builder.query<MscrSearchResults, { formatRestrictions: Array<Format>; includePersonalDrafts?: boolean }>({
+      query: (query) => ({
+        url: createSearchUrl(query.formatRestrictions, query.includePersonalDrafts),
         method: 'GET',
       }),
     }),

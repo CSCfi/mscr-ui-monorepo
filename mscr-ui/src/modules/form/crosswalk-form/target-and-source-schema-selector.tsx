@@ -6,7 +6,7 @@ import {
 } from '@app/common/components/schema/schema.slice';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { MscrSearchResult } from '@app/common/interfaces/search.interface';
+import { MscrSearchResult, MscrSearchResults } from '@app/common/interfaces/search.interface';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { ModelFormContainer } from '@app/modules/form/form.styles';
 import { useTranslation } from 'next-i18next';
@@ -39,7 +39,7 @@ interface SelectableSchema {
 
 interface SelectableWorkspace {
   labelText: string;
-  uniqueItemId: string;
+  uniqueItemId: 'all' | 'personalWorkspace' | 'groupWorkspace';
 }
 
 export default function TargetAndSourceSchemaSelector({
@@ -53,7 +53,28 @@ export default function TargetAndSourceSchemaSelector({
   const formatRestrictions = createNew
     ? formatsAvailableForCrosswalkCreation
     : [];
-  const { data, isSuccess } = useGetPublicSchemasQuery(formatRestrictions);
+
+  const workspaceValuesInit: SelectableWorkspace[] = [];
+  const [workspaceValues, setWorkspaceValues] =
+    useState<SelectableWorkspace[]>(workspaceValuesInit);
+  const [selectedSourceWorkspace, setSelectedSourceWorkspace] =
+    useState<string>('');
+  const [selectedTargetWorkspace, setSelectedTargetWorkspace] =
+    useState<string>('');
+
+  const { data, isSuccess } = useGetPublicSchemasQuery(
+    { formatRestrictions },
+    { skip: schemaSelectorDisabled || !createNew }
+  );
+  const { data: dataWithDrafts } = useGetPublicSchemasQuery(
+    { formatRestrictions, includePersonalDrafts: true },
+    {
+      skip:
+        schemaSelectorDisabled ||
+        (selectedSourceWorkspace !== 'personalWorkspace' &&
+        selectedTargetWorkspace !== 'personalWorkspace'),
+    }
+  );
 
   const { data: sourceSchemaData } = useGetSchemaQuery(
     formData.sourceSchema ?? '',
@@ -74,15 +95,6 @@ export default function TargetAndSourceSchemaSelector({
   );
   const [sourceSchemas, setSourceSchemas] = useState(Array<SelectableSchema>());
   const [targetSchemas, setTargetSchemas] = useState(Array<SelectableSchema>());
-
-  const workspaceValuesInit: SelectableWorkspace[] = [];
-  const [workspaceValues, setWorkspaceValues] =
-    useState<SelectableWorkspace[]>(workspaceValuesInit);
-
-  const [selectedSourceWorkspace, setSelectedSourceWorkspace] =
-    useState<string>('');
-  const [selectedTargetWorkspace, setSelectedTargetWorkspace] =
-    useState<string>('');
 
   const [defaultSourceSchema, setDefaultSourceSchema] = useState('');
   const [defaultTargetSchema, setDefaultTargetSchema] = useState('');
@@ -130,27 +142,7 @@ export default function TargetAndSourceSchemaSelector({
   ];
 
   useEffect(() => {
-    const fetchedSchemas: SelectableSchema[] = [];
-    data?.hits.hits.forEach((item: MscrSearchResult) => {
-      const label = getLanguageVersion({
-        data: item._source.label,
-        lang,
-      });
-
-      const schema = {
-        labelText: label,
-        uniqueItemId: item._source.id,
-        organizationIds:
-          item._source.organizations.length > 0
-            ? item._source.organizations.map((organization) => organization.id)
-            : [''],
-        owner:
-          item._source?.owner && item._source?.owner?.length > 0
-            ? item._source.owner
-            : [],
-      };
-      fetchedSchemas.push(schema);
-    });
+    const fetchedSchemas: SelectableSchema[] = optionsFromSchemas(data);
     setDefaultSchemas(fetchedSchemas);
     setSourceSchemas(fetchedSchemas);
     setTargetSchemas(fetchedSchemas);
@@ -170,7 +162,7 @@ export default function TargetAndSourceSchemaSelector({
       setSourceSchemas(defaultSchemas);
     } else if (selectedSourceWorkspace === 'personalWorkspace') {
       setSourceSchemas(
-        defaultSchemas.filter((item) => item.owner.includes(user.id))
+        optionsFromSchemas(dataWithDrafts).filter((item) => item.owner.includes(user.id))
       );
     } else {
       setSourceSchemas(
@@ -188,7 +180,7 @@ export default function TargetAndSourceSchemaSelector({
       setTargetSchemas(defaultSchemas);
     } else if (selectedTargetWorkspace === 'personalWorkspace') {
       setTargetSchemas(
-        defaultSchemas.filter((item) => item.owner.includes(user.id))
+        optionsFromSchemas(dataWithDrafts).filter((item) => item.owner.includes(user.id))
       );
     } else {
       setTargetSchemas(
@@ -201,18 +193,44 @@ export default function TargetAndSourceSchemaSelector({
     }
   }, [selectedTargetWorkspace, groupWorkspacePid]);
 
-  function setSource(selectedSchemaId: string | null) {
-      setFormData({
-        ...formData,
-        sourceSchema: selectedSchemaId ?? '',
+  function optionsFromSchemas(schemaData?: MscrSearchResults) {
+    if (!schemaData) return [];
+    const schemaOptions: SelectableSchema[] = [];
+    schemaData?.hits.hits.forEach((item: MscrSearchResult) => {
+      const label = getLanguageVersion({
+        data: item._source.label,
+        lang,
       });
+
+      const schema = {
+        labelText: label,
+        uniqueItemId: item._source.id,
+        organizationIds:
+          item._source.organizations.length > 0
+            ? item._source.organizations.map((organization) => organization.id)
+            : [''],
+        owner:
+          item._source?.owner && item._source?.owner?.length > 0
+            ? item._source.owner
+            : [],
+      };
+      schemaOptions.push(schema);
+    });
+    return schemaOptions;
+  }
+
+  function setSource(selectedSchemaId: string | null) {
+    setFormData({
+      ...formData,
+      sourceSchema: selectedSchemaId ?? '',
+    });
   }
 
   function setTarget(selectedSchemaId: string | null) {
-      setFormData({
-        ...formData,
-        targetSchema: selectedSchemaId ?? '',
-      });
+    setFormData({
+      ...formData,
+      targetSchema: selectedSchemaId ?? '',
+    });
   }
 
   return (
