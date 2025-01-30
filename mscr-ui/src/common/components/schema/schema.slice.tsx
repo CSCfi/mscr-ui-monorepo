@@ -16,9 +16,9 @@ function createSearchUrl(formatRestrictions: Array<Format>, includePersonalDraft
     return `${filterString}&format=${fr}`;
   }, '');
   if (includePersonalDraft) {
-    return `/frontend/mscrSearch?type=SCHEMA${formatString}&includePersonalPrivate=true&pageSize=100`;
+    return `/frontend/mscrSearch?type=SCHEMA${formatString}&includePersonalPrivate=true&pageSize=1000`;
   }
-  return `/frontend/mscrSearch?type=SCHEMA${formatString}&pageSize=100`;
+  return `/frontend/mscrSearch?type=SCHEMA${formatString}&pageSize=1000`;
 }
 
 function createDataTypeUrl({schemaId, target, dataType}: {schemaId: string; target: string; dataType: string}) {
