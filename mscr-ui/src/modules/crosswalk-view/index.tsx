@@ -136,56 +136,26 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
     useGetCrosswalkMappingFunctionsQuery('FILTERS');
 
   let sourceSchemaFormat: Format | undefined, targetSchemaFormat: Format | undefined;
-  //const [sourceSchemaFormat, setSourceSchemaFormat] = useState();
-  //const [targetSchemaFormat, setTargetSchemaFormat] = useState();
-  //const [sourceSchemaData, setSourceSchemaData] = useState(undefined);
-  //const [targetSchemaData, setTargetSchemaData] = useState(undefined);
   let sourceSchemaData: SchemaWithContent | undefined, targetSchemaData: SchemaWithContent | undefined;
 
-
-    //if (crosswalkData?.sourceSchema) {
-      console.log('Marko: crosswalk-view index.ts: isNodeMappingsModalOpen) = ' + isNodeMappingsModalOpen);
-      //console.log('Marko: crosswalkData?.sourceSchema=' + crosswalkData?.sourceSchema)
-      /*const {data: schemaData1} = useGetSchemaQuery(
-        crosswalkData?.sourceSchema ?? '',
-      );*/
-      const sourceSchema = getSchema(crosswalkData?.sourceSchema || '');
-      // const sourceSchema = schemaData1;
-      //console.log('Marko: sourceSchema=' + JSON.stringify(sourceSchema));
-      const {data: getSchemaData1, isSuccess: getSchemaDataIsSuccess1} =
+  const sourceSchema = getSchema(crosswalkData?.sourceSchema || '');
+  const {data: getSchemaData1, isSuccess: getSchemaDataIsSuccess1} =
         useGetFrontendSchemaQuery(crosswalkData?.sourceSchema?? '');
-      sourceSchemaFormat = sourceSchema?.format ?? undefined;
-      sourceSchemaData = getSchemaData1 ?? undefined;
-    //}
+  sourceSchemaFormat = sourceSchema?.format ?? undefined;
+  sourceSchemaData = getSchemaData1 ?? undefined;
+  const targetSchema = getSchema(crosswalkData?.targetSchema || '');
 
-
-
-    //if (crosswalkData?.targetSchema) {
-      //console.log('Marko: crosswalkData?.targetSchema=' + crosswalkData?.targetSchema)
-      /*const {data: schemaData2} = useGetSchemaQuery(
-        crosswalkData?.targetSchema ?? '',
-      );*/
-      const targetSchema = getSchema(crosswalkData?.targetSchema || '');
-      // const targetSchema = schemaData2;
-      //console.log('Marko: targetSchema=' + JSON.stringify(targetSchema));
-      const {data: getSchemaData2, isSuccess: getSchemaDataIsSuccess} =
+  const {data: getSchemaData2, isSuccess: getSchemaDataIsSuccess} =
         useGetFrontendSchemaQuery(crosswalkData?.targetSchema ?? '');
-      targetSchemaFormat = targetSchema?.format ?? undefined;
-      targetSchemaData = getSchemaData2 ?? undefined;
-    //}
+  targetSchemaFormat = targetSchema?.format ?? undefined;
+  targetSchemaData = getSchemaData2 ?? undefined;
+
   useEffect(() => {
     updateActionMenu(dispatch, Type.Crosswalk, crosswalkData, hasEditPermission);
   }, [dispatch, crosswalkData, hasEditPermission]);
 
-  /*useEffect( () => {
-    if (isEditModeActive) {
-      setNodeMappingsModalOpen(true);
-    }
-  } ,[isEditModeActive]);*/
-
   useEffect(() => {
     // After mapping to be edited is set, this opens editing modal
-    console.log('Marko: crosswalk-editor index.ts: useEffect isNodeMappingsModalOpen) = ' + isNodeMappingsModalOpen + ' asetetaan setNodeMappingsModalOpen = true');
     setNodeMappingsModalOpen(true);
   }, [mappingToBeEdited]);
 
@@ -357,11 +327,9 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
   ) => {
     if (action === 'closeModal') {
       setIsMappingPatchOperation(false);
-      console.log('Marko: performCallbackFromMappingsModal: action: closeModal: setNodeMappingsModalOpen(false).');
       setNodeMappingsModalOpen(false);
     }
     if (action === 'addMapping') {
-      console.log('Marko: performCallbackFromMappingsModal: action: addMapping: setNodeMappingsModalOpen(false).');
       setNodeMappingsModalOpen(false);
       putMapping({ payload: mappingPayload, pid: crosswalkId });
       const sourceIds: string[] = [];
@@ -377,7 +345,6 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
     }
     if (action === 'save') {
       setIsMappingPatchOperation(false);
-      console.log('Marko: performCallbackFromMappingsModal: action: save: setNodeMappingsModalOpen(false).');
       setNodeMappingsModalOpen(false);
       patchMapping({ payload: mappingPayload, pid: patchPid });
     }
@@ -497,7 +464,6 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
   }
 
   function getSchema(schemaPid: string) {
-    console.log('Marko: getSchema: schemaPid=' + schemaPid);
     const {data: schemaData} = useGetSchemaQuery(
       schemaPid ?? '',
     );
@@ -582,11 +548,10 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
                 tabIndex: 1,
                 tabText: 'content-and-editor-tab',
                 content: (
-                  <CrosswalkEditor crosswalkId={crosswalkId} crosswalkData={crosswalkData} hasEditPermission={hasEditPermission}
-                                   nodeMappings={nodeMappings} setNodeMappings={setNodeMappings} isEditModeActive={isEditModeActive}
+                  <CrosswalkEditor crosswalkData={crosswalkData} hasEditPermission={hasEditPermission}
+                                   nodeMappings={nodeMappings} isEditModeActive={isEditModeActive}
                                    showAttributeNames={showAttributeNames} setShowAttributeNames={setShowAttributeNames}
                                    sourceTreeSelection={sourceTreeSelection}
-                                   setSourceTreeSelection={setSourceTreeSelection}
                                    scrollToSelectedSourceNodeId={scrollToSelectedSourceNodeId}
                                    scrollToSelectedTargetNodeId={scrollToSelectedTargetNodeId}
                                    deleteMappingResponse={deleteMappingResponse}
@@ -595,9 +560,6 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
                                    setNodeMappingsModalOpen={setNodeMappingsModalOpen}
                                    mappingToBeEdited={mappingToBeEdited}
                                    setMappingToBeEdited={setMappingToBeEdited}
-                                   patchPid={patchPid}
-                                   putMappingResponse={putMappingResponse}
-                                   patchMappingResponse={patchMappingResponse}
                                    isPatchMappingOperation={isPatchMappingOperation}
                                    targetTreeSelection={targetTreeSelection}
                                    isOneToManyMapping={isOneToManyMapping}
@@ -611,8 +573,6 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
                                    performCallbackFromMappingsModal={performCallbackFromMappingsModal}
                                    sourceSchemaData={sourceSchemaData}
                                    targetSchemaData={targetSchemaData}
-                                   mappingsFromBackend={mappingsFromBackend}
-                                   getMappingsDataIsSuccess={getMappingsDataIsSuccess}
                                    setPatchSourceNodes={setPatchSourceNodes}
                                    setPatchTargetNodes={setPatchTargetNodes}/>
                 )

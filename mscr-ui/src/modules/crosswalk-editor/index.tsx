@@ -10,58 +10,39 @@ import {
 } from '@app/common/interfaces/crosswalk-connection.interface';
 import NodeMappingsModal from './tabs/node-mappings';
 import LinkIcon from '@app/common/components/shared-icons';
-import {
-  usePutMappingMutation,
-  useDeleteMappingMutation,
-  usePatchMappingMutation,
-  useGetMappingsQuery,
-} from '@app/common/components/crosswalk/crosswalk.slice';
-import { useGetCrosswalkMappingFunctionsQuery } from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
 import SchemaInfo from '@app/common/components/schema-info';
 import { useTranslation } from 'next-i18next';
 import { CrosswalkWithVersionInfo } from '@app/common/interfaces/crosswalk.interface';
-import { useSelector } from 'react-redux';
-import { selectIsEditContentActive } from '@app/common/components/content-view/content-view.slice';
 import { State } from '@app/common/interfaces/state.interface';
 import Tooltip from '@mui/material/Tooltip';
-import {useGetFrontendSchemaQuery, useGetSchemaQuery} from "@app/common/components/schema/schema.slice";
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
 import {Format} from "@app/common/interfaces/format.interface";
-import {MutationDefinition, QueryStatus} from "@reduxjs/toolkit/query";
-import {AxiosBaseQueryArgs, AxiosBaseQueryError} from "yti-common-ui/interfaces/axios-base-query.interface";
-import {BaseQueryFn} from "@reduxjs/toolkit/dist/query";
+import _ from "lodash";
 
 export default function CrosswalkEditor({
-  crosswalkId,
-  crosswalkData,
-  hasEditPermission,
-  nodeMappings,
-  setNodeMappings,
-  isEditModeActive,
-  showAttributeNames,
-  setShowAttributeNames, sourceTreeSelection,
-  setSourceTreeSelection,
-  scrollToSelectedSourceNodeId,
-  scrollToSelectedTargetNodeId, deleteMappingResponse, setIsMappingPatchOperation,
+                                          crosswalkData, hasEditPermission,
+                                          nodeMappings, isEditModeActive,
+                                          showAttributeNames,
+                                          setShowAttributeNames, sourceTreeSelection,
+                                          scrollToSelectedSourceNodeId,
+                                          scrollToSelectedTargetNodeId,
+                                          setIsMappingPatchOperation,
                                           isNodeMappingsModalOpen, setNodeMappingsModalOpen,
-                                          mappingToBeEdited, setMappingToBeEdited, patchPid, putMappingResponse,
-                                          patchMappingResponse, isPatchMappingOperation, targetTreeSelection,
+                                          mappingToBeEdited, setMappingToBeEdited,
+                                          isPatchMappingOperation, targetTreeSelection,
                                           isOneToManyMapping, setIsOneToManyMapping, mappingFunctions,
                                           performCallbackFromAccordionAction, sourceSchemaFormat, targetSchemaFormat,
-                                          sourceSchemaData, targetSchemaData, performCallbackFromMappingsModal,
-                                          mappingFilters, highlightOperation, mappingsFromBackend, getMappingsDataIsSuccess,
+                                          mappingFilters, highlightOperation, performCallbackFromMappingsModal,
+                                          sourceSchemaData, targetSchemaData,
                                           setPatchSourceNodes, setPatchTargetNodes
 }: {
-  crosswalkId: string;
   crosswalkData: CrosswalkWithVersionInfo;
   hasEditPermission: boolean;
   nodeMappings: NodeMapping[];
-  setNodeMappings: Dispatch<SetStateAction<NodeMapping[]>>;
   isEditModeActive: boolean;
   showAttributeNames: boolean;
   setShowAttributeNames: Dispatch<SetStateAction<boolean>>;
   sourceTreeSelection: string[];
-  setSourceTreeSelection: Dispatch<SetStateAction<string[]>>;
   scrollToSelectedSourceNodeId: string | undefined;
   scrollToSelectedTargetNodeId: string | undefined;
   deleteMappingResponse:  any;
@@ -70,9 +51,6 @@ export default function CrosswalkEditor({
   setNodeMappingsModalOpen:  Dispatch<SetStateAction<boolean>>;
   mappingToBeEdited:  CrosswalkConnectionNew[] | undefined;
   setMappingToBeEdited:  Dispatch<SetStateAction<CrosswalkConnectionNew[] | undefined>>;
-  patchPid: string;
-  putMappingResponse: any;
-  patchMappingResponse: any;
   isPatchMappingOperation: boolean;
   targetTreeSelection: string[];
   isOneToManyMapping: boolean;
@@ -86,8 +64,6 @@ export default function CrosswalkEditor({
   performCallbackFromMappingsModal: Function;
   mappingFilters: any;
   highlightOperation: highlightOperation | undefined;
-  mappingsFromBackend: NodeMapping[] | undefined;
-  getMappingsDataIsSuccess: boolean;
   setPatchSourceNodes:  Dispatch<SetStateAction<RenderTree[]>>;
   setPatchTargetNodes:  Dispatch<SetStateAction<RenderTree[]>>;
 }) {
@@ -104,9 +80,11 @@ export default function CrosswalkEditor({
     []
   );
 
-  const [linkingError] = useState<string>('');
+  const [filteredSourceNodeMappings, setFilteredSourceNodeMappings] = useState<NodeMapping[]>([]);
+  const [filteredTargetNodeMappings, setFilteredTargetNodeMappings] = useState<NodeMapping[]>([]);
+  const [filteredCombinedNodeMappings, setFilteredCombinedNodeMappings] = useState<NodeMapping[]>([]);
 
-  console.log('Marko: crosswalk-editor index.ts alussa: isNodeMappingsModalOpen) = ' + isNodeMappingsModalOpen);
+  const [linkingError] = useState<string>('');
 
   useEffect(() => {
     if (crosswalkData?.sourceSchema) {
@@ -117,6 +95,11 @@ export default function CrosswalkEditor({
     }
   }, [crosswalkData]);
 
+  useEffect( () => {
+    setFilteredSourceNodeMappings(nodeMappings);
+    setFilteredTargetNodeMappings(nodeMappings);
+    setFilteredCombinedNodeMappings(nodeMappings);
+  }, [nodeMappings]);
 
   function addMappingButtonClick() {
     setIsMappingPatchOperation(false);
@@ -189,24 +172,77 @@ export default function CrosswalkEditor({
     return results;
   }
 
+  function filterMappingsWithId(nodeMappingsInput: NodeMapping[], ids: string[], source: boolean) {
+    let results: NodeMapping[] = [];
+
+    nodeMappingsInput.forEach(item => {
+        if (source) {
+          let foundItemsMatchingIds = ids.filter( id => item.source.some(sourceItem => sourceItem.id === id ));
+          if (foundItemsMatchingIds.length === ids.length) {
+            results.push(item);
+          }
+        } else {
+          let foundItemsMatchingIds = ids.filter( id => item.target.some(targetItem => targetItem.id === id ));
+          if (foundItemsMatchingIds.length === ids.length) {
+            results.push(item);
+          }
+        }
+
+      }
+    );
+    return results;
+  }
+
   const performCallbackFromSchemaInfo = (
     nodeIds: RenderTree[],
     isSourceTree: boolean
   ) => {
-    if (nodeIds.length > 0) {
+    let foundNodeMappings = [];
+    if (nodeIds.length > 0 && nodeIds[0] != null) {
+      let ids = nodeIds.map(nodeId => nodeId.id);
+      foundNodeMappings = filterMappingsWithId(nodeMappings, ids, isSourceTree);
       if (isSourceTree) {
-        setSelectedSourceNodes(nodeIds);
-        if (isPatchMappingOperation) {
-          setPatchSourceNodes(nodeIds);
+        setFilteredSourceNodeMappings(foundNodeMappings);
+        let result = foundNodeMappings.filter(sourceNodeMapping =>
+          filteredTargetNodeMappings.some(targetNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
+        setFilteredCombinedNodeMappings(result);
+      } else {
+        setFilteredTargetNodeMappings(foundNodeMappings);
+        let result = foundNodeMappings.filter(targetNodeMapping =>
+          filteredSourceNodeMappings.some(sourceNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
+        setFilteredCombinedNodeMappings(result);
+      }
+
+    } else {
+      if (isSourceTree) {
+        setFilteredSourceNodeMappings(nodeMappings);
+        if (_.isEqual(nodeMappings, filteredTargetNodeMappings)) {
+          setFilteredCombinedNodeMappings(nodeMappings);
+        } else {
+          setFilteredCombinedNodeMappings(filteredTargetNodeMappings);
         }
       } else {
-        setSelectedTargetNodes(nodeIds);
-        if (isPatchMappingOperation) {
-          setPatchTargetNodes(nodeIds);
+        setFilteredTargetNodeMappings(nodeMappings);
+        if (_.isEqual(nodeMappings, filteredSourceNodeMappings)) {
+          setFilteredCombinedNodeMappings(nodeMappings);
+        } else {
+          setFilteredCombinedNodeMappings(filteredSourceNodeMappings);
         }
       }
     }
-  };
+    
+    if (isSourceTree) {
+      setSelectedSourceNodes(nodeIds);
+      if (isPatchMappingOperation) {
+        setPatchSourceNodes(nodeIds);
+      }
+    } else {
+      setSelectedTargetNodes(nodeIds);
+      if (isPatchMappingOperation) {
+        setPatchTargetNodes(nodeIds);
+      }
+    }
+  }
 
   return (
     <div className="row d-flex justify-content-between crosswalk-editor">
@@ -288,7 +324,7 @@ export default function CrosswalkEditor({
 
         <div className="joint-listing-accordion-wrap my-3">
           <MappingsAccordion
-            nodeMappings={nodeMappings}
+            nodeMappings={filteredCombinedNodeMappings}
             viewOnlyMode={false}
             isEditModeActive={
               isEditModeActive && crosswalkData.state !== State.Published

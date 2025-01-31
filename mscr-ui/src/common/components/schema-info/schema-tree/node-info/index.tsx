@@ -123,8 +123,8 @@ export default function NodeInfo(props: {
                 onChange={(newValue) => handleDropDownSelect(newValue)}
               >
                 {dropDownList.map((rt) => (
-                  <DropdownItem key={rt.visualTreeId} value={rt.id}>
-                    {rt.name}
+                  <DropdownItem key={rt?.visualTreeId} value={rt?.id}>
+                    {rt?.name}
                   </DropdownItem>
                 ))}
               </Dropdown>

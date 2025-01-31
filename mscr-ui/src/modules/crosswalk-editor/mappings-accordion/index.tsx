@@ -464,17 +464,9 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
 }) {
   const {t} = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
-  //const [showAttributeNames, setShowAttributeNames] = React.useState<boolean>(false);
-  //const [schemaFormats, setSchemaFormats] = React.useState<{}>({sourceSchemaFormat: undefined, targetSchemaFormat: undefined});
-  // const [schemaDatas, setSchemaDatas] = React.useState<{}>({sourceSchemaData: undefined, targetSchemaData: undefined});
 
   useEffect(() => {
     setMappingData(nodeMappings);
-    //setShowAttributeNames(showAttributeNames);
-    //setSchemaFormats(props.schemaFormats);
-    //setSchemaDatas(props.schemaDatas);
-    console.log('Marko: MappingsAccordion: props.setNodeMappingsModalOpen=' + JSON.stringify(setNodeMappingsModalOpen)
-    + ',  isEditModeActive=' + isEditModeActive + ', showAttributeNames=' + showAttributeNames);
   }, [nodeMappings]);
   const nodeMappingsInput = nodeMappings;
   return (
