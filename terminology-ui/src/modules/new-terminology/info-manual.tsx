@@ -53,6 +53,7 @@ export default function InfoManual({
       return;
     }
     let valid = true;
+    console.log(terminologyData.contributors);
 
     if (Object.keys(terminologyData).length < 6) {
       valid = false;

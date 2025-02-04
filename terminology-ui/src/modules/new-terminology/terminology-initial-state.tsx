@@ -24,8 +24,8 @@ export const TerminologyDataInitialState: NewTerminologyInfo = {
     {
       labelText: 'contributor',
       name: 'mscr',
-      organizationId: '7d3a3c00-5a6b-489b-a3ed-63bb58c26a63',
-      uniqueItemId: '7d3a3c00-5a6b-489b-a3ed-63bb58c26a63',
+      organizationId: 'd2732371-4ca1-4c34-9469-d6a6b55da0a5',
+      uniqueItemId: 'd2732371-4ca1-4c34-9469-d6a6b55da0a5',
     },
   ],
   prefix: [v4().slice(0, 8), true],

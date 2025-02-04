@@ -120,7 +120,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
       <ExpanderTitleButton asHeading="h2">
         {t('vocabulary-info-terminology')}
       </ExpanderTitleButton>
-      <ModalContent>
+      <ExpanderContent>
         <MultilingualPropertyBlock
           title={t('vocabulary-info-name')}
           data={data.properties.prefLabel}
@@ -346,7 +346,7 @@ export default function InfoExpander({ data }: InfoExpanderProps) {
         <BasicBlock title="URI" id="uri">
           {data.uri}
         </BasicBlock>
-      </ModalContent>
+      </ExpanderContent>
     </InfoExpanderWrapper>
   );
 }

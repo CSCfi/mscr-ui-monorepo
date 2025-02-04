@@ -37,6 +37,7 @@ export default function generateNewTerminology({
   postData.id = id ? id : UUID;
   postData.createdDate = createdDate ? createdDate : now.toISOString();
   postData.lastModifiedDate = now.toISOString();
+  console.log(postData.references.contributor);
 
   // Not removing it now as need to check if it breaks the post
   postData.properties.contact = [
