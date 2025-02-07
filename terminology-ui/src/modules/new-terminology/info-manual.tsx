@@ -9,6 +9,9 @@ import LanguageSelector, {
 } from 'yti-common-ui/form/language-selector';
 import StatusSelector from './status-selector';
 import Separator from 'yti-common-ui/separator';
+import OrganizationSelector from '@app/common/components/terminology-components/organization-selector';
+import { Label, Paragraph } from 'suomifi-ui-components';
+import { TallerSeparator } from './new-terminology.styles';
 
 interface InfoManualProps {
   setIsValid: (valid: boolean) => void;
@@ -138,6 +141,15 @@ export default function InfoManual({
         ariaOptionChipRemovedText={''}
         noItemsText={''}
         disabled={disabled}
+      />
+
+      <TallerSeparator />
+
+      <OrganizationSelector
+        disabled={disabled}
+        update={handleUpdate}
+        userPosted={userPosted}
+        initialData={initialData}
       />
 
       {initialData && (
