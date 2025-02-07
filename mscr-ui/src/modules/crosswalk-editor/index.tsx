@@ -18,6 +18,7 @@ import Tooltip from '@mui/material/Tooltip';
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
 import {Format} from "@app/common/interfaces/format.interface";
 import _ from "lodash";
+import MappingsAccordion2 from "@app/modules/crosswalk-editor/mappings-accordion2";
 
 export default function CrosswalkEditor({
                                           crosswalkData, hasEditPermission,
@@ -230,7 +231,7 @@ export default function CrosswalkEditor({
         }
       }
     }
-    
+
     if (isSourceTree) {
       setSelectedSourceNodes(nodeIds);
       if (isPatchMappingOperation) {
@@ -249,7 +250,7 @@ export default function CrosswalkEditor({
       <div className="col-12 mx-1">
         <div className="row gx-0">
           {/*  SOURCE TREE */}
-          <div className="col-5">
+          <div className="col-3">
             <SchemaInfo
               updateTreeNodeSelectionsOutput={performCallbackFromSchemaInfo}
               isSourceTree={true}
@@ -260,42 +261,26 @@ export default function CrosswalkEditor({
             />
           </div>
 
-          {/*  MID BUTTONS */}
-          <div className="col-2 px-4 mid-buttons">
-            {hasEditPermission && (
-              <Tooltip
-                title={
-                  selectedSourceNodes.length > 1 &&
-                  selectedTargetNodes.length > 1
-                    ? 'Many to many node mappings are not supported'
-                    : !isEditModeActive
-                      ? 'Activate edit mode to enable mappings'
-                      : 'Map selected nodes'
-                }
-                placement="bottom"
-              >
-                <Sbutton
-                  className="link-button"
-                  disabled={
-                    selectedSourceNodes.length < 1 ||
-                    selectedTargetNodes.length < 1 ||
-                    crosswalkData.state === State.Published ||
-                    (selectedSourceNodes.length > 1 &&
-                      selectedTargetNodes.length > 1) ||
-                    !isEditModeActive
-                  }
-                  onClick={() => {
-                    addMappingButtonClick();
-                  }}
-                >
-                  <LinkIcon></LinkIcon>
-                </Sbutton>
-              </Tooltip>
-            )}
+
+          <div className="joint-listing-accordion-wrap ">
+            <MappingsAccordion2
+              nodeMappings={filteredCombinedNodeMappings}
+              viewOnlyMode={false}
+              isEditModeActive={
+                isEditModeActive && crosswalkData.state !== State.Published
+              }
+              showAttributeNames={showAttributeNames}
+              mappingFunctions={mappingFunctions}
+              performAccordionAction={performCallbackFromAccordionAction}
+              schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
+              schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
+              setNodeMappingsModalOpen={setNodeMappingsModalOpen}
+            />
           </div>
+          {/*  MID BUTTONS */}
 
           {/*  TARGET TREE */}
-          <div className="col-5 pe-2">
+          <div className="col-3">
             <SchemaInfo
               updateTreeNodeSelectionsOutput={performCallbackFromSchemaInfo}
               isSourceTree={false}
@@ -305,37 +290,6 @@ export default function CrosswalkEditor({
               scrollToSelectedNodeId={scrollToSelectedTargetNodeId}
             />
           </div>
-        </div>
-      </div>
-      <div className="col-12 mt-4">
-        <div className="d-flex justify-content-between">
-          <div className="align-self-end pe-1">
-            {/*TODO: Checkbox can be removed as deprecatmappingFunctionsed when all new style titles work*/}
-            <Checkbox
-              checked={showAttributeNames}
-              onClick={(newState) => {
-                setShowAttributeNames(newState.checkboxState);
-              }}
-            >
-              {t('crosswalk-editor.show-node-titles')}
-            </Checkbox>
-          </div>
-        </div>
-
-        <div className="joint-listing-accordion-wrap my-3">
-          <MappingsAccordion
-            nodeMappings={filteredCombinedNodeMappings}
-            viewOnlyMode={false}
-            isEditModeActive={
-              isEditModeActive && crosswalkData.state !== State.Published
-            }
-            showAttributeNames={showAttributeNames}
-            mappingFunctions={mappingFunctions}
-            performAccordionAction={performCallbackFromAccordionAction}
-            schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
-            schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
-            setNodeMappingsModalOpen={setNodeMappingsModalOpen}
-          />
         </div>
       </div>
       {mappingToBeEdited && (
