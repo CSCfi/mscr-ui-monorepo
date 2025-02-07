@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Heading } from 'suomifi-ui-components';
+import {Heading, Modal, ModalContent} from 'suomifi-ui-components';
 
 export const SchemaHeading = styled(Heading)`
   && {
@@ -100,5 +100,37 @@ export const NodeInfoWrapper = styled.div`
     padding: 15px;
     min-height: 377px;
     max-width: 100%;
+  }
+`;
+
+export const StyledSchemaModal = styled(Modal)`
+  background-color: ${(props) => props.theme.suomifi.colors.whiteBase};
+  && {
+    margin: auto;
+    max-width: 350px;
+    max-height: 550px;
+    width: auto;
+    height: auto;
+  }
+
+  .schema-modal-header {
+    display: flex;
+    justify-content: end;
+    font-size: 2rem;
+    height: 4rem;
+  }
+  ;
+  .close {
+    cursor: pointer;
+  }
+`;
+
+export const StyledSchemaModalContent = styled(ModalContent)`
+  font-size: 0.9rem;
+  && {
+    padding: 5px 5px 5px 5px;
+  }
+  th {
+    background-color: ${(props) => props.theme.suomifi.colors.highlightLight2};
   }
 `;

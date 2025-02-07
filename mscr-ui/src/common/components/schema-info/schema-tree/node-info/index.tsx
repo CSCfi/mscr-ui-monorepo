@@ -85,13 +85,13 @@ export default function NodeInfo(props: {
     <div className="row d-flex justify-content-between node-info-box">
       <h3>{t('node-info.selected-node-info')}</h3>
       <div className="col flex-column d-flex justify-content-between side-bar-wrap">
-        <div className="mb-2"></div>
+        <div></div>
         <Box
           className="bg-wrap"
           sx={{
-            height: 440,
+            height: 300,
             flexGrow: 1,
-            maxWidth: 400,
+            maxWidth: 300,
             overflowY: 'auto',
           }}
         >

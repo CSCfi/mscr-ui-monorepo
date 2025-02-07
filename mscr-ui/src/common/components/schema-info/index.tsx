@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Checkbox, SearchInput } from 'suomifi-ui-components';
+import {Button, Checkbox, ModalFooter, ModalTitle, SearchInput} from 'suomifi-ui-components';
 import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
@@ -15,7 +15,7 @@ import {
   ExpandButtonWrapper,
   NodeInfoWrapper,
   SchemaHeading,
-  SearchWrapper,
+  SearchWrapper, StyledSchemaModal, StyledSchemaModalContent,
   TreeviewWrapper,
   TreeWrapper,
 } from '@app/common/components/schema-info/schema-info.styles';
@@ -61,6 +61,8 @@ export default function SchemaInfo(props: {
 
   const [showAttributeNames, setShowAttributeNames] = useState(true);
   const [treeDataOriginal, setTreeDataOriginal] = useState<RenderTree[]>([]);
+
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     if (getSchemaData?.content) {
@@ -180,6 +182,7 @@ export default function SchemaInfo(props: {
   }
 
   function handleTreeClick(nodeIds: string[]) {
+    setModalOpen(true);
     setTreeSelectedArray(nodeIds);
     // If there's several nodes with the same id, expand paths to all
     const isMultiple = nodeIds
@@ -199,6 +202,7 @@ export default function SchemaInfo(props: {
   }
 
   function handleTreeToggle(nodeIds: string[]) {
+    setModalOpen(true);
     setTreeExpandedArray(nodeIds);
   }
 
@@ -226,6 +230,10 @@ export default function SchemaInfo(props: {
         });
       }
     }
+  }
+
+  function closeModal() {
+    setModalOpen(false);
   }
 
   return (
@@ -320,7 +328,30 @@ export default function SchemaInfo(props: {
             </Box>
           </div>
         </TreeWrapper>
-        <NodeInfoWrapper className="col-5 px-0">
+        <CheckboxWrapper>
+          <Checkbox
+            checked={showAttributeNames}
+            onClick={(newState) => {
+              setShowAttributeNames(newState.checkboxState);
+            }}
+          >
+            {t('schema-tree.show-titles')}
+          </Checkbox>
+        </CheckboxWrapper>
+        <StyledSchemaModal
+          appElementId="__next"
+          visible={modalOpen}
+          variant={'default'}
+          onEscKeyDown={() => closeModal()}
+        >
+          <StyledSchemaModalContent>
+            <div className="schema-modal-header">
+              <p className="close"
+                 onClick={() => closeModal()}>
+                &times;
+              </p>
+            </div>
+        <NodeInfoWrapper>
           <NodeInfo
             treeData={selectedTreeNodes}
             currentlySelectedNodeId={currentlySelectedNodeId}
@@ -328,17 +359,10 @@ export default function SchemaInfo(props: {
             isNodeEditable={props.isNodeEditable}
             hasCustomRoot={props.hasCustomRoot}
           />
-          <CheckboxWrapper>
-            <Checkbox
-              checked={showAttributeNames}
-              onClick={(newState) => {
-                setShowAttributeNames(newState.checkboxState);
-              }}
-            >
-              {t('schema-tree.show-titles')}
-            </Checkbox>
-          </CheckboxWrapper>
         </NodeInfoWrapper>
+            </StyledSchemaModalContent>
+        </StyledSchemaModal>
+
       </TreeviewWrapper>
     </>
   );
