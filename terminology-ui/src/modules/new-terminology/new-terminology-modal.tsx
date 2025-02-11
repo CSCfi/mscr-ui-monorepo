@@ -112,7 +112,6 @@ export default function NewTerminologyModal({
       }
 
       const newTerminology = generateNewTerminology({ data: manualData });
-      console.log(newTerminology?.references.contributor);
 
       if (!newTerminology) {
         console.error('Main organization missing');
