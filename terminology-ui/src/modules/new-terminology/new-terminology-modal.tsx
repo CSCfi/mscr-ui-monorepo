@@ -208,7 +208,7 @@ export default function NewTerminologyModal({
   function renderInfoInput() {
     return (
       <>
-        <Paragraph marginBottomSpacing="m">
+        <Paragraph mb="m">
           <Text>{t('info-input-description')}</Text>
         </Paragraph>
 

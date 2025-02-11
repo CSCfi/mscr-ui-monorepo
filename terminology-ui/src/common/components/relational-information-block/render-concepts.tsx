@@ -87,9 +87,8 @@ export default function RenderConcepts({
                 }}
               >
                 <ExpanderTitle
-                  ariaCloseText={t('open-concept-expander')}
-                  ariaOpenText={t('close-concept-expander')}
-                  toggleButtonAriaDescribedBy=""
+                  toggleButtonAriaDescribedBy={`concept-result-checkbox-${concept.id}`}
+                  toggleButtonAriaLabel={t('additional-information')}
                 >
                   <Checkbox
                     hintText={`${getPrefLabel({
