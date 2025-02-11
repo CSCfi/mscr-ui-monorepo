@@ -47,6 +47,7 @@ export default function LanguageSelector(
 
     props.setLanguages(
       props.items.map((item) => {
+        if (item.title) console.log(item.title);
         if (!selectedIds.includes(item.uniqueItemId)) {
           return {
             ...item,

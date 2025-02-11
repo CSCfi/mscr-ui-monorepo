@@ -34,14 +34,15 @@ export default function InfoManual({
   const [terminologyData, setTerminologyData] = useState<NewTerminologyInfo>(
     initialData ? initialData : TerminologyDataInitialState
   );
+
   /*
   const { data: languages } = useGetCodesQuery({
     registry: 'interoperabilityplatform',
     codeScheme: 'languagecodes',
   });
   */
-  const languages = { results: [] };
-  const [languageList, setLanguageList] = useState<LanguageBlockType[]>([
+
+  const [emptyLanguageList] = useState<LanguageBlockType[]>([
     {
       labelText: 'en',
       uniqueItemId: 'en',
@@ -50,6 +51,11 @@ export default function InfoManual({
       selected: true,
     },
   ]);
+
+  const languages = { results: [] };
+  const [languageList, setLanguageList] = useState<LanguageBlockType[]>(
+    initialData ? initialData.languages : emptyLanguageList
+  );
 
   useEffect(() => {
     if (!terminologyData) {
