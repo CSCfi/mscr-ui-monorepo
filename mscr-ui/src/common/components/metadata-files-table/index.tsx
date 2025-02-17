@@ -140,7 +140,7 @@ export default function MetadataFilesTable({
         ? DownloadTypes.CROSSWALK_FILES
         : DownloadTypes.SCHEMA_FILES;
       const row = {
-        filename: item.name,
+        filename: item?.filename,
         format: item.contentType,
         size: item.size,
         downloadLink: generateDownloadLink(
