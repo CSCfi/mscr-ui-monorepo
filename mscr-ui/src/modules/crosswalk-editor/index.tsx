@@ -258,11 +258,12 @@ export default function CrosswalkEditor({
               caption={t('crosswalk-editor.search-from-source-schema')}
               schemaUrn={sourceSchemaUrn}
               scrollToSelectedNodeId={scrollToSelectedSourceNodeId}
+              nodeMappings={nodeMappings}
             />
           </div>
 
 
-          <div className="joint-listing-accordion-wrap ">
+          <div className="col-6">
             <MappingsAccordion2
               nodeMappings={filteredCombinedNodeMappings}
               viewOnlyMode={false}
@@ -288,6 +289,7 @@ export default function CrosswalkEditor({
               caption={t('crosswalk-editor.search-from-target-schema')}
               schemaUrn={targetSchemaUrn}
               scrollToSelectedNodeId={scrollToSelectedTargetNodeId}
+              nodeMappings={nodeMappings}
             />
           </div>
         </div>

@@ -3,38 +3,57 @@ import TreeView from '@mui/lab/TreeView';
 import TreeItem from '@mui/lab/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CircleIcon from '@mui/icons-material/Circle';
 import { useTranslation } from 'next-i18next';
-import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
+import {NodeMapping, RenderTree} from '@app/common/interfaces/crosswalk-connection.interface';
 
-function toTree(nodes: RenderTree, showQname: boolean) {
+function returnIconForMappedNode(nodeMappings: NodeMapping[], node: any, isSourceTree: boolean) {
+  let foundMappings = null;
+  if (isSourceTree) {
+    if (nodeMappings ) {
+      foundMappings = nodeMappings.find(nodeMapping => nodeMapping.source.find(sourceItem => sourceItem.id === node.id));
+    }
+  } else {
+    if (nodeMappings) {
+      foundMappings = nodeMappings.find(nodeMapping => nodeMapping.target.find(targetItem => targetItem.id === node.id));
+    }
+  }
+  if (foundMappings != null) {
+    return <CircleIcon string={"viesti"} style={{color: "#1976d2", maxHeight: "25%", maxWidth: "25%"}}/>;
+  } else {
+    return <div></div>;
+  }
+}
+
+function toTree(nodes: RenderTree, showQname: boolean, nodeMappings: NodeMapping[], isSourceTree: boolean) {
   let ret = undefined;
   if (Array.isArray(nodes)) {
     return nodes.map((node) => {
       return (
-        <TreeItem
+        <div style={{display: 'flex'}}><TreeItem
           key={node.visualTreeId}
           nodeId={node.id}
           label={showQname ? node.qname : node.name}
           className="linked-tree-item"
         >
           {Array.isArray(node.children)
-            ? node.children.map((node: RenderTree) => toTree(node, showQname))
+            ? node.children.map((node: RenderTree) => toTree(node, showQname, nodeMappings, isSourceTree))
             : null}
-        </TreeItem>
+        </TreeItem>{returnIconForMappedNode(nodeMappings, node, isSourceTree)} </div>
       );
     });
   } else {
     ret = (
-      <TreeItem
+      <div style={{display: 'flex'}}><TreeItem
         key={nodes.visualTreeId}
         nodeId={nodes.id}
         label={showQname ? nodes.qname : nodes.name}
         className="linked-tree-item"
       >
         {Array.isArray(nodes.children)
-          ? nodes.children.map((node: RenderTree) => toTree(node, showQname))
+          ? nodes.children.map((node: RenderTree) => toTree(node, showQname, nodeMappings, isSourceTree))
           : null}
-      </TreeItem>
+      </TreeItem>{returnIconForMappedNode(nodeMappings, nodes, isSourceTree)} </div>
     );
     return ret;
   }
@@ -47,6 +66,7 @@ export default function SchemaTree({
   performTreeAction,
   showQname,
   isSourceTree,
+  nodeMappings,
 }: {
   nodes: RenderTree[];
   treeSelectedArray: string[];
@@ -54,6 +74,7 @@ export default function SchemaTree({
   performTreeAction: (action: string, nodeIds: string[]) => void;
   showQname: boolean;
   isSourceTree: boolean | undefined;
+  nodeMappings?: NodeMapping[];
 }) {
   const { t } = useTranslation('common');
 
@@ -78,7 +99,7 @@ export default function SchemaTree({
       defaultExpandIcon={<ChevronRightIcon />}
       multiSelect
     >
-      {nodes.map((node: RenderTree) => toTree(node, showQname))}
+      {nodes.map((node: RenderTree) => toTree(node, showQname, nodeMappings, isSourceTree))}
     </TreeView>
   );
 }

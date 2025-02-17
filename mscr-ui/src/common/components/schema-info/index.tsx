@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {Button, Checkbox, ModalFooter, ModalTitle, SearchInput} from 'suomifi-ui-components';
 import IconButton from '@mui/material/IconButton';
@@ -6,7 +6,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
 import SchemaTree from '@app/common/components/schema-info/schema-tree';
 import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
-import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
+import {NodeMapping, RenderTree} from '@app/common/interfaces/crosswalk-connection.interface';
 import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
 import { useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
@@ -23,6 +23,9 @@ import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
+import {StyledPanel} from "@app/common/components/action-panel/action-panel.styles";
+import { Panel } from 'reactflow';
+import ActionPanel from '../action-panel';
 
 export default function SchemaInfo(props: {
   updateTreeNodeSelectionsOutput?: (
@@ -37,6 +40,7 @@ export default function SchemaInfo(props: {
   isNodeEditable?: boolean;
   hasCustomRoot?: boolean;
   scrollToSelectedNodeId?: string;
+  nodeMappings?: NodeMapping[];
 }) {
   const { t } = useTranslation('common');
   const lang = useRouter().locale ?? '';
@@ -102,6 +106,28 @@ export default function SchemaInfo(props: {
     }
     setSelectedTreeNodes(selectedNodes);
   }, [treeSelectedArray, nodeIdToNodeDictionary]);
+
+  useEffect(() => {
+
+    if (modalOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+
+  }, [modalOpen]);
+
+  const modalRef = useRef(null);
+
+
+  const handleClickOutside = (event: Event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      setModalOpen(false);
+    }
+  };
 
   const setFullyExpanded = () => {
     const nodeIdsToExpand: string[] = [];
@@ -236,6 +262,7 @@ export default function SchemaInfo(props: {
     setModalOpen(false);
   }
 
+  // @ts-ignore
   return (
     <>
       <div className="row d-flex mb-2">
@@ -264,7 +291,7 @@ export default function SchemaInfo(props: {
       </div>
 
       <TreeviewWrapper className="row gx-0">
-        <TreeWrapper className="col-7 px-0">
+        <TreeWrapper className="col-12 px-0">
           <SpinnerOverlay animationVisible={!isTreeDataFetched} />
           <div className="d-flex justify-content-between mb-2 ps-3 pe-2">
             {isTreeDataFetched && (
@@ -323,6 +350,7 @@ export default function SchemaInfo(props: {
                   performTreeAction={performCallbackFromTreeAction}
                   showQname={!showAttributeNames}
                   isSourceTree={props.isSourceTree}
+                  nodeMappings={props.nodeMappings}
                 />
               )}
             </Box>
@@ -338,20 +366,8 @@ export default function SchemaInfo(props: {
             {t('schema-tree.show-titles')}
           </Checkbox>
         </CheckboxWrapper>
-        <StyledSchemaModal
-          appElementId="__next"
-          visible={modalOpen}
-          variant={'default'}
-          onEscKeyDown={() => closeModal()}
-        >
-          <StyledSchemaModalContent>
-            <div className="schema-modal-header">
-              <p className="close"
-                 onClick={() => closeModal()}>
-                &times;
-              </p>
-            </div>
-        <NodeInfoWrapper>
+        <StyledPanel>
+        <NodeInfoWrapper ref={modalRef}>
           <NodeInfo
             treeData={selectedTreeNodes}
             currentlySelectedNodeId={currentlySelectedNodeId}
@@ -360,8 +376,7 @@ export default function SchemaInfo(props: {
             hasCustomRoot={props.hasCustomRoot}
           />
         </NodeInfoWrapper>
-            </StyledSchemaModalContent>
-        </StyledSchemaModal>
+        </StyledPanel>
 
       </TreeviewWrapper>
     </>

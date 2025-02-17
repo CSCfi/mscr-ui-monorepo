@@ -39,6 +39,7 @@ import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion
 import ConfirmModal from "@app/common/components/confirmation-modal";
 import {Format} from "@app/common/interfaces/format.interface";
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
+import Box from "@mui/material/Box";
 
 export interface highlightOperation {
   operationId: string;
@@ -86,90 +87,96 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
     <>
       <StyledTableRow className="accordion-row row">
         <StyledTableCell className="row">
+          <div className='d-flex justify-content-between'>
+            <div className='d-flex justify-content-center'>
+              <TableCellPadder>From</TableCellPadder></div>
+          </div>
+            {row.source.map((mapping, index) => {
+                return (<>
+                  <div className='d-flex justify-content-between'>
+                    <div className='d-flex justify-content-center'>
+                      <TableCellPadder>
+                        <StyledButton
+                          className="px-3 py-0"
+                          style={{textTransform: 'none'}}
+                          title={showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
+                          onClick={(e) => {
+                            selectFromTrees(row, mapping.id, true);
+                            e.stopPropagation();
+                          }}
+                        >{showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
+                          schemaFormats?.sourceSchemaFormat, schemaDatas?.sourceSchemaData)}</StyledButton>
 
-          {row.source.map((mapping, index) => {
-              return (<>
-                <div className='d-flex justify-content-between'>
-                  <div className='d-flex justify-content-center'>
-                    <TableCellPadder>
-                      <StyledButton
-                        className="px-3 py-0"
-                        style={{textTransform: 'none'}}
-                        title={showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
-                        onClick={(e) => {
-                          selectFromTrees(row, mapping.id, true);
-                          e.stopPropagation();
-                        }}
-                      >{showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
-                        schemaFormats?.sourceSchemaFormat, schemaDatas?.sourceSchemaData)}</StyledButton>
-
-                      <HorizontalLineStart>
-                        <div></div>
-                      </HorizontalLineStart>
-                    </TableCellPadder>
-                  </div>
-                  <StyledArrowRightIcon></StyledArrowRightIcon>
-                  {/*<HorizontalLineStart>
+                        <HorizontalLineStart>
+                          <div></div>
+                        </HorizontalLineStart>
+                      </TableCellPadder>
+                    </div>
+                    <StyledArrowRightIcon></StyledArrowRightIcon>
+                    {/*<HorizontalLineStart>
                     <div></div>
                   </HorizontalLineStart>*/}
-                  {mapping['processing']?.id &&
+                    {mapping['processing']?.id &&
                       <FunctionTooltipBox callBackFunction={callBackFunction}
                                           isEditModeActive={isEditModeActive}
                                           tooltipHeading={'source operation'} tooltipHoverText={'source operation'}
                                           processingId={mapping.id} functionName={'sourceOperation'}
                                           mappingFunctions={mappingFunctions}
                                           row={row}></FunctionTooltipBox>
-                  }
-                  {/*<HorizontalLineStartSecond>
+                    }
+                    {/*<HorizontalLineStartSecond>
                     <div></div>
                   </HorizontalLineStartSecond>*/}
-                  <div className='d-flex flex-column'>
-                    {index === 0 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
-                    {row.source.length > 1 && <VerticalLine>
+                    <div className='d-flex flex-column'>
+                      {index === 0 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                      {row.source.length > 1 && <VerticalLine>
                         <div></div>
-                    </VerticalLine>}
-                    {index === row.source.length - 1 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                      </VerticalLine>}
+                      {index === row.source.length - 1 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                    </div>
                   </div>
-                </div>
-              </>)
-            }
-          )}
+                </>)
+              }
+            )}
 
         </StyledTableCell>
 
         <StyledTableCell className='row'>
-          <div className='d-flex justify-content-center'>
-            {/*<HorizontalLineMidStart>
+          <div className='d-flex justify-content-between'>
+            <div className='d-flex justify-content-center'>
+              <TableCellPadder>To</TableCellPadder></div>
+            <StyledButton className='d-flex justify-content-end'>&gt;</StyledButton>
+          </div>
+
+          {/*<HorizontalLineMidStart>
               <div></div>
             </HorizontalLineMidStart>*/}
-            {row.processing &&
+            {/*row.processing &&
                 <FunctionTooltipBox callBackFunction={callBackFunction} isEditModeActive={isEditModeActive}
                                     tooltipHeading={'mapping function'} tooltipHoverText={'mapping function'}
                                     processingId={row.processing.id} functionName={'mappingFunction'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>
+                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>*/
             }
-            {!row.processing &&
-                <IconSpacer></IconSpacer>
+            {/*!row.processing &&
+                <IconSpacer></IconSpacer>*/
             }
-            {row.predicate &&
+            {/*row.predicate &&
                 <FunctionTooltipBox alternateIconLetter={'P'} callBackFunction={callBackFunction}
                                     isEditModeActive={isEditModeActive} tooltipHeading={'predicate'}
                                     processingId={''} tooltipHoverText={'predicate'} functionName={'predicate'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>
+                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>*/
             }
-            {!row.predicate &&
-                <IconSpacer></IconSpacer>
+            {/*!row.predicate &&
+                <IconSpacer></IconSpacer>*/
             }
             {/*<HorizontalLineMidEnd>
               <div></div>
             </HorizontalLineMidEnd>*/}
-          </div>
         </StyledTableCell>
-
         <StyledTableCell className="row">
           <div className='d-flex flex-column'>
             {row.target.map((mapping, index) => {
-                return (<>
+              return (<>
                   <div className='d-flex justify-content-between'>
                     <div className='d-flex justify-content-center'>
                       <div className='d-flex flex-column'>
@@ -292,7 +299,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
             <div className="row row ms-2 mt-2 mb-3">
               <div className='row col-12'>
                 <div className="col-5 gx-0">
-                  {/*                                <Box sx={{margin: 1}}>
+                  {/*                               <Box sx={{margin: 1}}>
                                     <div className='fw-bold mt-3 mb-2' style={{fontSize: '0.9em'}}>Mapping type: <span
                                         className='fw-normal'>exact match</span></div>
                                     <br/>
@@ -472,7 +479,7 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
   return (
     <>
 
-  <div className='d-flex justify-content-between ps-1'>
+  <div className='d-flex justify-content-between ps-1' style={{maxHeight: "600px"}}>
         <h2 className="mb-0">Mappings</h2>
         <SearchWrapper>
           <SearchInput
