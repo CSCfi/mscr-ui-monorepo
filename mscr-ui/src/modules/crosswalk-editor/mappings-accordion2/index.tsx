@@ -3,15 +3,14 @@ import {Dispatch, SetStateAction, useEffect} from 'react';
 import Collapse from '@mui/material/Collapse';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TableCell from '@mui/material/TableCell';
 import {Button as Sbutton, SearchInput} from 'suomifi-ui-components';
 import Tooltip from '@mui/material/Tooltip';
 
-import {NodeMapping} from '@app/common/interfaces/crosswalk-connection.interface';
-import {InfoIcon} from '@app/common/components/shared-icons';
+import {NodeMapping, RenderTree} from '@app/common/interfaces/crosswalk-connection.interface';
+import LinkIcon, {InfoIcon} from '@app/common/components/shared-icons';
 import {useTranslation} from 'next-i18next';
 import {
   AccordionContainer,
@@ -40,6 +39,9 @@ import ConfirmModal from "@app/common/components/confirmation-modal";
 import {Format} from "@app/common/interfaces/format.interface";
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
 import Box from "@mui/material/Box";
+import {CrosswalkWithVersionInfo} from "@app/common/interfaces/crosswalk.interface";
+import {State} from "@app/common/interfaces/state.interface";
+import withWidth from "@mui/material/Hidden/withWidth";
 
 export interface highlightOperation {
   operationId: string;
@@ -457,7 +459,8 @@ function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAtt
 }
 
 export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditModeActive, showAttributeNames,
-                                            mappingFunctions, performAccordionAction, schemaFormats, schemaDatas, setNodeMappingsModalOpen}
+                                            mappingFunctions, performAccordionAction, schemaFormats, schemaDatas, setNodeMappingsModalOpen,
+                                           selectedSourceNodes, selectedTargetNodes, addMappingButtonClick, hasEditPermission, crosswalkData}
                                             :
 {nodeMappings: NodeMapping[];
   viewOnlyMode: boolean;
@@ -468,6 +471,11 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
   schemaFormats: {sourceSchemaFormat: Format | undefined; targetSchemaFormat: Format | undefined};
   schemaDatas: {sourceSchemaData: SchemaWithContent | undefined; targetSchemaData: SchemaWithContent | undefined; };
   setNodeMappingsModalOpen:  Dispatch<SetStateAction<boolean>>;
+  selectedSourceNodes: RenderTree[];
+  selectedTargetNodes: RenderTree[];
+  addMappingButtonClick: Function;
+  hasEditPermission: boolean;
+  crosswalkData: CrosswalkWithVersionInfo;
 }) {
   const {t} = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
@@ -475,6 +483,8 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
   useEffect(() => {
     setMappingData(nodeMappings);
   }, [nodeMappings]);
+
+
   const nodeMappingsInput = nodeMappings;
   return (
     <>
@@ -503,29 +513,6 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
       </div>
       <AccordionContainer component={Paper} className="gx-0">
         <Table aria-label="collapsible table w-100">
-          {/*<TableHead>
-            <TableRow className="accordion-row row">
-              <StyledTableCell className="col-4">
-                <TableCellPadder>
-                  <span className="fw-bold ps-3">Source</span>
-                </TableCellPadder>
-              </StyledTableCell>
-              <StyledTableCell className="col-2">
-                <TableCellPadder>
-                  <span className="fw-bold">Mapping operations</span>
-                </TableCellPadder>
-              </StyledTableCell>
-              <StyledTableTargetCell className="col-4">
-                <span className="fw-bold">Target</span>
-              </StyledTableTargetCell>
-              <StyledTableActionsCell className="col-2 d-flex flex-row justify-content-end">
-                <TableCellPadder>
-                  <span className="fw-bold">Actions</span>
-                </TableCellPadder>
-              </StyledTableActionsCell>
-            </TableRow>
-          </TableHead>*/}
-
           {mappingData?.length > 0 && (
             <TableBody>
               {mappingData.map((row: NodeMapping) => {
@@ -558,6 +545,37 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
                     <div>
                       No elements have been mapped yet. Mappings will appear in
                       this table.
+                      {hasEditPermission && (
+                        <Tooltip
+                          title={
+                            selectedSourceNodes.length > 1 &&
+                            selectedTargetNodes.length > 1
+                              ? 'Many to many node mappings are not supported'
+                              : !isEditModeActive
+                                ? 'Activate edit mode to enable mappings'
+                                : 'Map selected nodes'
+                          }
+                          placement="bottom"
+                        >
+                          <Sbutton
+                            className="link-button"
+                            disabled={
+                              selectedSourceNodes.length < 1 ||
+                              selectedTargetNodes.length < 1 ||
+                              crosswalkData.state === State.Published ||
+                              (selectedSourceNodes.length > 1 &&
+                                selectedTargetNodes.length > 1) ||
+                              !isEditModeActive
+                            }
+                            onClick={() => {
+                              addMappingButtonClick();
+                            }}
+                            style={{width: "200px", height: "60px"}}
+                          >
+                            <div><LinkIcon></LinkIcon> Create Mapping</div>
+                          </Sbutton>
+                        </Tooltip>
+                      )}
                     </div>
                   </div>
                 </td>

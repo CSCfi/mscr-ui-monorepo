@@ -276,6 +276,11 @@ export default function CrosswalkEditor({
               schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
               schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
               setNodeMappingsModalOpen={setNodeMappingsModalOpen}
+              selectedSourceNodes={selectedSourceNodes}
+              selectedTargetNodes={selectedTargetNodes}
+              addMappingButtonClick={addMappingButtonClick}
+              hasEditPermission={hasEditPermission}
+              crosswalkData={crosswalkData}
             />
           </div>
           {/*  MID BUTTONS */}
