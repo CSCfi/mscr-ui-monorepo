@@ -260,23 +260,6 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                   text1={t('confirm-modal.do-you-want-to-delete-mapping')}
                 />}
               </>
-              {/*              <Tooltip
-                title={open ? 'Hide details' : 'Show details'}
-                placement="bottom"
-              >
-                <IconButton
-                  className="ms-2"
-                  hidden={props.viewOnlyMode}
-                  aria-label="expand row"
-                  size="small"
-                  onClick={(e) => {
-                    setOpen(!open);
-                    e.stopPropagation();
-                  }}
-                >
-                  {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
-                </IconButton>
-              </Tooltip>*/}
             </div>
           </>
         </StyledTableButtonCell>
@@ -292,11 +275,6 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
             <div className="row row ms-2 mt-2 mb-3">
               <div className='row col-12'>
                 <div className="col-5 gx-0">
-                  {/*                                <Box sx={{margin: 1}}>
-                                    <div className='fw-bold mt-3 mb-2' style={{fontSize: '0.9em'}}>Mapping type: <span
-                                        className='fw-normal'>exact match</span></div>
-                                    <br/>
-                                </Box>*/}
                   <div className="ms-0 mt-1 mb-2">
                     <div>Mapping type:</div>
                     <div className="fw-normal mt-2">{row.predicate}</div>

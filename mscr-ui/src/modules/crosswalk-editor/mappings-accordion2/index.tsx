@@ -42,6 +42,8 @@ import Box from "@mui/material/Box";
 import {CrosswalkWithVersionInfo} from "@app/common/interfaces/crosswalk.interface";
 import {State} from "@app/common/interfaces/state.interface";
 import withWidth from "@mui/material/Hidden/withWidth";
+import {Panel} from "reactflow";
+import {StyledPanel} from "@app/common/components/action-panel/action-panel.styles";
 
 export interface highlightOperation {
   operationId: string;
@@ -147,33 +149,8 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
           <div className='d-flex justify-content-between'>
             <div className='d-flex justify-content-center'>
               <TableCellPadder>To</TableCellPadder></div>
-            <StyledButton className='d-flex justify-content-end'>&gt;</StyledButton>
           </div>
 
-          {/*<HorizontalLineMidStart>
-              <div></div>
-            </HorizontalLineMidStart>*/}
-            {/*row.processing &&
-                <FunctionTooltipBox callBackFunction={callBackFunction} isEditModeActive={isEditModeActive}
-                                    tooltipHeading={'mapping function'} tooltipHoverText={'mapping function'}
-                                    processingId={row.processing.id} functionName={'mappingFunction'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>*/
-            }
-            {/*!row.processing &&
-                <IconSpacer></IconSpacer>*/
-            }
-            {/*row.predicate &&
-                <FunctionTooltipBox alternateIconLetter={'P'} callBackFunction={callBackFunction}
-                                    isEditModeActive={isEditModeActive} tooltipHeading={'predicate'}
-                                    processingId={''} tooltipHoverText={'predicate'} functionName={'predicate'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>*/
-            }
-            {/*!row.predicate &&
-                <IconSpacer></IconSpacer>*/
-            }
-            {/*<HorizontalLineMidEnd>
-              <div></div>
-            </HorizontalLineMidEnd>*/}
         </StyledTableCell>
         <StyledTableCell className="row">
           <div className='d-flex flex-column'>
@@ -269,23 +246,6 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                   text1={t('confirm-modal.do-you-want-to-delete-mapping')}
                 />}
               </>
-              {/*              <Tooltip
-                title={open ? 'Hide details' : 'Show details'}
-                placement="bottom"
-              >
-                <IconButton
-                  className="ms-2"
-                  hidden={props.viewOnlyMode}
-                  aria-label="expand row"
-                  size="small"
-                  onClick={(e) => {
-                    setOpen(!open);
-                    e.stopPropagation();
-                  }}
-                >
-                  {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
-                </IconButton>
-              </Tooltip>*/}
             </div>
           </>
         </StyledTableButtonCell>
@@ -301,11 +261,6 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
             <div className="row row ms-2 mt-2 mb-3">
               <div className='row col-12'>
                 <div className="col-5 gx-0">
-                  {/*                               <Box sx={{margin: 1}}>
-                                    <div className='fw-bold mt-3 mb-2' style={{fontSize: '0.9em'}}>Mapping type: <span
-                                        className='fw-normal'>exact match</span></div>
-                                    <br/>
-                                </Box>*/}
                   <div className="ms-0 mt-1 mb-2">
                     <div>Mapping type:</div>
                     <div className="fw-normal mt-2">{row.predicate}</div>
@@ -322,7 +277,6 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                 </div>
                 <div className='col mt-4 d-flex flex-row gx-0 justify-content-end'>
                   <div className="d-flex flex-column action-buttons">
-
                   </div>
                 </div>
               </div>
@@ -511,8 +465,8 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
           />
         </SearchWrapper>
       </div>
-      <AccordionContainer component={Paper} className="gx-0">
-        <Table aria-label="collapsible table w-100">
+      <AccordionContainer component={Paper} className="gx-0" style={{maxHeight: "600px", overflowY: "auto"}}>
+        <Table aria-label="collapsible table w-100" >
           {mappingData?.length > 0 && (
             <TableBody>
               {mappingData.map((row: NodeMapping) => {
@@ -532,6 +486,43 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
                   />
                 );
               })}
+              <TableRow className="">
+                <td>
+                    <div style={{display: "flex", alignItems: "center", justifyContent: "right"}}>
+                      {hasEditPermission && (
+                        <Tooltip
+                          title={
+                            selectedSourceNodes.length > 1 &&
+                            selectedTargetNodes.length > 1
+                              ? 'Many to many node mappings are not supported'
+                              : !isEditModeActive
+                                ? 'Activate edit mode to enable mappings'
+                                : 'Map selected nodes'
+                          }
+                          placement="bottom"
+                        >
+                          <Sbutton
+                            className="link-button"
+                            disabled={
+                              selectedSourceNodes.length < 1 ||
+                              selectedTargetNodes.length < 1 ||
+                              crosswalkData.state === State.Published ||
+                              (selectedSourceNodes.length > 1 &&
+                                selectedTargetNodes.length > 1) ||
+                              !isEditModeActive
+                            }
+                            onClick={() => {
+                              addMappingButtonClick();
+                            }}
+                            style={{width: "200px", height: "60px"}}
+                          >
+                            <div><LinkIcon></LinkIcon> Create Mapping</div>
+                          </Sbutton>
+                        </Tooltip>
+                      )}
+                    </div>
+                </td>
+              </TableRow>
             </TableBody>
           )}
           {nodeMappingsInput?.length < 1 && (
@@ -542,9 +533,13 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
                     <div className="info-icon">
                       <InfoIcon></InfoIcon>
                     </div>
-                    <div>
+                    <div style={{alignItems: "center"}}>
                       No elements have been mapped yet. Mappings will appear in
                       this table.
+                      <br/>
+                      <br/>
+                      <br/>
+                      <br/>
                       {hasEditPermission && (
                         <Tooltip
                           title={
