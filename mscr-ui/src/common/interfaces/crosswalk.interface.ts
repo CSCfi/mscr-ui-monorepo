@@ -11,7 +11,13 @@ export interface Crosswalk extends Metadata {
   status?: string | undefined;
   organizations?: string[];
   sourceSchema: string;
+  sourceSchemaInfo: {
+    format: Format;
+  };
   targetSchema: string;
+  targetSchemaInfo: {
+    format: Format;
+  };
   owner?: string[]; // Added owner for checking permission
 }
 

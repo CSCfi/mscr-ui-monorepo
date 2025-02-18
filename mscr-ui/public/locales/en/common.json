@@ -217,6 +217,7 @@
     "crosswalk-details": "Crosswalk details",
     "description": "Description",
     "file": {
+      "download": "Download",
       "download-file": "File",
       "format": "Format",
       "label": "Files",
