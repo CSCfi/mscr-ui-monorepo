@@ -11,11 +11,15 @@
     "invalidate": "",
     "publish": "",
     "save": "",
-    "schema-actions": ""
+    "schema-actions": "",
+    "set-root-selection": "",
+    "unset-root-selection": ""
   },
   "actionmenu": {
+    "activate-edit-mode-to-delete-mapping": "",
     "delete-crosswalk": "",
     "delete-draft": "",
+    "delete-mapping": "",
     "delete-schema": "",
     "deprecate-crosswalk": "",
     "deprecate-schema": "",
@@ -28,7 +32,8 @@
     "mscr-copy": "",
     "publish-crosswalk": "",
     "publish-schema": "",
-    "revision": ""
+    "revision": "",
+    "unset-root-node-selection": ""
   },
   "and": "",
   "association": "",
@@ -60,6 +65,7 @@
     "no-upper-associations": "",
     "no-upper-attributes": ""
   },
+  "confirm": "",
   "confirm-modal": {
     "delete-crosswalk": "",
     "delete-draft": "",
@@ -68,13 +74,16 @@
     "delete-schema": "",
     "deprecate-crosswalk": "",
     "deprecate-schema": "",
+    "do-you-want-to-delete-mapping": "",
     "heading": "",
     "invalidate-crosswalk": "",
     "invalidate-schema": "",
     "publish-crosswalk1": "",
     "publish-crosswalk2": "",
     "publish-schema": "",
-    "save": ""
+    "save": "",
+    "set-root-selection": "",
+    "unset-root-selection": ""
   },
   "confirm-page-leave": "",
   "content-form": {
@@ -108,7 +117,8 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "",
-    "search-from-target-schema": ""
+    "search-from-target-schema": "",
+    "show-node-titles": ""
   },
   "crosswalk-form": {
     "all": "",
@@ -185,9 +195,21 @@
   "library": "",
   "library-variant": "",
   "link-opens-new-window-external": "",
+  "loading-circle-label": "",
+  "mapping-modal": {
+    "add-mapping": "",
+    "edit-mapping": "",
+    "exact-match": "",
+    "mapping-operation": "",
+    "no-notes-set": "",
+    "notes": "",
+    "operation-not-selected": "",
+    "predicate": ""
+  },
   "mappings-accordion": {
     "clear": "",
-    "filter-from-mappings": ""
+    "filter-from-mappings": "",
+    "select-linked-nodes": ""
   },
   "metadata": {
     "contact": "",
@@ -204,11 +226,13 @@
     "format": "",
     "modified": "",
     "name": "",
+    "name-space-label": "",
     "not-available": "",
     "owner": "",
     "pid": "",
     "schema-details": "",
     "source-schema": "",
+    "source-url": "",
     "state": "",
     "stub-crosswalk-details": "",
     "stub-schema-details": "",
@@ -238,8 +262,10 @@
     "make-longer-query": "",
     "make-query-and-choose": "",
     "no-results": "",
+    "reset-custom-root-node": "",
     "select-a-node": "",
     "selected-node-info": "",
+    "set-as-root-node": "",
     "type-search": "",
     "type-search-results-title": "",
     "type-to-search": "",
@@ -266,7 +292,8 @@
     "schema-finish-editing": "",
     "schema-invalidated": "",
     "schema-published": "",
-    "schema-saved": ""
+    "schema-saved": "",
+    "set-root-selection": ""
   },
   "organization": "",
   "organizations-and-roles": "",
@@ -381,6 +408,7 @@
     "history-tab": "",
     "label": "",
     "metadata-and-files": "",
+    "mapping-accordion-tab": "",
     "schema": {
       "content-and-editor-tab": ""
     },
@@ -432,7 +460,6 @@
     "crosswalks": "",
     "group": "",
     "label": "",
-    "namespace": "",
     "navigation": "",
     "no-crosswalks": "",
     "no-schemas": "",

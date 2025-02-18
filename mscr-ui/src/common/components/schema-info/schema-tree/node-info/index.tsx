@@ -1,18 +1,28 @@
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
-import { Dropdown, DropdownItem, ToggleButton } from 'suomifi-ui-components';
+import { Dropdown, DropdownItem, Button } from 'suomifi-ui-components';
 import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { InfoIcon } from '@app/common/components/shared-icons';
 import { useTranslation } from 'next-i18next';
 import { DropdownWrapper } from '@app/common/components/schema-info/schema-info.styles';
 import TypeSelector from '@app/common/components/schema-info/schema-tree/node-info/type-selector';
-import { IconLinkExternal } from 'suomifi-icons';
+import {
+  setConfirmModalState,
+  setSelectedRootNode,
+} from '@app/common/components/actionmenu/actionmenu.slice';
+import { useStoreDispatch } from '@app/store';
+import processHtmlLinks from '@app/common/utils/process-html-links';
+import { ConstantAttribute } from '@app/common/interfaces/node.interface';
+import RenderAttribute from '@app/common/components/schema-info/schema-tree/node-info/render-attribute';
 
 export default function NodeInfo(props: {
   treeData: RenderTree[];
+  currentlySelectedNodeId: string | undefined;
   dataIsLoaded: boolean;
   isNodeEditable?: boolean;
+  hasCustomRoot?: boolean;
 }) {
+  const dispatch = useStoreDispatch();
   const { t } = useTranslation('common');
   const [selectedNode, setSelectedNode] = useState<RenderTree>();
   const [nodeAttributes, setNodeAttributes] = useState<ConstantAttribute[]>([]);
@@ -23,21 +33,20 @@ export default function NodeInfo(props: {
   useEffect(() => {
     if (props.treeData && props.treeData.length > 0) {
       setDropDownList(props.treeData);
-      setSelectedNode(props.treeData[0]);
+      if (props.currentlySelectedNodeId) {
+        handleDropDownSelect(props.currentlySelectedNodeId);
+      } else {
+        setSelectedNode(props.treeData[0]);
+      }
     } else {
       setSelectedNode(undefined);
     }
-  }, [props.treeData]);
+  }, [props.treeData, props.currentlySelectedNodeId]);
 
   const handleDropDownSelect = (nodeId: string) => {
-    const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
+    const newSelectedNode = props.treeData.find((item) => item?.id === nodeId);
     setSelectedNode(newSelectedNode ?? selectedNode);
   };
-
-  interface ConstantAttribute {
-    name: string;
-    value: string | undefined;
-  }
 
   useEffect(() => {
     if (selectedNode && selectedNode.properties) {
@@ -47,24 +56,29 @@ export default function NodeInfo(props: {
           setNodeTypeAttribute(value as string);
           continue;
         }
+        let propertyValue;
+        if (typeof value === 'string') propertyValue = value.toString();
+        if (Array.isArray(value)) propertyValue = value;
         nodeProperties.push({
           name: key,
-          value: typeof value === 'string' ? value.toString() : undefined,
+          value: propertyValue,
         });
       }
       setNodeAttributes(nodeProperties);
     }
   }, [isLeafNode, props.isNodeEditable, selectedNode]);
 
-  function processHtmlLinks(input: string | undefined) {
-    if (input && (input.startsWith('http://') || input.startsWith('https://'))) {
-      return (
-        <a href={input} target="_blank" rel="noreferrer">
-          {input} <IconLinkExternal />
-        </a>
+  function setAsRootNode(node: RenderTree | undefined) {
+    dispatch(setSelectedRootNode(node));
+    if (node) {
+      dispatch(
+        setConfirmModalState({ key: 'setRootNodeSelection', value: true })
+      );
+    } else {
+      dispatch(
+        setConfirmModalState({ key: 'unsetRootNodeSelection', value: true })
       );
     }
-    return input;
   }
 
   return (
@@ -109,12 +123,33 @@ export default function NodeInfo(props: {
                 onChange={(newValue) => handleDropDownSelect(newValue)}
               >
                 {dropDownList.map((rt) => (
-                  <DropdownItem key={rt.visualTreeId} value={rt.id}>
-                    {rt.name}
+                  <DropdownItem key={rt?.visualTreeId} value={rt?.id}>
+                    {rt?.name}
                   </DropdownItem>
                 ))}
               </Dropdown>
             </DropdownWrapper>
+          )}
+          {props.isNodeEditable &&
+            selectedNode &&
+            !isLeafNode &&
+            !props.hasCustomRoot && (
+              <Button
+                variant="secondary"
+                className="mb-1"
+                onClick={() => setAsRootNode(selectedNode)}
+              >
+                {t('node-info.set-as-root-node')}
+              </Button>
+            )}
+          {props.isNodeEditable && props.hasCustomRoot && (
+            <Button
+              variant="secondary"
+              className="mb-1"
+              onClick={() => setAsRootNode(undefined)}
+            >
+              {t('node-info.reset-custom-root-node')}
+            </Button>
           )}
           <div>
             <div className="row">
@@ -128,18 +163,13 @@ export default function NodeInfo(props: {
               )}
 
               {nodeAttributes.map((attrib) => (
-                <div className="col-12" key={self.crypto.randomUUID()}>
-                  <div className="">{processHtmlLinks(attrib.name)}:</div>
-                  <div className="attribute-font">
-                    {processHtmlLinks(attrib.value)}
-                  </div>
-                </div>
+                <RenderAttribute key={self.crypto.randomUUID()} attribute={attrib} />
               ))}
               {props.isNodeEditable &&
                 isLeafNode &&
                 nodeTypeAttribute !== '' && (
-                  <div className="col-12" key={self.crypto.randomUUID()}>
-                    <div className="">@type:</div>
+                  <div className='col-12' key={self.crypto.randomUUID()}>
+                    <div>@type:</div>
                     <div className="attribute-font">
                       {processHtmlLinks(nodeTypeAttribute)}
                     </div>

@@ -42,6 +42,7 @@ export default function Tabmenu({
       'tabs.crosswalk.content-and-editor-tab'
     ),
     'SCHEMA.history-tab': t('tabs.history-tab'),
+    'CROSSWALK.mapping-accordion-tab': t('tabs.mapping-accordion-tab'),
     'CROSSWALK.history-tab': t('tabs.history-tab'),
     'stub': t('tabs.stub-metadata'), // If the content is removed, there's only one tab with only metadata.
   };
@@ -73,6 +74,9 @@ export default function Tabmenu({
         <StyledTab {...customTabProps('metadata-and-files-tab')} />
         {!isRemoved && (
           <StyledTab {...customTabProps('content-and-editor-tab')} />
+        )}
+        {!isRemoved && (
+          <StyledTab {...customTabProps('mapping-accordion-tab')} />
         )}
         {!isRemoved && <StyledTab {...customTabProps('history-tab')} />}
       </StyledTabs>

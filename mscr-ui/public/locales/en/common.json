@@ -11,11 +11,15 @@
     "invalidate": "Invalidate",
     "publish": "Publish",
     "save": "Save",
-    "schema-actions": "Schema actions"
+    "schema-actions": "Schema actions",
+    "set-root-selection": "Set custom root",
+    "unset-root-selection": "Reset root selection"
   },
   "actionmenu": {
+    "activate-edit-mode-to-delete-mapping": "Activate edit mode to delete mapping",
     "delete-crosswalk": "Delete crosswalk",
     "delete-draft": "Delete draft",
+    "delete-mapping": "Delete mapping",
     "delete-schema": "Delete schema",
     "deprecate-crosswalk": "Deprecate crosswalk",
     "deprecate-schema": "Deprecate schema",
@@ -25,10 +29,11 @@
     "finish-editing": "Finish editing",
     "invalidate-crosswalk": "Invalidate crosswalk",
     "invalidate-schema": "Invalidate schema",
-    "mscr-copy": "Make MSCR copy",
+    "mscr-copy": "Make a MSCR Copy",
     "publish-crosswalk": "Publish crosswalk",
     "publish-schema": "Publish schema",
-    "revision": "Add new revision"
+    "revision": "Add new revision",
+    "unset-root-node-selection": "Reset custom root selection"
   },
   "and": "and",
   "association": "",
@@ -60,6 +65,7 @@
     "no-upper-associations": "",
     "no-upper-attributes": ""
   },
+  "confirm": "Confirm",
   "confirm-modal": {
     "delete-crosswalk": "Are you sure you want to delete the crosswalk?",
     "delete-draft": "Are you sure you want to delete the draft?",
@@ -68,13 +74,16 @@
     "delete-schema": "Are you sure you want to delete the schema?",
     "deprecate-crosswalk": "Are you sure you want to deprecate the crosswalk?",
     "deprecate-schema": "Are you sure you want to deprecate the schema?",
+    "do-you-want-to-delete-mapping": "Do you want to delete mapping?",
     "heading": "Confirmation",
     "invalidate-crosswalk": "Are you sure you want to invalidate the crosswalk?",
     "invalidate-schema": "Are you sure you want to invalidate the schema?",
     "publish-crosswalk1": "Are you sure you want to publish the crosswalk?",
     "publish-crosswalk2": "After publishing, you cannot make changes to mappings in crosswalk.",
     "publish-schema": "Are you sure you want to publish the schema?",
-    "save": "Are you sure you want to save changes?"
+    "save": "Are you sure you want to save changes?",
+    "set-root-selection": "Are you sure you want to set custom root element?",
+    "unset-root-selection": "Are you sure you want to reset custom root selection?"
   },
   "confirm-page-leave": "Are you sure you want to leave the page? Changes you made won't be saved.",
   "content-form": {
@@ -82,7 +91,7 @@
       "crosswalk-create": "Create Crosswalk",
       "crosswalk-register": "Register Crosswalk",
       "crosswalk-revision": "Register revision",
-      "mscr-copy": "Register MSCR Copy",
+      "mscr-copy": "MSCR Copy",
       "schema-register": "Register Schema",
       "schema-revision": "Register revision"
     },
@@ -100,7 +109,7 @@
       "crosswalk-mscr-copy": "Register MSCR copy of crosswalk",
       "crosswalk-register": "Register existing crosswalk",
       "crosswalk-revision": "Register revision of crosswalk",
-      "schema-mscr-copy": "Register MSCR copy of schema",
+      "schema-mscr-copy": "Make a MSCR copy",
       "schema-register": "Register schema",
       "schema-revision": "Register revision of schema"
     },
@@ -108,7 +117,8 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "Search from source schema",
-    "search-from-target-schema": "Search from target schema"
+    "search-from-target-schema": "Search from target schema",
+    "show-node-titles": "Show simple node titles"
   },
   "crosswalk-form": {
     "all": "All",
@@ -185,9 +195,21 @@
   "library": "",
   "library-variant": "",
   "link-opens-new-window-external": "",
+  "loading-circle-label": "",
+  "mapping-modal": {
+    "add-mapping": "Add mapping",
+    "edit-mapping": "Edit mapping",
+    "exact-match": "Exact match",
+    "mapping-operation": "Mapping operation",
+    "no-notes-set": "No notes set. Add free form notes here.",
+    "notes": "Notes",
+    "operation-not-selected": "Operation not selected",
+    "predicate": "Predicate"
+  },
   "mappings-accordion": {
     "clear": "Clear",
-    "filter-from-mappings": "Filter from mappings"
+    "filter-from-mappings": "Filter from mappings",
+    "select-linked-nodes": "Select linked nodes from schema trees"
   },
   "metadata": {
     "contact": "Contact",
@@ -204,11 +226,13 @@
     "format": "Format",
     "modified": "Modified",
     "name": "Name",
+    "name-space-label": "Namespace",
     "not-available": "Not available",
     "owner": "Owner",
     "pid": "PID",
     "schema-details": "Schema details",
     "source-schema": "Source schema",
+    "source-url": "Source URL",
     "state": "State",
     "stub-crosswalk-details": "Deleted crosswalk",
     "stub-schema-details": "Deleted schema",
@@ -238,8 +262,10 @@
     "make-longer-query": "Query needs to be at least two characters",
     "make-query-and-choose": "Use the search to see type selection",
     "no-results": "No results with the current query",
+    "reset-custom-root-node": "Reset custom root node",
     "select-a-node": "Nothing to show just now. Select an entity to view information.",
     "selected-node-info": "Selected node info",
+    "set-as-root-node": "Set as root node",
     "type-search": "Search for data types",
     "type-search-results-title": "Type search results",
     "type-to-search": "Type to search",
@@ -266,7 +292,8 @@
     "schema-finish-editing": "Schema editing disabled",
     "schema-invalidated": "Schema invalidated",
     "schema-published": "Schema published successfully",
-    "schema-saved": "Schema metadata saved successfully"
+    "schema-saved": "Schema metadata saved successfully",
+    "set-root-selection": "Root element changed successfully"
   },
   "organization": "",
   "organizations-and-roles": "",
@@ -357,7 +384,7 @@
   "site-open-new-email": "",
   "site-register": "",
   "site-services": "",
-  "site-title": "Metadata Schema and Crosswalk Regisrtry",
+  "site-title": "Metadata Schema and Crosswalk Registry",
   "site-to-login": "Sign in",
   "site-tools": "",
   "skip-link-main": "Skip to main content",
@@ -381,6 +408,7 @@
     "history-tab": "Version history",
     "label": "Content tabs",
     "metadata-and-files": "Metadata & files",
+    "mapping-accordion-tab": "Mapping",
     "schema": {
       "content-and-editor-tab": "Schema"
     },
@@ -432,7 +460,6 @@
     "crosswalks": "Crosswalks",
     "group": "Group workspaces",
     "label": "Name",
-    "namespace": "Namespace",
     "navigation": "Workspaces",
     "no-crosswalks": "There are no crosswalks to show yet",
     "no-schemas": "There are no schemas to show yet",

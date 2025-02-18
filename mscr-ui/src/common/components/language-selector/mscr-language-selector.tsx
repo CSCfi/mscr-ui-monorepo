@@ -149,6 +149,7 @@ export default function MscrLanguageSelector(
               <WideTextInput
                 labelText={props.versionLabelCaption}
                 defaultValue={props.versionLabel ?? '1'}
+                disabled={props.disabled}
                 onBlur={(e) => props.setVersionLabel(e.target.value)}
               />
             </div>

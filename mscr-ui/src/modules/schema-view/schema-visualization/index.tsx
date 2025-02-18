@@ -8,11 +8,13 @@ import {
 export default function SchemaVisualization({
   pid,
   format,
-  isNodeEditable
+  isNodeEditable,
+  hasCustomRoot
 }: {
   pid: string;
   format: Format;
   isNodeEditable: boolean;
+  hasCustomRoot: boolean;
 }) {
   const { t } = useTranslation('common');
   const filterLabel = t('schema-tree.search-schema');
@@ -25,6 +27,7 @@ export default function SchemaVisualization({
         schemaUrn={pid}
         isSingleTree={true}
         isNodeEditable={isNodeEditable}
+        hasCustomRoot={hasCustomRoot}
       />
     );
   } else {

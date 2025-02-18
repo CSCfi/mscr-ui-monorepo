@@ -1,7 +1,8 @@
-import Box from '@mui/material/Box';
-import {useEffect, useState} from 'react';
-import {Button as Sbutton} from 'suomifi-ui-components';
-import MappingsAccordion, {highlightOperation} from '@app/modules/crosswalk-editor/mappings-accordion';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import { Button as Sbutton, Checkbox } from 'suomifi-ui-components';
+import MappingsAccordion, {
+  highlightOperation,
+} from '@app/modules/crosswalk-editor/mappings-accordion';
 import {
   CrosswalkConnectionNew,
   RenderTree,
@@ -9,46 +10,64 @@ import {
 } from '@app/common/interfaces/crosswalk-connection.interface';
 import NodeMappingsModal from './tabs/node-mappings';
 import LinkIcon from '@app/common/components/shared-icons';
-import {
-  usePutMappingMutation,
-  useDeleteMappingMutation,
-  usePatchMappingMutation,
-  useGetMappingsQuery,
-} from '@app/common/components/crosswalk/crosswalk.slice';
-import {
-  useGetCrosswalkMappingFunctionsQuery
-} from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
 import SchemaInfo from '@app/common/components/schema-info';
-import {useTranslation} from 'next-i18next';
-import {CrosswalkWithVersionInfo} from '@app/common/interfaces/crosswalk.interface';
-import {useSelector} from 'react-redux';
-import {selectIsEditContentActive} from '@app/common/components/content-view/content-view.slice';
-import {State} from '@app/common/interfaces/state.interface';
+import { useTranslation } from 'next-i18next';
+import { CrosswalkWithVersionInfo } from '@app/common/interfaces/crosswalk.interface';
+import { State } from '@app/common/interfaces/state.interface';
 import Tooltip from '@mui/material/Tooltip';
+import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
+import {Format} from "@app/common/interfaces/format.interface";
+import _ from "lodash";
 
 export default function CrosswalkEditor({
-                                          crosswalkId,
-                                          crosswalkData,
-                                          hasEditPermission,
-                                        }: {
-  crosswalkId: string;
+                                          crosswalkData, hasEditPermission,
+                                          nodeMappings, isEditModeActive,
+                                          showAttributeNames,
+                                          setShowAttributeNames, sourceTreeSelection,
+                                          scrollToSelectedSourceNodeId,
+                                          scrollToSelectedTargetNodeId,
+                                          setIsMappingPatchOperation,
+                                          isNodeMappingsModalOpen, setNodeMappingsModalOpen,
+                                          mappingToBeEdited, setMappingToBeEdited,
+                                          isPatchMappingOperation, targetTreeSelection,
+                                          isOneToManyMapping, setIsOneToManyMapping, mappingFunctions,
+                                          performCallbackFromAccordionAction, sourceSchemaFormat, targetSchemaFormat,
+                                          mappingFilters, highlightOperation, performCallbackFromMappingsModal,
+                                          sourceSchemaData, targetSchemaData,
+                                          setPatchSourceNodes, setPatchTargetNodes
+}: {
   crosswalkData: CrosswalkWithVersionInfo;
   hasEditPermission: boolean;
+  nodeMappings: NodeMapping[];
+  isEditModeActive: boolean;
+  showAttributeNames: boolean;
+  setShowAttributeNames: Dispatch<SetStateAction<boolean>>;
+  sourceTreeSelection: string[];
+  scrollToSelectedSourceNodeId: string | undefined;
+  scrollToSelectedTargetNodeId: string | undefined;
+  deleteMappingResponse:  any;
+  setIsMappingPatchOperation:  Dispatch<SetStateAction<boolean>>;
+  isNodeMappingsModalOpen: boolean;
+  setNodeMappingsModalOpen:  Dispatch<SetStateAction<boolean>>;
+  mappingToBeEdited:  CrosswalkConnectionNew[] | undefined;
+  setMappingToBeEdited:  Dispatch<SetStateAction<CrosswalkConnectionNew[] | undefined>>;
+  isPatchMappingOperation: boolean;
+  targetTreeSelection: string[];
+  isOneToManyMapping: boolean;
+  setIsOneToManyMapping: Dispatch<SetStateAction<boolean>>;
+  mappingFunctions: any;
+  performCallbackFromAccordionAction: Function;
+  sourceSchemaFormat: Format | undefined;
+  targetSchemaFormat: Format | undefined;
+  sourceSchemaData: SchemaWithContent | undefined;
+  targetSchemaData: SchemaWithContent | undefined;
+  performCallbackFromMappingsModal: Function;
+  mappingFilters: any;
+  highlightOperation: highlightOperation | undefined;
+  setPatchSourceNodes:  Dispatch<SetStateAction<RenderTree[]>>;
+  setPatchTargetNodes:  Dispatch<SetStateAction<RenderTree[]>>;
 }) {
-  const {t} = useTranslation('common');
-  const isEditModeActive = useSelector(selectIsEditContentActive());
-
-  const emptyTreeSelection: RenderTree = {
-    elementPath: '',
-    parentElementPath: undefined,
-    name: '',
-    id: '',
-    visualTreeId: '',
-    properties: undefined,
-    uri: '',
-    children: [],
-    qname: '',
-  };
+  const { t } = useTranslation('common');
 
   // STATE VARIABLES
   const [sourceSchemaUrn, setSourceSchemaUrn] = useState<string>('');
@@ -60,64 +79,12 @@ export default function CrosswalkEditor({
   const [selectedTargetNodes, setSelectedTargetNodes] = useState<RenderTree[]>(
     []
   );
-  const [patchSourceNodes, setPatchSourceNodes] = useState<RenderTree[]>([
-    emptyTreeSelection,
-  ]);
-  const [patchTargetNodes, setPatchTargetNodes] = useState<RenderTree[]>([
-    emptyTreeSelection,
-  ]);
-  const [patchPid, setPatchPid] = useState<string>('');
 
-  const [nodeMappings, setNodeMappings] = useState<NodeMapping[]>([]);
+  const [filteredSourceNodeMappings, setFilteredSourceNodeMappings] = useState<NodeMapping[]>([]);
+  const [filteredTargetNodeMappings, setFilteredTargetNodeMappings] = useState<NodeMapping[]>([]);
+  const [filteredCombinedNodeMappings, setFilteredCombinedNodeMappings] = useState<NodeMapping[]>([]);
 
-  const [linkingError,] = useState<string>('');
-  const [isNodeMappingsModalOpen, setNodeMappingsModalOpen] =
-    useState<boolean>(false);
-
-  const [lastPutMappingPid, setLastPutMappingPid] = useState<string>('');
-  const [lastPatchMappingReqId, setLastPatchMappingReqId] =
-    useState<string>('');
-  const [lastDeleteMappingPid, setLastDeleteMappingPid] = useState<string>('');
-  const [showAttributeNames, setShowAttributeNames] = useState(true);
-  const [sourceTreeSelection, setSourceTreeSelection] = useState<string[]>([]);
-  const [targetTreeSelection, setTargetTreeSelection] = useState<string[]>([]);
-  const [isOneToManyMapping, setIsOneToManyMapping] =
-    useState<boolean>(false);
-  const [isPatchMappingOperation, setIsMappingPatchOperation] =
-    useState<boolean>(false);
-  const [mappingToBeEdited, setMappingToBeEdited] = useState<CrosswalkConnectionNew[] | undefined>(undefined);
-  const [highlightOperation, setHighlightOperation] =
-    useState<highlightOperation | undefined>(undefined);
-
-
-  const [putMapping, putMappingResponse] = usePutMappingMutation();
-  const [deleteMapping, deleteMappingResponse] = useDeleteMappingMutation();
-  const [patchMapping, patchMappingResponse] = usePatchMappingMutation();
-
-  const {data: mappingFunctions, /*isLoading: mappingFunctionsIsLoading*/} =
-    useGetCrosswalkMappingFunctionsQuery('');
-
-  const {data: mappingFilters, /*isLoading: mappingFiltersIsLoading*/} =
-    useGetCrosswalkMappingFunctionsQuery('FILTERS');
-
-  useEffect(() => {
-    if (
-      patchSourceNodes &&
-      patchTargetNodes &&
-      patchSourceNodes[0].id.length > 0 &&
-      patchTargetNodes[0].id.length > 0
-    ) {
-      // Source and target nodes are both now fetched from trees
-      setMappingToBeEdited(
-        generateMappingToBeEdited(patchSourceNodes, patchTargetNodes, patchPid)
-      );
-    }
-  }, [patchSourceNodes, patchTargetNodes]);
-
-  useEffect(() => {
-    // After mapping to be edited is set, this opens editing modal
-    setNodeMappingsModalOpen(true);
-  }, [mappingToBeEdited]);
+  const [linkingError] = useState<string>('');
 
   useEffect(() => {
     if (crosswalkData?.sourceSchema) {
@@ -128,80 +95,11 @@ export default function CrosswalkEditor({
     }
   }, [crosswalkData]);
 
-  const {
-    data: mappingsFromBackend,
-    // isLoading: getMappingsDataIsLoading,
-    isSuccess: getMappingsDataIsSuccess,
-    // isError: getMappingsIsError,
-    // error: getMappingsError,
-    // refetch: refetchMappings,
-  } = useGetMappingsQuery(crosswalkId);
-
-  useEffect(() => {
-    if (mappingsFromBackend) {
-      const nodeMappings = mappingsFromBackend as NodeMapping[];
-      setNodeMappings(nodeMappings);
-    }
-  }, [getMappingsDataIsSuccess, mappingsFromBackend]);
-
-  // Add mapping to accordion
-  if (putMappingResponse.isSuccess) {
-    if (lastPutMappingPid !== putMappingResponse.data.pid) {
-      addMappingToAccordion(putMappingResponse, true);
-    }
-    //TODO: add error notification
-  }
-
-  if (patchMappingResponse.isSuccess) {
-    if (lastPatchMappingReqId !== patchMappingResponse.requestId) {
-      addMappingToAccordion(patchMappingResponse, false);
-    }
-  }
-
-  if (deleteMappingResponse.isSuccess) {
-    if (
-      deleteMappingResponse.isSuccess &&
-      deleteMappingResponse.originalArgs !== lastDeleteMappingPid
-    ) {
-      const newMappings = [
-        ...nodeMappings.filter((item) => {
-          return item.pid !== deleteMappingResponse.originalArgs;
-        }),
-      ];
-      if (deleteMappingResponse.originalArgs) {
-        setLastDeleteMappingPid(deleteMappingResponse.originalArgs);
-      }
-      setNodeMappings(() => [...newMappings]);
-      //
-    }
-  }
-
-  function addMappingToAccordion(response: any, isPutOperation: boolean) {
-    if (mappingToBeEdited) {
-      mappingToBeEdited[0].id = response.data.pid;
-
-      if (isPutOperation) {
-        const newMapping = response.data as NodeMapping;
-        setNodeMappings((mappings) => {
-          return [newMapping, ...mappings];
-        });
-        setLastPutMappingPid(response.data.pid);
-      } else {
-        // This is needed in the future for showing success or error status
-        setLastPatchMappingReqId(response.requestId);
-        const patchedMapping = patchMappingResponse.data as NodeMapping;
-
-        const filteredMappings = [
-          ...nodeMappings.filter((item) => {
-            return item.pid !== patchMappingResponse?.originalArgs?.pid;
-          }),
-        ];
-        setNodeMappings((mappings) => {
-          return [patchedMapping, ...filteredMappings];
-        });
-      }
-    }
-  }
+  useEffect( () => {
+    setFilteredSourceNodeMappings(nodeMappings);
+    setFilteredTargetNodeMappings(nodeMappings);
+    setFilteredCombinedNodeMappings(nodeMappings);
+  }, [nodeMappings]);
 
   function addMappingButtonClick() {
     setIsMappingPatchOperation(false);
@@ -256,72 +154,6 @@ export default function CrosswalkEditor({
     setMappingToBeEdited(mappingssToBeAdded);
   }
 
-
-  function generateMappingToBeEdited(
-    sourceNodes: RenderTree[],
-    targetNodes: RenderTree[],
-    patchPid: string
-  ) {
-    const originalMapping: NodeMapping[] = nodeMappings.filter(
-      (item) => item.pid === patchPid
-    );
-
-    const mappingsToBeAdded: CrosswalkConnectionNew[] = [];
-    const isOneToManyMapping = sourceNodes.length < 2;
-    setIsOneToManyMapping(isOneToManyMapping);
-
-    if (isOneToManyMapping) {
-      for (let i = 0; i < targetNodes.length; i += 1) {
-        const mapping: CrosswalkConnectionNew = {
-          processing: originalMapping[0].processing,
-          source: sourceNodes[0],
-          target: targetNodes[i],
-          id: patchPid,
-          notes: originalMapping.length > 0 ? originalMapping[0].notes : '',
-          predicate:
-            originalMapping.length > 0 ? originalMapping[0].predicate : '',
-          isSelected: true,
-          isDraft: true,
-          sourceJsonPath: undefined,
-          targetJsonPath: undefined,
-          sourcePredicate: undefined,
-          sourceProcessing: originalMapping.length > 0 ? originalMapping[0].source[i]?.processing : undefined,
-          targetPredicate: undefined,
-          targetProcessing: originalMapping.length > 0 ? originalMapping[0].target[i]?.processing : undefined,
-        };
-        mappingsToBeAdded.push(mapping);
-      }
-      ;
-    } else {
-      for (let i = 0; i < sourceNodes.length; i += 1) {
-        const mapping: CrosswalkConnectionNew = {
-          processing: originalMapping[0].processing,
-          source: sourceNodes[i],
-          target: targetNodes[0],
-          id: patchPid,
-          notes: originalMapping.length > 0 ? originalMapping[0].notes : '',
-          predicate:
-            originalMapping.length > 0 ? originalMapping[0].predicate : '',
-          isSelected: true,
-          isDraft: true,
-          sourceJsonPath: undefined,
-          targetJsonPath: undefined,
-          sourcePredicate: undefined,
-          sourceProcessing: originalMapping.length > 0 ? originalMapping[0].source[i]?.processing : undefined,
-          targetPredicate: undefined,
-          targetProcessing: originalMapping.length > 0 ? originalMapping[0].target[i]?.processing : undefined,
-        };
-        mappingsToBeAdded.push(mapping);
-      }
-      ;
-    }
-    return mappingsToBeAdded;
-  }
-
-  function removeMapping(mappingPid: any) {
-    deleteMapping(mappingPid);
-  }
-
   // Used to tree filtering
   function findNodesFromTree(
     tree: any,
@@ -340,127 +172,81 @@ export default function CrosswalkEditor({
     return results;
   }
 
-  // Called from accordion
-  const selectFromTreeByNodeMapping = (
-    node: NodeMapping | undefined,
-    isSourceTree: boolean
-  ) => {
-    const nodeIds: string[] = [];
-    if (node) {
-      if (isSourceTree) {
-        node.source.forEach((node) => nodeIds.push(node.id));
-        setSourceTreeSelection(nodeIds);
-      } else {
-        node.target.forEach((node) => nodeIds.push(node.id));
-        setTargetTreeSelection(nodeIds);
-      }
-    }
-  };
+  function filterMappingsWithId(nodeMappingsInput: NodeMapping[], ids: string[], source: boolean) {
+    let results: NodeMapping[] = [];
 
-  const performCallbackFromAccordionAction = (
-    mapping: NodeMapping,
-    action: string,
-    nodeId?: string,
-    highlightOperationId?: string
-  ) => {
-    // TODO: implement add notes from accordion if needed?
-    if (action === 'remove') {
-      removeMapping(mapping);
-    } else if (action === 'selectFromSourceTreeByMapping') {
-      selectFromTreeByNodeMapping(mapping, true);
-      scrollToTop();
-    } else if (action === 'selectFromSourceTreeById') {
-      if (nodeId) {
-        setSourceTreeSelection([nodeId]);
-      }
-      scrollToTop();
-    } else if (action === 'selectFromTargetTreeByMapping') {
-      selectFromTreeByNodeMapping(mapping, false);
-      scrollToTop();
-    } else if (action === 'selectFromTargetTreeById') {
-      if (nodeId) {
-        setTargetTreeSelection([nodeId]);
-      }
-      scrollToTop();
-    } else if (action === 'selectFromTargetTreeByMapping') {
-      selectFromTreeByNodeMapping(mapping, false);
-      scrollToTop();
-    } else if (action === 'openMappingDetails') {
-      setIsMappingPatchOperation(true);
-      setPatchPid(mapping.pid ? mapping.pid : '');
-      selectFromTreeByNodeMapping(mapping, true);
-      selectFromTreeByNodeMapping(mapping, false);
-    } else if (action === 'highlightFunctionField') {
-      setHighlightOperation({operationId: highlightOperationId ? highlightOperationId : '', nodeId: nodeId});
+    nodeMappingsInput.forEach(item => {
+        if (source) {
+          let foundItemsMatchingIds = ids.filter( id => item.source.some(sourceItem => sourceItem.id === id ));
+          if (foundItemsMatchingIds.length === ids.length) {
+            results.push(item);
+          }
+        } else {
+          let foundItemsMatchingIds = ids.filter( id => item.target.some(targetItem => targetItem.id === id ));
+          if (foundItemsMatchingIds.length === ids.length) {
+            results.push(item);
+          }
+        }
 
-      setIsMappingPatchOperation(true);
-      setPatchPid(mapping.pid ? mapping.pid : '');
-      selectFromTreeByNodeMapping(mapping, true);
-      selectFromTreeByNodeMapping(mapping, false);
-    } else if (action === 'removeMapping') {
-      removeMapping(mapping.pid);
-    }
-  };
+      }
+    );
+    return results;
+  }
 
   const performCallbackFromSchemaInfo = (
     nodeIds: RenderTree[],
     isSourceTree: boolean
   ) => {
-    if (nodeIds.length > 0) {
+    let foundNodeMappings = [];
+    if (nodeIds.length > 0 && nodeIds[0] != null) {
+      let ids = nodeIds.map(nodeId => nodeId.id);
+      foundNodeMappings = filterMappingsWithId(nodeMappings, ids, isSourceTree);
       if (isSourceTree) {
-        setSelectedSourceNodes(nodeIds);
-        if (isPatchMappingOperation) {
-          setPatchSourceNodes(nodeIds);
+        setFilteredSourceNodeMappings(foundNodeMappings);
+        let result = foundNodeMappings.filter(sourceNodeMapping =>
+          filteredTargetNodeMappings.some(targetNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
+        setFilteredCombinedNodeMappings(result);
+      } else {
+        setFilteredTargetNodeMappings(foundNodeMappings);
+        let result = foundNodeMappings.filter(targetNodeMapping =>
+          filteredSourceNodeMappings.some(sourceNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
+        setFilteredCombinedNodeMappings(result);
+      }
+
+    } else {
+      if (isSourceTree) {
+        setFilteredSourceNodeMappings(nodeMappings);
+        if (_.isEqual(nodeMappings, filteredTargetNodeMappings)) {
+          setFilteredCombinedNodeMappings(nodeMappings);
+        } else {
+          setFilteredCombinedNodeMappings(filteredTargetNodeMappings);
         }
       } else {
-        setSelectedTargetNodes(nodeIds);
-        if (isPatchMappingOperation) {
-          setPatchTargetNodes(nodeIds);
+        setFilteredTargetNodeMappings(nodeMappings);
+        if (_.isEqual(nodeMappings, filteredSourceNodeMappings)) {
+          setFilteredCombinedNodeMappings(nodeMappings);
+        } else {
+          setFilteredCombinedNodeMappings(filteredSourceNodeMappings);
         }
       }
     }
-  };
-
-  const performCallbackFromMappingsModal = (
-    action: any,
-    mappingPayload: any,
-    patchPid: string
-  ) => {
-    if (action === 'closeModal') {
-      setIsMappingPatchOperation(false);
-      setNodeMappingsModalOpen(false);
+    
+    if (isSourceTree) {
+      setSelectedSourceNodes(nodeIds);
+      if (isPatchMappingOperation) {
+        setPatchSourceNodes(nodeIds);
+      }
+    } else {
+      setSelectedTargetNodes(nodeIds);
+      if (isPatchMappingOperation) {
+        setPatchTargetNodes(nodeIds);
+      }
     }
-    if (action === 'addMapping') {
-      setNodeMappingsModalOpen(false);
-      putMapping({payload: mappingPayload, pid: crosswalkId});
-      const sourceIds: string[] = [];
-      const targetIds: string[] = [];
-      mappingPayload.source.forEach((node: { id: string }) =>
-        sourceIds.push(node.id)
-      );
-      setSourceTreeSelection(sourceIds);
-      mappingPayload.target.forEach((node: { id: string }) =>
-        targetIds.push(node.id)
-      );
-      setTargetTreeSelection(targetIds);
-    }
-    if (action === 'save') {
-      setIsMappingPatchOperation(false);
-      setNodeMappingsModalOpen(false);
-      patchMapping({payload: mappingPayload, pid: patchPid});
-    }
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  };
+  }
 
   return (
     <div className="row d-flex justify-content-between crosswalk-editor">
-      <div className='col-12 mx-1'>
+      <div className="col-12 mx-1">
         <div className="row gx-0">
           {/*  SOURCE TREE */}
           <div className="col-5">
@@ -470,6 +256,7 @@ export default function CrosswalkEditor({
               treeSelection={sourceTreeSelection}
               caption={t('crosswalk-editor.search-from-source-schema')}
               schemaUrn={sourceSchemaUrn}
+              scrollToSelectedNodeId={scrollToSelectedSourceNodeId}
             />
           </div>
 
@@ -477,7 +264,14 @@ export default function CrosswalkEditor({
           <div className="col-2 px-4 mid-buttons">
             {hasEditPermission && (
               <Tooltip
-                title={selectedSourceNodes.length > 1 && selectedTargetNodes.length > 1 ? 'Many to many node mappings are not supported' : !isEditModeActive ? 'Activate edit mode to enable mappings' : 'Map selected nodes'}
+                title={
+                  selectedSourceNodes.length > 1 &&
+                  selectedTargetNodes.length > 1
+                    ? 'Many to many node mappings are not supported'
+                    : !isEditModeActive
+                      ? 'Activate edit mode to enable mappings'
+                      : 'Map selected nodes'
+                }
                 placement="bottom"
               >
                 <Sbutton
@@ -486,7 +280,8 @@ export default function CrosswalkEditor({
                     selectedSourceNodes.length < 1 ||
                     selectedTargetNodes.length < 1 ||
                     crosswalkData.state === State.Published ||
-                    (selectedSourceNodes.length > 1 && selectedTargetNodes.length > 1) ||
+                    (selectedSourceNodes.length > 1 &&
+                      selectedTargetNodes.length > 1) ||
                     !isEditModeActive
                   }
                   onClick={() => {
@@ -507,6 +302,7 @@ export default function CrosswalkEditor({
               treeSelection={targetTreeSelection}
               caption={t('crosswalk-editor.search-from-target-schema')}
               schemaUrn={targetSchemaUrn}
+              scrollToSelectedNodeId={scrollToSelectedTargetNodeId}
             />
           </div>
         </div>
@@ -514,34 +310,38 @@ export default function CrosswalkEditor({
       <div className="col-12 mt-4">
         <div className="d-flex justify-content-between">
           <div className="align-self-end pe-1">
-            {/*                        // TODO: this can be shown when attribute qnames are available for accordion. Those are temporarily replaced with attribute ids.
-                        <Checkbox
-                          checked={showAttributeNames}
-                          onClick={(newState) => {
-                            setShowAttributeNames(newState.checkboxState);
-                          }}
-                        >Show node titles
-                        </Checkbox>*/}
+            {/*TODO: Checkbox can be removed as deprecatmappingFunctionsed when all new style titles work*/}
+            <Checkbox
+              checked={showAttributeNames}
+              onClick={(newState) => {
+                setShowAttributeNames(newState.checkboxState);
+              }}
+            >
+              {t('crosswalk-editor.show-node-titles')}
+            </Checkbox>
           </div>
         </div>
 
         <div className="joint-listing-accordion-wrap my-3">
           <MappingsAccordion
-            nodeMappings={nodeMappings}
+            nodeMappings={filteredCombinedNodeMappings}
             viewOnlyMode={false}
-            isEditModeActive={isEditModeActive && crosswalkData.state !== State.Published}
+            isEditModeActive={
+              isEditModeActive && crosswalkData.state !== State.Published
+            }
             showAttributeNames={showAttributeNames}
             mappingFunctions={mappingFunctions}
             performAccordionAction={performCallbackFromAccordionAction}
+            schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
+            schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
+            setNodeMappingsModalOpen={setNodeMappingsModalOpen}
           />
         </div>
       </div>
       {mappingToBeEdited && (
         <NodeMappingsModal
           nodeSelections={mappingToBeEdited}
-          performMappingsModalAction={
-            performCallbackFromMappingsModal
-          }
+          performMappingsModalAction={performCallbackFromMappingsModal}
           mappingFilters={mappingFilters}
           mappingFunctions={mappingFunctions}
           modalOpen={isNodeMappingsModalOpen}

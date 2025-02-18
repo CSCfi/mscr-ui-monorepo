@@ -16,7 +16,7 @@ export default function MetadataAndFiles({
 }) {
 
   const schemaFiles = schemaDetails?.fileMetadata;
-
+  
   return (
     <>
       <MetadataForm

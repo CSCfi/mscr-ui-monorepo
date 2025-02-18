@@ -7,7 +7,6 @@ import Box from '@mui/material/Box';
 import SchemaTree from '@app/common/components/schema-info/schema-tree';
 import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
 import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
-import { cloneDeep } from 'lodash';
 import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
 import { useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
@@ -18,12 +17,11 @@ import {
   SchemaHeading,
   SearchWrapper,
   TreeviewWrapper,
+  TreeWrapper,
 } from '@app/common/components/schema-info/schema-info.styles';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import SpinnerOverlay, {
-  SpinnerType,
-} from '@app/common/components/spinner-overlay';
+import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
 
 export default function SchemaInfo(props: {
@@ -37,6 +35,8 @@ export default function SchemaInfo(props: {
   schemaUrn: string;
   isSingleTree?: boolean;
   isNodeEditable?: boolean;
+  hasCustomRoot?: boolean;
+  scrollToSelectedNodeId?: string;
 }) {
   const { t } = useTranslation('common');
   const lang = useRouter().locale ?? '';
@@ -53,13 +53,14 @@ export default function SchemaInfo(props: {
   const [treeExpandedArray, setTreeExpandedArray] = useState<string[]>([]);
   // These are used by datamodel
   const [selectedTreeNodes, setSelectedTreeNodes] = useState<RenderTree[]>([]);
+  const [currentlySelectedNodeId, setCurrentlySelectedNodeId] = useState<
+    string | undefined
+  >(undefined);
 
   const [isTreeDataFetched, setTreeDataFetched] = useState<boolean>(false);
 
   const [showAttributeNames, setShowAttributeNames] = useState(true);
-  const [treeDataOriginal, setTreeDataOriginal] = useState<RenderTree[]>(
-    []
-  );
+  const [treeDataOriginal, setTreeDataOriginal] = useState<RenderTree[]>([]);
 
   useEffect(() => {
     if (getSchemaData?.content) {
@@ -70,8 +71,6 @@ export default function SchemaInfo(props: {
       generatedTree.then((res) => {
         if (res) {
           setTreeDataOriginal(res);
-          // Expand tree when data is loaded
-          setPartlyExpanded();
           setTreeData(res);
           setTreeDataFetched(true);
           setNodeIdToNodeDictionary(nodeIdToShallowNode);
@@ -81,17 +80,12 @@ export default function SchemaInfo(props: {
     }
   }, [getSchemaDataIsSuccess, getSchemaData]);
 
-  // Expand tree when data is loaded
-  useEffect(() => {
-    setPartlyExpanded();
-  }, [isTreeDataFetched]);
-
   // Expand and select nodes when input changed (from mappings accordion)
   useEffect(() => {
     if (props.treeSelection) {
       expandAndSelectNodes(props.treeSelection);
     }
-  }, [props.treeSelection]);
+  }, [props.treeSelection, props.scrollToSelectedNodeId]);
 
   useEffect(() => {
     // Update selections for node info and parent component for mappings
@@ -107,39 +101,34 @@ export default function SchemaInfo(props: {
     setSelectedTreeNodes(selectedNodes);
   }, [treeSelectedArray, nodeIdToNodeDictionary]);
 
-  const setPartlyExpanded = () => {
+  const setFullyExpanded = () => {
     const nodeIdsToExpand: string[] = [];
-    treeData.forEach(({ children, id }) => {
-      if (children && children.length > 0) {
-        nodeIdsToExpand.push(id);
-        if (children.length === 1) {
-          nodeIdsToExpand.push(children[0].id);
-        }
-      }
+    Object.entries(nodeIdToNodeDictionary).map(([nodeId, node]) => {
+      if (node.some((n) => n.children.length > 0)) nodeIdsToExpand.push(nodeId);
     });
     setTreeExpandedArray(nodeIdsToExpand);
   };
 
   function clearTreeSearch() {
     setTreeSelectedArray([]);
-    setPartlyExpanded();
     setSelectedTreeNodes([]);
   }
 
   // Used by tree select and filtering
   function getAllNodeIdsOnPathToLeaf(nodeIds: string[]) {
-    const elementPaths: string[] = [];
+    let idsOnPath: string[] = [];
     nodeIds.forEach((nodeId) => {
       const nodes = nodeIdToNodeDictionary[nodeId];
-      nodes.map((node) => elementPaths.push(node.elementPath));
+      if (nodes) {
+        nodes.map((node) => {
+          idsOnPath = idsOnPath.concat(node.rootPathIds);
+        });
+      }
     });
 
     const nodesToSelect: Set<string> = new Set();
-    elementPaths.forEach((path) => {
-      const nodeIdsOnPath = path.split('.');
-      nodeIdsOnPath.forEach((nodeId) => {
-        nodesToSelect.add(nodeId);
-      });
+    idsOnPath.forEach((pathNodeId) => {
+      nodesToSelect.add(pathNodeId);
     });
 
     return Array.from(nodesToSelect);
@@ -147,7 +136,7 @@ export default function SchemaInfo(props: {
 
   const handleExpandClick = () => {
     if (treeExpandedArray.length === 0) {
-      setPartlyExpanded();
+      setFullyExpanded();
     } else {
       setTreeExpandedArray([]);
     }
@@ -158,6 +147,13 @@ export default function SchemaInfo(props: {
       const nodeIdsToExpand = getAllNodeIdsOnPathToLeaf(nodeIds);
       setTreeExpandedArray(nodeIdsToExpand);
       setTreeSelectedArray(nodeIds);
+      // Get element by id sometimes returns a null reference. Added artificial delay to mitigate the problem.
+      if (props?.scrollToSelectedNodeId) {
+        setCurrentlySelectedNodeId(props?.scrollToSelectedNodeId);
+        setTimeout(() => {
+          scrollToElement(props.isSourceTree, props.scrollToSelectedNodeId);
+        }, 10);
+      }
     }
   }
 
@@ -214,6 +210,24 @@ export default function SchemaInfo(props: {
     }
   };
 
+  function scrollToElement(
+    isSourceTree: boolean | undefined,
+    elementId: string | undefined
+  ) {
+    if (elementId) {
+      const elementRef = document.getElementById(
+        isSourceTree ? 'source-' + elementId : 'target-' + elementId
+      );
+      if (elementRef) {
+        elementRef.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'nearest',
+        });
+      }
+    }
+  }
+
   return (
     <>
       <div className="row d-flex mb-2">
@@ -222,9 +236,9 @@ export default function SchemaInfo(props: {
             title={
               getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                  data: getSchemaData.metadata.label,
-                  lang,
-                })
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
                 : t('schema-tree.no-label')
             }
             placement="bottom-start"
@@ -232,9 +246,9 @@ export default function SchemaInfo(props: {
             <SchemaHeading variant="h2">
               {getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                  data: getSchemaData.metadata.label,
-                  lang,
-                })
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
                 : t('schema-tree.no-label')}
             </SchemaHeading>
           </Tooltip>
@@ -242,7 +256,8 @@ export default function SchemaInfo(props: {
       </div>
 
       <TreeviewWrapper className="row gx-0">
-        <div className="col-7 px-0">
+        <TreeWrapper className="col-7 px-0">
+          <SpinnerOverlay animationVisible={!isTreeDataFetched} />
           <div className="d-flex justify-content-between mb-2 ps-3 pe-2">
             {isTreeDataFetched && (
               <>
@@ -292,33 +307,26 @@ export default function SchemaInfo(props: {
                 overflowY: 'auto',
               }}
             >
-              <div className="d-flex justify-content-center">
-                <SpinnerOverlay
-                  animationVisible={!isTreeDataFetched}
-                  type={
-                    props.isSingleTree
-                      ? SpinnerType.SchemaTreeSingle
-                      : SpinnerType.SchemaTreeDouble
-                  }
-                />
-              </div>
               {isTreeDataFetched && (
                 <SchemaTree
-                  nodes={treeData[0]}
+                  nodes={treeData}
                   treeSelectedArray={treeSelectedArray}
                   treeExpanded={treeExpandedArray}
                   performTreeAction={performCallbackFromTreeAction}
                   showQname={!showAttributeNames}
+                  isSourceTree={props.isSourceTree}
                 />
               )}
             </Box>
           </div>
-        </div>
+        </TreeWrapper>
         <NodeInfoWrapper className="col-5 px-0">
           <NodeInfo
             treeData={selectedTreeNodes}
+            currentlySelectedNodeId={currentlySelectedNodeId}
             dataIsLoaded={isTreeDataFetched}
             isNodeEditable={props.isNodeEditable}
+            hasCustomRoot={props.hasCustomRoot}
           />
           <CheckboxWrapper>
             <Checkbox

@@ -53,11 +53,10 @@ export const formatsAvailableForSchemaRegistration: Format[] = [
   Format.Enum,
 ];
 
+// According to current spec, MSCR Copy option only should be available to JSON, CSV and XSD Schemas
 export const formatsAvailableForMscrCopy: Format[] = [
   Format.Csv,
   Format.Jsonschema,
-  Format.Mscr,
-  Format.Shacl,
   Format.Xsd
 ];
 

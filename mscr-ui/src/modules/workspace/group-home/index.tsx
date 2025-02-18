@@ -14,17 +14,16 @@ import { MscrUser } from '@app/common/interfaces/mscr-user.interface';
 import Pagination from '@app/common/components/pagination';
 import { ButtonBlock } from '../workspace.styles';
 import useUrlState from '@app/common/utils/hooks/use-url-state';
-import {
-  mscrSearchApi,
-  useGetOrgContentQuery,
-} from '@app/common/components/mscr-search/mscr-search.slice';
-import { useStoreDispatch } from '@app/store';
+import { useGetOrgContentQuery } from '@app/common/components/mscr-search/mscr-search.slice';
 import { useEffect, useMemo, useState } from 'react';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { useRouter } from 'next/router';
 import { ModalVisibilityButton } from '@app/modules/form/modal-visibility-button';
 import FormModal, { ModalType } from '@app/modules/form';
 import Link from 'next/link';
+import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
+import SpinnerOverlay from '@app/common/components/spinner-overlay';
+import HasPermission from '@app/common/utils/has-permission';
 
 interface GroupHomeProps {
   user: MscrUser;
@@ -36,12 +35,15 @@ export default function GroupWorkspace({
   pid,
   contentType,
 }: GroupHomeProps) {
+  const hasCreatePermission = HasPermission({
+    action: 'CREATE_CONTENT',
+    owner: [pid],
+  });
   const { t } = useTranslation('common');
   const router = useRouter();
   const lang = router.locale ?? '';
   const { isSmall } = useBreakpoints();
   const { urlState } = useUrlState();
-  const dispatch = useStoreDispatch();
   const pageSize = 20;
   const [registerCrosswalkModalVisible, setRegisterCrosswalkModalVisible] =
     useState(false);
@@ -49,6 +51,7 @@ export default function GroupWorkspace({
     useState(false);
   const [registerSchemaModalVisible, setRegisterSchemaModalVisible] =
     useState(false);
+  const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
   const [content, setContent] = useState(new Array<ContentRow>());
   const { data, isLoading } = useGetOrgContentQuery({
     type: contentType,
@@ -76,12 +79,18 @@ export default function GroupWorkspace({
         const linkLabel = `${t('workspace.view')} ${label}`;
         return {
           label: label,
-          ...(contentType == Type.Schema && { namespace: info.namespace }),
+          /* ...(contentType == Type.Schema && { namespace: info.namespace }), */
           state: info.state,
           numberOfRevisions: info.numberOfRevisions.toString(),
           pid: info.handle ?? t('metadata.not-available'),
+          format: info.format,
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
-          linkUrl: <Link href={linkUrl} passHref><a aria-label={linkLabel}>{t('workspace.view')}</a></Link>,        };
+          linkUrl: (
+            <Link href={linkUrl} passHref>
+              <a aria-label={linkLabel}>{t('workspace.view')}</a>
+            </Link>
+          ),
+        };
       });
     } else {
       return [];
@@ -92,18 +101,16 @@ export default function GroupWorkspace({
     setContent(fetchedContent);
   }, [fetchedContent]);
 
-  const refetchInfo = () => {
-    setTimeout(
-      () =>
-        dispatch(
-          mscrSearchApi.util.invalidateTags(['OrgContent', 'MscrSearch'])
-        ),
-      300
-    );
-  };
-
   if (isLoading) {
-    return <div> Is Loading </div>; //ToDo: A loading circle or somesuch
+    setTimeout(() => setLoadingSpinnerVisible(true), 500);
+    return (
+      <SpinnerWrapper>
+        <SpinnerOverlay
+          animationVisible={loadingSpinnerVisible}
+          transparentBackground={true}
+        />
+      </SpinnerWrapper>
+    );
   } else if (!user || user.anonymous || !user.rolesInOrganizations[pid]) {
     return <div> You do not have rights to view this page </div>;
   } else {
@@ -120,52 +127,54 @@ export default function GroupWorkspace({
             </TitleDescriptionWrapper>
           }
         />
-        <Separator isLarge />
-        <div>
-          <ButtonBlock>
-            {contentType == 'SCHEMA' ? (
-              <>
-                <ModalVisibilityButton
-                  setVisible={setRegisterSchemaModalVisible}
-                  label={t('content-form.button.schema-register')}
-                />
-                <FormModal
-                  modalType={ModalType.RegisterNewFull}
-                  contentType={Type.Schema}
-                  visible={registerSchemaModalVisible}
-                  setVisible={setRegisterSchemaModalVisible}
-                  organizationPid={pid}
-                />
-              </>
-            ) : (
-              <>
-                <ModalVisibilityButton
-                  setVisible={setRegisterCrosswalkModalVisible}
-                  label={t('content-form.button.crosswalk-register')}
-                />
-                <FormModal
-                  modalType={ModalType.RegisterNewFull}
-                  contentType={Type.Crosswalk}
-                  visible={registerCrosswalkModalVisible}
-                  setVisible={setRegisterCrosswalkModalVisible}
-                  organizationPid={pid}
-                />
-                <ModalVisibilityButton
-                  setVisible={setCreateCrosswalkModalVisible}
-                  label={t('content-form.button.crosswalk-create')}
-                />
-                <FormModal
-                  modalType={ModalType.RegisterNewMscr}
-                  contentType={Type.Crosswalk}
-                  visible={createCrosswalkModalVisible}
-                  setVisible={setCreateCrosswalkModalVisible}
-                  organizationPid={pid}
-                />
-              </>
-            )}
-          </ButtonBlock>
-        </div>
-        <Separator isLarge />
+        {hasCreatePermission &&
+          <div>
+            <Separator isLarge />
+            <ButtonBlock>
+              {contentType == 'SCHEMA' ? (
+                <>
+                  <ModalVisibilityButton
+                    setVisible={setRegisterSchemaModalVisible}
+                    label={t('content-form.button.schema-register')}
+                  />
+                  <FormModal
+                    modalType={ModalType.RegisterNewFull}
+                    contentType={Type.Schema}
+                    visible={registerSchemaModalVisible}
+                    setVisible={setRegisterSchemaModalVisible}
+                    organizationPid={pid}
+                  />
+                </>
+              ) : (
+                <>
+                  <ModalVisibilityButton
+                    setVisible={setRegisterCrosswalkModalVisible}
+                    label={t('content-form.button.crosswalk-register')}
+                  />
+                  <FormModal
+                    modalType={ModalType.RegisterNewFull}
+                    contentType={Type.Crosswalk}
+                    visible={registerCrosswalkModalVisible}
+                    setVisible={setRegisterCrosswalkModalVisible}
+                    organizationPid={pid}
+                  />
+                  <ModalVisibilityButton
+                    setVisible={setCreateCrosswalkModalVisible}
+                    label={t('content-form.button.crosswalk-create')}
+                  />
+                  <FormModal
+                    modalType={ModalType.RegisterNewMscr}
+                    contentType={Type.Crosswalk}
+                    visible={createCrosswalkModalVisible}
+                    setVisible={setCreateCrosswalkModalVisible}
+                    organizationPid={pid}
+                  />
+                </>
+              )}
+            </ButtonBlock>
+            <Separator isLarge />
+          </div>
+        }
         {data?.hits.hits && data?.hits.hits.length < 1 ? (
           <div>
             {contentType == 'SCHEMA'

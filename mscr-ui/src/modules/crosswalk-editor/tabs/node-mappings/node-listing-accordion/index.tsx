@@ -207,7 +207,7 @@ function Row(props: {
           <div
             className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center d-none'}>
             <div>
-              <Tooltip className={props.index !== 0 && props.isSourceAccordion ? '' : 'd-none'}
+              <Tooltip className={props.index !== 0 ? '' : 'd-none'}
                        title={'Order node up'}
                        placement="left"
               >
@@ -215,8 +215,8 @@ function Row(props: {
                   onClick={() => moveNode(true)}></StyledArrowCircleUp>
               </Tooltip>
             </div>
-            <div className={props.isSourceAccordion ? '' : 'ms-3'}>
-              {props.index !== props.rowCount - 1 && props.rowCount > 1 && props.isSourceAccordion &&
+            <div>
+              {props.index !== props.rowCount - 1 && props.rowCount > 1 &&
                   <Tooltip
                       title={'Order node down'}
                       placement="left"
@@ -335,22 +335,22 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
   function generateAccordionNodes() {
     let newNodes: NodeListingRow[] = [];
     if (props.isSourceAccordion) {
-      // Source
+      // Source accordion
       if (props.isOneToManyMapping) {
         let newNode: NodeListingRow = {
-          description: props.nodes[0].source.properties.description,
-          processingSelection: props.isSourceAccordion ? (props.nodes[0].sourceProcessing?.id ?? '') : (props.nodes[0].targetProcessing?.id ?? ''),
-          processing: props.isSourceAccordion ? (props.nodes[0].sourceProcessing) : (props.nodes[0].targetProcessing),
-          type: props.nodes[0].source.properties.type,
-          isSelected: false, notes: undefined, name: props.nodes[0].source.name, id: props.nodes[0].source.id
+          description: props.nodes[0]?.source?.properties?.description,
+          processingSelection: props.nodes[0]?.sourceProcessing?.id,
+          processing: props.nodes[0]?.sourceProcessing,
+          type: props.nodes[0]?.source?.properties?.type,
+          isSelected: false, notes: undefined, name: props.nodes[0]?.source?.name, id: props.nodes[0]?.source?.id
         }
         newNodes.push(newNode);
       } else {
         props.nodes.forEach((node: CrosswalkConnectionNew) => {
           let newNode: NodeListingRow = {
             description: node?.source.properties.description,
-            processingSelection: props.isSourceAccordion ? (node?.sourceProcessing?.id ?? '') : (node?.targetProcessing?.id ?? ''),
-            processing: props.isSourceAccordion ? node?.sourceProcessing : node?.targetProcessing,
+            processingSelection: node?.sourceProcessing?.id,
+            processing: node?.sourceProcessing,
             type: node?.source.properties.type,
             isSelected: false, notes: undefined, name: node.source.name, id: node.source.id
           }
@@ -358,25 +358,25 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
         });
       }
     } else {
-      // Target
+      // Target accordion
       if (props.isOneToManyMapping) {
         props.nodes.forEach((node: CrosswalkConnectionNew) => {
           let newNode: NodeListingRow = {
-            description: node?.target.properties.description,
-            processingSelection: props.isSourceAccordion ? (node?.sourceProcessing?.id ?? '') : (node?.targetProcessing?.id ?? ''),
-            processing: props.isSourceAccordion ? node?.sourceProcessing : node?.targetProcessing,
-            type: node?.target.properties.type,
-            isSelected: false, notes: undefined, name: node.target.name, id: node.target.id
+            description: node?.target?.properties?.description,
+            processingSelection: node?.targetProcessing?.id,
+            processing: node?.targetProcessing,
+            type: node?.target?.properties?.type,
+            isSelected: false, notes: undefined, name: node?.target?.name, id: node?.target?.id
           }
           newNodes.push(newNode);
         });
       } else {
         let newNode: NodeListingRow = {
-          description: props.nodes[0].target.properties.description,
-          processingSelection: props.isSourceAccordion ? (props.nodes[0].sourceProcessing?.id ?? '') : (props.nodes[0].targetProcessing?.id ?? ''),
-          processing: props.isSourceAccordion ? (props.nodes[0].sourceProcessing) : (props.nodes[0].targetProcessing),
-          type: props.isSourceAccordion ? (props.nodes[0].source.properties.type) : (props.nodes[0].target.properties.type),
-          isSelected: false, notes: undefined, name: props.isSourceAccordion ? (props.nodes[0].target.name) : (props.nodes[0].source.name), id: props.isSourceAccordion ? (props.nodes[0].target.id) : (props.nodes[0].source.id)
+          description: props.nodes[0]?.target?.properties?.description,
+          processingSelection: props.nodes[0]?.targetProcessing?.id,
+          processing: props.nodes[0]?.targetProcessing,
+          type: props.nodes[0]?.target?.properties?.type,
+          isSelected: false, notes: undefined, name: props.nodes[0]?.target?.name, id: props.nodes[0]?.target?.id
         }
         newNodes.push(newNode);
       }
@@ -399,7 +399,7 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
         <Table aria-label="collapsible table w-100">
           <TableHead className="gx-0">
             <TableRow className="row gx-0">
-              <StyledTableHeadingCell className="col-12 bg-light-blue">
+              <StyledTableHeadingCell className="col-12">
                 <span
                   className="fw-bold ps-3">{props.isSourceAccordion ? props.isOneToManyMapping ? 'Source' : 'Sources' : props.isOneToManyMapping ? 'Targets' : 'Target'}</span>
               </StyledTableHeadingCell>

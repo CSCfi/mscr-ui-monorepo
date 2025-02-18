@@ -349,6 +349,8 @@ export function translateNotification(key: NotificationKeys, t: TFunction) {
       return t('notifications.copy-crosswalk');
     case 'SCHEMA_COPY':
       return t('notifications.copy-schema');
+    case 'SCHEMA_SET_ROOT_SELECTION':
+      return t('notifications.set-root-selection');
     default:
       return '';
   }

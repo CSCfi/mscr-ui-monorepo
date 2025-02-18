@@ -14,16 +14,15 @@ import {
   ModalTitle,
 } from 'suomifi-ui-components';
 import NodeListingAccordion from "@app/modules/crosswalk-editor/tabs/node-mappings/node-listing-accordion";
-import {MidColumnWrapper} from "@app/modules/crosswalk-editor/tabs/node-mappings/node-mappings.styles";
+import {
+  MidColumnWrapper,
+  StyledModal,
+  StyledModalContent
+} from '@app/modules/crosswalk-editor/tabs/node-mappings/node-mappings.styles';
 import {cloneDeep} from 'lodash';
 import {useRef} from 'react';
 import {highlightOperation} from "@app/modules/crosswalk-editor/mappings-accordion";
-
-interface mappingOperationValue {
-  operationId: string;
-  parameterId: string;
-  value: string;
-}
+import { useTranslation } from 'next-i18next';
 
 export default function NodeMappings(props: {
   nodeSelections: CrosswalkConnectionNew[];
@@ -36,6 +35,7 @@ export default function NodeMappings(props: {
   highlightOperation: highlightOperation | undefined;
 }) {
   const EXACT_MATCH_DROPDOWN_DEFAULT = 'http://www.w3.org/2004/02/skos/core#exactMatch';
+  const { t } = useTranslation('common');
 
   let sourceSelectionInit = '';
   let targetSelectionInit = '';
@@ -119,7 +119,6 @@ export default function NodeMappings(props: {
 
   const [isMappingOperationValuesInit, setMappingOperationValuesInit] = useState<boolean>(false);
   const [isErrorBarVisible, setIsErrorBarVisible] = useState<boolean>(true);
-  const [mappingOperationValues, setMappingOperationValues] = useState<mappingOperationValue[] | undefined>(undefined);
   const [mappingOperationSelection, setMappingOperationSelection] = useState<string | undefined>(undefined);
   const [mappingOperationFormatted, setMappingOperationFormatted] = useState([] as any);
   const [mappingFunctions, setMappingFunctions] = useState([] as any);
@@ -234,7 +233,7 @@ export default function NodeMappings(props: {
       if (action === 'moveNodeUp' && mappingNodes.length > 1) {
         let sourceNodesNew = [...mappingNodes];
         for (let i = 0; i < mappingNodes.length; i += 1) {
-          if (mappingNodes[i].source.id === mappingId) {
+          if ((isSourceNode && mappingNodes[i].source.id === mappingId) || (!isSourceNode && mappingNodes[i].target.id === mappingId)) {
             let first = mappingNodes[i - 1];
             let second = mappingNodes[i];
             sourceNodesNew[i - 1] = second;
@@ -245,7 +244,7 @@ export default function NodeMappings(props: {
       } else if (action === 'moveNodeDown' && mappingNodes.length > 1) {
         let sourceNodesNew = [...mappingNodes];
         for (let i = 0; i < mappingNodes.length; i += 1) {
-          if (mappingNodes[i].source.id === mappingId) {
+          if ((isSourceNode && mappingNodes[i].source.id === mappingId) || (!isSourceNode && mappingNodes[i].target.id === mappingId)) {
             let first = mappingNodes[i];
             let second = mappingNodes[i + 1];
             sourceNodesNew[i] = second;
@@ -429,23 +428,8 @@ export default function NodeMappings(props: {
   function updateMappingOperationValue(operationKey: string, parameter: string, newValue: string) {
     setMappingOperationSelection(operationKey);
 
-    if (mappingOperationValues) {
-      const newValues = mappingOperationValues.map(operation => {
-        if (operation.parameterId === parameter && operation.operationId === operationKey) {
-          operation.value = newValue;
-          operation.operationId = operationKey;
-        }
-        return operation;
-      });
-      setMappingOperationValues(newValues);
-    } else {
-      const operations: mappingOperationValue[] = [];
-      operations.push({operationId: operationKey, parameterId: parameter, value: newValue});
-      setMappingOperationValues(operations);
-    }
-
-    let formattedParams = generateMappingFunctionDefaultParams(operationKey);
-    formattedParams[parameter] = newValue;
+    const originalParams = mappingOperationFormatted?.id === operationKey ? mappingOperationFormatted.params : generateMappingFunctionDefaultParams(operationKey);
+    const formattedParams = {...originalParams, [parameter]: newValue };
     let processing: any = {
       id: operationKey,
       params: formattedParams,
@@ -462,17 +446,10 @@ export default function NodeMappings(props: {
   }
 
   function isMappingOperationValueValid(parameterName: string) {
-
-    let ret = false;
-    if (mappingOperationValues) {
-      mappingOperationValues.filter(x => x.parameterId === parameterName).map(x => {
-          if (x.value) {
-            ret = x.value.length > 0;
-          }
-        }
-      );
-      return ret;
+    if (mappingOperationFormatted && 'params' in mappingOperationFormatted) {
+      return mappingOperationFormatted.params[parameterName]?.length > 0;
     }
+    return false;
   }
 
   function generateMappingOperationFields(operationKey: string | undefined) {
@@ -505,111 +482,118 @@ export default function NodeMappings(props: {
 
   return (
     <>
-      <Modal
+      <StyledModal
         appElementId="__next"
         visible={visible}
         onEscKeyDown={() => closeModal()}
-        className="row bg-white edit-mapping-modal"
       >
-        <ModalContent className="edit-mapping-modal-content">
-          <ModalTitle>{props.isPatchMappingOperation ? 'Edit mapping' : 'Add mapping'}</ModalTitle>
+        <StyledModalContent>
+          <ModalTitle>{props.isPatchMappingOperation ? t('mapping-modal.edit-mapping') : t('mapping-modal.add-mapping')}</ModalTitle>
           {false && isErrorBarVisible &&
               <ValidationErrorBar hideErrorBarCallback={() => setIsErrorBarVisible(false)}
                                   mappingNodes={mappingNodes}
                                   mappingFunctions={props.mappingFunctions}></ValidationErrorBar>
           }
           <div className="col flex-column d-flex justify-content-between">
-            <div className="row bg-white">
+            <div className="row">
               {/* SOURCE OPERATIONS */}
               <div className="col-4">
-                <NodeListingAccordion nodes={mappingNodes} mappingFunctions={props.mappingFunctions}
-                                      predicateOperationValues={predicateValues}
-                                      accordionCallbackFunction={accordionCallbackFunction}
-                                      isSourceAccordion={true}
-                                      isOneToManyMapping={props.isOneToManyMapping}
-                                      highlightOperation={highlightOperation} showAttributeNames={false}>
-                </NodeListingAccordion>
+                <NodeListingAccordion
+                  nodes={mappingNodes}
+                  mappingFunctions={props.mappingFunctions}
+                  predicateOperationValues={predicateValues}
+                  accordionCallbackFunction={accordionCallbackFunction}
+                  isSourceAccordion={true}
+                  isOneToManyMapping={props.isOneToManyMapping}
+                  highlightOperation={highlightOperation}
+                  showAttributeNames={false}
+                />
               </div>
 
               {/* MID COLUMN */}
-              <div className="col-4 d-flex flex-column bg-light-blue">
-                <MidColumnWrapper>
-                  <div><Dropdown className='mt-2 node-info-dropdown'
-                                 labelText="Mapping operation"
-                                 ref={onMappingFunctionRefChange}
-                                 visualPlaceholder="Operation not selected"
-                                 value={mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id}
-                                 onChange={(newValue) => updateMappingOperationSelection(newValue)}
+              <MidColumnWrapper className="col-4 d-flex flex-column">
+                <div>
+                  <Dropdown
+                    className='mt-2 node-info-dropdown'
+                    labelText={t('mapping-modal.mapping-operation')}
+                    ref={onMappingFunctionRefChange}
+                    visualPlaceholder={t('mapping-modal.operation-not-selected')}
+                    value={mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id}
+                    onChange={(newValue) => updateMappingOperationSelection(newValue)}
                   >
-                    {mappingFunctions?.map((rt) => (
+                    {mappingFunctions?.map((rt : {uri: string; name: string}) => (
                       <DropdownItem key={rt.uri} value={rt.uri}>
                         {rt.name}
                       </DropdownItem>
                     ))}
-                  </Dropdown></div>
-                  {generateMappingOperationFields(mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id)}
+                  </Dropdown>
+                </div>
+                {generateMappingOperationFields(mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id)}
 
-                  <div>
-                    <br/>
-                    <Dropdown
-                      className="mt-2 mb-4 node-info-dropdown"
-                      labelText="Predicate"
-                      visualPlaceholder="Exact match"
-                      value={predicateValue}
-                      ref={onPredicateRefChange}
-                      autoFocus
-                      //defaultValue={mappingNodes ? mappingNodes[0].predicate : ''}
-                      onChange={(newValue) => {
-                        setPredicateValue(newValue)
-                      }
-                      }
-                    >
-                      {predicateValues.map((rt) => (
-                        <DropdownItem key={rt.id} value={rt.id}>
-                          {rt.name}
-                        </DropdownItem>
-                      ))}
-                    </Dropdown>
-
-                  </div>
-                  <Textarea
-                    onChange={(event) => setNotesValue(event.target.value)}
-                    labelText="Notes"
-                    visualPlaceholder="No notes set. Add free form notes here."
-                    value={notesValue}
-                  />
+                <div>
                   <br/>
-                </MidColumnWrapper>
-              </div>
+                  <Dropdown
+                    className="mt-2 mb-4 node-info-dropdown"
+                    labelText={t('mapping-modal.predicate')}
+                    visualPlaceholder={t('mapping-modal.exact-match')}
+                    value={predicateValue}
+                    ref={onPredicateRefChange}
+                    // autoFocus
+                    //defaultValue={mappingNodes ? mappingNodes[0].predicate : ''}
+                    onChange={(newValue) => {
+                      setPredicateValue(newValue);
+                    }}
+                  >
+                    {predicateValues.map((rt) => (
+                      <DropdownItem key={rt.id} value={rt.id}>
+                        {rt.name}
+                      </DropdownItem>
+                    ))}
+                  </Dropdown>
+
+                </div>
+                <Textarea
+                  onChange={(event) => setNotesValue(event.target.value)}
+                  labelText={t('mapping-modal.notes')}
+                  visualPlaceholder={t('mapping-modal.no-notes-set')}
+                  value={notesValue}
+                />
+                <br/>
+              </MidColumnWrapper>
 
               {/* TARGET OPERATIONS */}
               <div className="col-4">
-                <NodeListingAccordion nodes={mappingNodes} mappingFunctions={props.mappingFunctions}
-                                      predicateOperationValues={predicateValues}
-                                      accordionCallbackFunction={accordionCallbackFunction}
-                                      isSourceAccordion={false}
-                                      isOneToManyMapping={props.isOneToManyMapping}
-                                      highlightOperation={highlightOperation}
-                                      showAttributeNames={false}
-                ></NodeListingAccordion>
+                <NodeListingAccordion
+                  nodes={mappingNodes}
+                  mappingFunctions={props.mappingFunctions}
+                  predicateOperationValues={predicateValues}
+                  accordionCallbackFunction={accordionCallbackFunction}
+                  isSourceAccordion={false}
+                  isOneToManyMapping={props.isOneToManyMapping}
+                  highlightOperation={highlightOperation}
+                  showAttributeNames={false}
+                />
               </div>
             </div>
           </div>
-        </ModalContent>
+        </StyledModalContent>
         <ModalFooter>
-          <Button disabled={sourceOperationValueErrors.length > 0} style={{height: 'min-content'}}
-                  onClick={() => save()}>
-            {'Save'}
+          <Button
+            disabled={sourceOperationValueErrors.length > 0}
+            style={{height: 'min-content'}}
+            onClick={() => save()}
+          >
+            {t('action.save')}
           </Button>
           <Button
             style={{height: 'min-content'}}
             variant="secondary"
             onClick={() => closeModal()}
           >
-            {'Cancel'}
+            {t('action.cancel')}
           </Button>
         </ModalFooter>
-      </Modal>
+      </StyledModal>
     </>
   );
 }

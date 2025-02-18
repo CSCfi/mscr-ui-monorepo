@@ -21,11 +21,10 @@ import {
   PopoverNavigationMenu,
 } from './side-navigation.styles';
 import { useTranslation } from 'next-i18next';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { MscrUser } from '@app/common/interfaces/mscr-user.interface';
 import getOrganizations from '@app/common/utils/get-organizations';
-import { SearchContext } from '@app/common/components/search-context-provider';
 import { useStoreDispatch } from '@app/store';
 import { useSelector } from 'react-redux';
 import {
@@ -33,11 +32,12 @@ import {
   setIsSideNavigationMinimized,
 } from '@app/common/components/navigation/navigation.slice';
 import { resetContentView } from '@app/common/components/content-view/content-view.slice';
+import useUrlState from '@app/common/utils/hooks/use-url-state';
 
 export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
   const { breakpoint } = useBreakpoints();
   const { t } = useTranslation('common');
-  const { setIsSearchActive } = useContext(SearchContext);
+  const { resetUrlState } = useUrlState();
   const router = useRouter();
   const lang = router.locale ?? '';
   const dispatch = useStoreDispatch();
@@ -61,7 +61,7 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
     if (isPersonal) {
       setOpenGroup([]);
     }
-    setIsSearchActive(false);
+    resetUrlState();
     dispatch(resetContentView());
   };
 
@@ -106,12 +106,12 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
               subLevel={3}
               selected={router.asPath.startsWith(personalCrosswalksPath)}
               content={
-                <Link href={personalCrosswalksPath} passHref>
-                  <RouterLink
-                    onClick={() => handleNavigate(true)}
-                  >
-                    {t('workspace.crosswalks')}
-                  </RouterLink>
+                <Link
+                  onClick={() => handleNavigate(true)}
+                  href={personalCrosswalksPath}
+                  passHref
+                >
+                  <RouterLink>{t('workspace.crosswalks')}</RouterLink>
                 </Link>
               }
             />
@@ -120,12 +120,12 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
               subLevel={3}
               selected={router.asPath.startsWith(personalSchemasPath)}
               content={
-                <Link href={personalSchemasPath} passHref>
-                  <RouterLink
-                    onClick={() => handleNavigate(true)}
-                  >
-                    {t('workspace.schemas')}
-                  </RouterLink>
+                <Link
+                  onClick={() => handleNavigate(true)}
+                  href={personalSchemasPath}
+                  passHref
+                >
+                  <RouterLink>{t('workspace.schemas')}</RouterLink>
                 </Link>
               }
             />
@@ -161,10 +161,12 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
                   '/' + group.id + '/crosswalks'
                 )}
                 content={
-                  <Link href={'/' + group.id + '/crosswalks'} passHref>
-                    <RouterLink onClick={() => handleNavigate()}>
-                      {t('workspace.crosswalks')}
-                    </RouterLink>
+                  <Link
+                    onClick={() => handleNavigate()}
+                    href={'/' + group.id + '/crosswalks'}
+                    passHref
+                  >
+                    <RouterLink>{t('workspace.crosswalks')}</RouterLink>
                   </Link>
                 }
               />
@@ -173,10 +175,12 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
                 subLevel={3}
                 selected={router.asPath.startsWith('/' + group.id + '/schemas')}
                 content={
-                  <Link href={'/' + group.id + '/schemas'} passHref>
-                    <RouterLink onClick={() => handleNavigate()}>
-                      {t('workspace.schemas')}
-                    </RouterLink>
+                  <Link
+                    onClick={() => handleNavigate()}
+                    href={'/' + group.id + '/schemas'}
+                    passHref
+                  >
+                    <RouterLink>{t('workspace.schemas')}</RouterLink>
                   </Link>
                 }
               />
@@ -204,19 +208,21 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
             buttonText="P"
             iconRight={<IconChevronDown />}
           >
-            <ActionMenuItem
-              key="crosswalks"
-              onClick={() => handleNavigate(true)}
-            >
-              <Link href={personalCrosswalksPath} passHref>
+            <ActionMenuItem key="crosswalks">
+              <Link
+                onClick={() => handleNavigate(true)}
+                href={personalCrosswalksPath}
+                passHref
+              >
                 {t('workspace.crosswalks')}
               </Link>
             </ActionMenuItem>
-            <ActionMenuItem
-              key="schemas"
-              onClick={() => handleNavigate(true)}
-            >
-              <Link href={personalSchemasPath} passHref>
+            <ActionMenuItem key="schemas">
+              <Link
+                onClick={() => handleNavigate(true)}
+                href={personalSchemasPath}
+                passHref
+              >
                 {t('workspace.schemas')}
               </Link>
             </ActionMenuItem>
@@ -232,25 +238,27 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
                   buttonText={group.label.substring(0, 2).toUpperCase()}
                   iconRight={<IconChevronDown />}
                 >
-                  <ActionMenuItem
-                    key={`${group.id}-crosswalks`}
-                    onClick={() => {
-                      handleNavigate();
-                      setOpenGroup([group.id]);
-                    }}
-                  >
-                    <Link href={`/${group.id}/crosswalks`} passHref>
+                  <ActionMenuItem key={`${group.id}-crosswalks`}>
+                    <Link
+                      onClick={() => {
+                        handleNavigate();
+                        setOpenGroup([group.id]);
+                      }}
+                      href={`/${group.id}/crosswalks`}
+                      passHref
+                    >
                       {t('workspace.crosswalks')}
                     </Link>
                   </ActionMenuItem>
-                  <ActionMenuItem
-                    key={`${group.id}-schemas`}
-                    onClick={() => {
-                      handleNavigate();
-                      setOpenGroup([group.id]);
-                    }}
-                  >
-                    <Link href={`/${group.id}/schemas`} passHref>
+                  <ActionMenuItem key={`${group.id}-schemas`}>
+                    <Link
+                      onClick={() => {
+                        handleNavigate();
+                        setOpenGroup([group.id]);
+                      }}
+                      href={`/${group.id}/schemas`}
+                      passHref
+                    >
                       {t('workspace.schemas')}
                     </Link>
                   </ActionMenuItem>

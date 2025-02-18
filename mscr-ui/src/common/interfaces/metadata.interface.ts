@@ -30,6 +30,7 @@ export interface Metadata {
   namespace?: string;
   prefix?: string;
   fileMetadata?: FileData[];
+  sourceURL?: string;
 }
 
 export interface FileData {
@@ -37,7 +38,7 @@ export interface FileData {
   contentType?: string;
   size?: number;
   fileID: number;
-  name?: string;
+  filename?: string;
 }
 
 export interface MetadataFormType {
@@ -46,6 +47,7 @@ export interface MetadataFormType {
   contact: string;
   versionLabel: string;
   visibility: string;
+  namespace: string;
 }
 
 export const initialMetadataForm: MetadataFormType = {
@@ -54,4 +56,5 @@ export const initialMetadataForm: MetadataFormType = {
   contact: '',
   versionLabel: '',
   visibility: '',
+  namespace: '',
 };

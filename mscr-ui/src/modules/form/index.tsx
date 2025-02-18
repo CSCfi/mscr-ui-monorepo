@@ -18,6 +18,7 @@ import { useTranslation } from 'next-i18next';
 import getApiError from '@app/common/utils/getApiErrors';
 import { useRouter } from 'next/router';
 import {
+  usePutMscrSchemaRevisionMutation,
   usePutSchemaFullMutation,
   usePutSchemaMscrCopyMutation,
   usePutSchemaRevisionMutation,
@@ -30,10 +31,7 @@ import {
   Format,
 } from '@app/common/interfaces/format.interface';
 import FileDropAreaMscr from '@app/common/components/file-drop-area-mscr';
-import SpinnerOverlay, {
-  delay,
-  SpinnerType,
-} from '@app/common/components/spinner-overlay';
+import SpinnerOverlay, { delay } from '@app/common/components/spinner-overlay';
 import { Schema } from '@app/common/interfaces/schema.interface';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
 import { useStoreDispatch } from '@app/store';
@@ -58,13 +56,14 @@ import { NotificationKeys } from '@app/common/interfaces/notifications.interface
 import { InputErrors, validateForm } from '@app/modules/form/validate-form';
 import generatePayload from '@app/modules/form/generate-payload';
 import { resetContentView } from '@app/common/components/content-view/content-view.slice';
+import { CloseButton } from '@app/modules/form/form.styles';
 
 export enum ModalType {
   RegisterNewFull = 'REGISTER_NEW_FULL',
   RegisterNewMscr = 'REGISTER_NEW_MSCR',
   RevisionFull = 'REVISION_FULL',
   RevisionMscr = 'REVISION_MSCR',
-  McsrCopy = 'MSCR_COPY',
+  MscrCopy = 'MSCR_COPY',
 }
 
 interface FormModalProps {
@@ -102,6 +101,8 @@ export default function FormModal({
   const [putCrosswalkFull, resultCrosswalkFull] = usePutCrosswalkFullMutation();
   const [putSchemaRevision, resultSchemaRevision] =
     usePutSchemaRevisionMutation();
+  const [putMscrSchemaRevision, resultMscrSchemaRevision] =
+    usePutMscrSchemaRevisionMutation();
   const [putCrosswalkRevision, resultCrosswalkRevision] =
     usePutCrosswalkRevisionMutation();
   const [putCrosswalkFullRevision, resultCrosswalkFullRevision] =
@@ -110,12 +111,11 @@ export default function FormModal({
     usePutSchemaMscrCopyMutation();
   const [submitAnimationVisible, setSubmitAnimationVisible] =
     useState<boolean>(false);
-
   const formDataFromInitialData = useCallback(() => {
     if (!initialData) return;
-    const existingData: FormType = {
+  const existingData: FormType = {
       format:
-        modalType == ModalType.McsrCopy ? Format.Mscr : initialData.format,
+        modalType == ModalType.MscrCopy ? Format.Mscr : initialData.format,
       languages: [
         {
           labelText: t('language-english-with-suffix'),
@@ -204,6 +204,12 @@ export default function FormModal({
             resultCrosswalkRevision.data
           ) {
             pid = resultCrosswalkRevision.data.pid;
+          } else if (
+            contentType == Type.Schema &&
+            resultMscrSchemaRevision.isSuccess &&
+            resultMscrSchemaRevision.data
+          ) {
+            pid = resultMscrSchemaRevision.data.pid;
           }
           break;
         case ModalType.RevisionFull:
@@ -221,7 +227,7 @@ export default function FormModal({
             pid = resultSchemaRevision.data.pid;
           }
           break;
-        case ModalType.McsrCopy:
+        case ModalType.MscrCopy:
           if (
             contentType == Type.Schema &&
             resultSchemaMscrCopy.isSuccess &&
@@ -249,6 +255,8 @@ export default function FormModal({
       resultSchemaMscrCopy.isSuccess,
       resultSchemaRevision.data,
       resultSchemaRevision.isSuccess,
+      resultMscrSchemaRevision.data,
+      resultMscrSchemaRevision.isSuccess,
     ]
   );
 
@@ -275,7 +283,7 @@ export default function FormModal({
           case ModalType.RevisionMscr:
             notificationKey = 'SCHEMA_REVISION';
             break;
-          case ModalType.McsrCopy:
+          case ModalType.MscrCopy:
             notificationKey = 'SCHEMA_COPY';
         }
       } else {
@@ -289,7 +297,7 @@ export default function FormModal({
           case ModalType.RevisionMscr:
             notificationKey = 'CROSSWALK_REVISION';
             break;
-          case ModalType.McsrCopy:
+          case ModalType.MscrCopy:
             notificationKey = 'CROSSWALK_COPY';
         }
       }
@@ -327,6 +335,7 @@ export default function FormModal({
       fileData,
       fileUri
     );
+
     setErrors(formErrors);
 
     if (
@@ -345,6 +354,7 @@ export default function FormModal({
         modalType,
         organizationPid
       );
+
       const newFormData = new FormData();
       newFormData.append('metadata', JSON.stringify(payload));
       if (fileUri && fileUri.length > 0) {
@@ -354,7 +364,6 @@ export default function FormModal({
       } else if (formData.format !== Format.Mscr) {
         return;
       }
-
       // Choose the api call and parameters according to content type and modal type
       let makeApiCall;
       if (modalType == ModalType.RegisterNewFull) {
@@ -366,6 +375,7 @@ export default function FormModal({
           }
         );
       } else if (modalType == ModalType.RegisterNewMscr) {
+        //what is register new MSCR?
         Promise.all([spinnerDelay(), putCrosswalk(payload)]).then((_values) => {
           setSubmitAnimationVisible(false);
         });
@@ -382,7 +392,7 @@ export default function FormModal({
         });
       } else if (
         initialData &&
-        modalType == ModalType.McsrCopy &&
+        modalType == ModalType.MscrCopy &&
         contentType == Type.Schema
       ) {
         Promise.all([
@@ -402,8 +412,20 @@ export default function FormModal({
         ]).then((_values) => {
           setSubmitAnimationVisible(false);
         });
+        // Creating revision of MSCR format schemas
+      } else if (
+        initialData &&
+        modalType == ModalType.RevisionMscr &&
+        contentType == Type.Schema
+      ) {
+        Promise.all([
+          spinnerDelay(),
+          putMscrSchemaRevision({ pid: initialData.pid, data: payload }),
+        ]).then((_values) => {
+          setSubmitAnimationVisible(false);
+        });
       }
-      // Missing scenarios: MSCR copy of a crosswalk, revision of an MSCR copy
+      // Missing scenarios: MSCR copy of a crosswalk
     }
   };
 
@@ -551,59 +573,32 @@ export default function FormModal({
       visible={visible}
       onEscKeyDown={() => handleClose()}
       variant={isSmall ? 'smallScreen' : 'default'}
+      style={{ position: 'relative' }}
     >
+      <CloseButton
+        variant="secondaryNoBorder"
+        icon={<IconClose />}
+        aria-label="t('cancel')"
+        onClick={() => handleClose()}
+      />
+      <SpinnerOverlay animationVisible={submitAnimationVisible} />
       <ModalContent>
-        <>
-          {submitAnimationVisible && (
-            <SpinnerOverlay
-              animationVisible={submitAnimationVisible}
-              type={
-                // Picking the right scaling breakpoints for the spinner
-                // Todo: differentiate crosswalk revision with and without file upload
-                // Todo: mscr copy type
-                contentType == Type.Schema
-                  ? modalType == ModalType.RegisterNewFull
-                    ? SpinnerType.SchemaRegistrationModal
-                    : SpinnerType.SchemaRevisionModal
-                  : modalType == ModalType.RegisterNewFull
-                  ? SpinnerType.CrosswalkRegistrationModal
-                  : modalType == ModalType.RegisterNewMscr
-                  ? SpinnerType.CrosswalkCreationModal
-                  : SpinnerType.CrosswalkRevisionModal
-              }
-            ></SpinnerOverlay>
-          )}
-        </>
         <div id={'modalTop'}></div>
-
-        <div className="row">
-          <div className="col-8">
-            <ModalTitle>
-              {contentType == Type.Schema
-                ? modalType == ModalType.RegisterNewFull
-                  ? t('content-form.title.schema-register')
-                  : modalType == ModalType.McsrCopy
-                  ? t('content-form.title.schema-mscr-copy')
-                  : t('content-form.title.schema-revision')
-                : modalType == ModalType.RegisterNewFull
-                ? t('content-form.title.crosswalk-register')
-                : modalType == ModalType.RegisterNewMscr
-                ? t('content-form.title.crosswalk-create')
-                : modalType == ModalType.McsrCopy
-                ? t('content-form.title.crosswalk-mscr-copy')
-                : t('content-form.title.crosswalk-revision')}
-            </ModalTitle>
-          </div>
-          <div className="col-4">
-            <Button
-              style={{ float: 'right' }}
-              variant="secondaryNoBorder"
-              icon={<IconClose />}
-              aria-label="t('cancel')"
-              onClick={() => handleClose()}
-            ></Button>
-          </div>
-        </div>
+        <ModalTitle>
+          {contentType == Type.Schema
+            ? modalType == ModalType.RegisterNewFull
+              ? t('content-form.title.schema-register')
+              : modalType == ModalType.MscrCopy
+              ? t('content-form.title.schema-mscr-copy')
+              : t('content-form.title.schema-revision')
+            : modalType == ModalType.RegisterNewFull
+            ? t('content-form.title.crosswalk-register')
+            : modalType == ModalType.RegisterNewMscr
+            ? t('content-form.title.crosswalk-create')
+            : modalType == ModalType.MscrCopy
+            ? t('content-form.title.crosswalk-mscr-copy')
+            : t('content-form.title.crosswalk-revision')}
+        </ModalTitle>
 
         {(modalType == ModalType.RegisterNewFull ||
           modalType == ModalType.RevisionFull) &&
@@ -622,7 +617,7 @@ export default function FormModal({
             hasInitialData={
               modalType == ModalType.RevisionMscr ||
               modalType == ModalType.RevisionFull ||
-              modalType == ModalType.McsrCopy
+              modalType == ModalType.MscrCopy
             }
           />
         )}
@@ -634,7 +629,7 @@ export default function FormModal({
             hasInitialData={
               modalType == ModalType.RevisionMscr ||
               modalType == ModalType.RevisionFull ||
-              modalType == ModalType.McsrCopy
+              modalType == ModalType.MscrCopy
             }
             userPosted={userPosted}
             disabled={
@@ -656,19 +651,19 @@ export default function FormModal({
           {contentType == Type.Schema
             ? modalType == ModalType.RegisterNewFull
               ? t('content-form.button.schema-register')
-              : modalType == ModalType.McsrCopy
+              : modalType == ModalType.MscrCopy
               ? t('content-form.button.mscr-copy')
               : t('content-form.button.schema-revision')
             : modalType == ModalType.RegisterNewFull
             ? t('content-form.button.crosswalk-register')
             : modalType == ModalType.RegisterNewMscr
             ? t('content-form.button.crosswalk-create')
-            : modalType == ModalType.McsrCopy
+            : modalType == ModalType.MscrCopy
             ? t('content-form.button.mscr-copy')
             : t('content-form.button.crosswalk-revision')}
         </Button>
         <Button variant="secondary" onClick={() => handleClose()}>
-          {t('cancel')}
+          {userPosted ? t('close') : t('cancel')}
         </Button>
       </ModalFooter>
     </Modal>
