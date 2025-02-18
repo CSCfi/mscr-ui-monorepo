@@ -4,7 +4,7 @@ import {
   useGetPublicSchemasQuery,
   useGetSchemaQuery,
 } from '@app/common/components/schema/schema.slice';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { MscrSearchResult, MscrSearchResults } from '@app/common/interfaces/search.interface';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
@@ -93,6 +93,7 @@ export default function TargetAndSourceSchemaSelector({
   const [defaultSchemas, setDefaultSchemas] = useState(
     Array<SelectableSchema>()
   );
+  const [personalSchemas, setPersonalSchemas] = useState(Array<SelectableSchema>());
   const [sourceSchemas, setSourceSchemas] = useState(Array<SelectableSchema>());
   const [targetSchemas, setTargetSchemas] = useState(Array<SelectableSchema>());
 
@@ -141,59 +142,7 @@ export default function TargetAndSourceSchemaSelector({
     },
   ];
 
-  useEffect(() => {
-    const fetchedSchemas: SelectableSchema[] = optionsFromSchemas(data);
-    setDefaultSchemas(fetchedSchemas);
-    setSourceSchemas(fetchedSchemas);
-    setTargetSchemas(fetchedSchemas);
-    setDataLoaded(true);
-    setSelectedSourceWorkspace('all');
-    setSelectedTargetWorkspace('all');
-
-    if (router.asPath.includes('personal')) {
-      setWorkspaceValues([...workspaceValuesPersonalCrosswalks]);
-    } else {
-      setWorkspaceValues([...workspaceValuesGroupCrosswalks]);
-    }
-  }, [data?.hits.hits, isSuccess, lang]);
-
-  useEffect(() => {
-    if (selectedSourceWorkspace === 'all') {
-      setSourceSchemas(defaultSchemas);
-    } else if (selectedSourceWorkspace === 'personalWorkspace') {
-      setSourceSchemas(
-        optionsFromSchemas(dataWithDrafts).filter((item) => item.owner.includes(user.id))
-      );
-    } else {
-      setSourceSchemas(
-        defaultSchemas.filter((item) => {
-          if (groupWorkspacePid) {
-            return item.organizationIds.includes(groupWorkspacePid);
-          }
-        })
-      );
-    }
-  }, [selectedSourceWorkspace, groupWorkspacePid]);
-
-  useEffect(() => {
-    if (selectedTargetWorkspace === 'all') {
-      setTargetSchemas(defaultSchemas);
-    } else if (selectedTargetWorkspace === 'personalWorkspace') {
-      setTargetSchemas(
-        optionsFromSchemas(dataWithDrafts).filter((item) => item.owner.includes(user.id))
-      );
-    } else {
-      setTargetSchemas(
-        defaultSchemas.filter((item) => {
-          if (groupWorkspacePid) {
-            return item.organizationIds.includes(groupWorkspacePid);
-          }
-        })
-      );
-    }
-  }, [selectedTargetWorkspace, groupWorkspacePid]);
-
-  function optionsFromSchemas(schemaData?: MscrSearchResults) {
+  const optionsFromSchemas = useCallback((schemaData?: MscrSearchResults) => {
     if (!schemaData) return [];
     const schemaOptions: SelectableSchema[] = [];
     schemaData?.hits.hits.forEach((item: MscrSearchResult) => {
@@ -217,7 +166,63 @@ export default function TargetAndSourceSchemaSelector({
       schemaOptions.push(schema);
     });
     return schemaOptions;
-  }
+  }, [lang]);
+
+  useEffect(() => {
+    const fetchedSchemas: SelectableSchema[] = optionsFromSchemas(data);
+    setDefaultSchemas(fetchedSchemas);
+    setSourceSchemas(fetchedSchemas);
+    setTargetSchemas(fetchedSchemas);
+    setDataLoaded(true);
+    setSelectedSourceWorkspace('all');
+    setSelectedTargetWorkspace('all');
+
+    if (router.asPath.includes('personal')) {
+      setWorkspaceValues([...workspaceValuesPersonalCrosswalks]);
+    } else {
+      setWorkspaceValues([...workspaceValuesGroupCrosswalks]);
+    }
+  }, [data?.hits.hits, isSuccess, lang]);
+
+  useEffect(() => {
+    setPersonalSchemas(optionsFromSchemas(dataWithDrafts));
+  }, [dataWithDrafts, optionsFromSchemas]);
+
+  useEffect(() => {
+    if (selectedSourceWorkspace === 'all') {
+      setSourceSchemas(defaultSchemas);
+    } else if (selectedSourceWorkspace === 'personalWorkspace') {
+      setSourceSchemas(
+        personalSchemas.filter((item) => item.owner.includes(user.id))
+      );
+    } else {
+      setSourceSchemas(
+        defaultSchemas.filter((item) => {
+          if (groupWorkspacePid) {
+            return item.organizationIds.includes(groupWorkspacePid);
+          }
+        })
+      );
+    }
+  }, [selectedSourceWorkspace, groupWorkspacePid, defaultSchemas, personalSchemas, user.id]);
+
+  useEffect(() => {
+    if (selectedTargetWorkspace === 'all') {
+      setTargetSchemas(defaultSchemas);
+    } else if (selectedTargetWorkspace === 'personalWorkspace') {
+      setTargetSchemas(
+        personalSchemas.filter((item) => item.owner.includes(user.id))
+      );
+    } else {
+      setTargetSchemas(
+        defaultSchemas.filter((item) => {
+          if (groupWorkspacePid) {
+            return item.organizationIds.includes(groupWorkspacePid);
+          }
+        })
+      );
+    }
+  }, [selectedTargetWorkspace, groupWorkspacePid, defaultSchemas, personalSchemas, user.id]);
 
   function setSource(selectedSchemaId: string | null) {
     setFormData({
