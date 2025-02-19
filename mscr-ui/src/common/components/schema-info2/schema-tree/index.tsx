@@ -1,0 +1,84 @@
+import * as React from 'react';
+import TreeView from '@mui/lab/TreeView';
+import TreeItem from '@mui/lab/TreeItem';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { useTranslation } from 'next-i18next';
+import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
+
+function toTree(nodes: RenderTree, showQname: boolean) {
+  let ret = undefined;
+  if (Array.isArray(nodes)) {
+    return nodes.map((node) => {
+      return (
+        <TreeItem
+          key={node.visualTreeId}
+          nodeId={node.id}
+          label={showQname ? node.qname : node.name}
+          className="linked-tree-item"
+        >
+          {Array.isArray(node.children)
+            ? node.children.map((node: RenderTree) => toTree(node, showQname))
+            : null}
+        </TreeItem>
+      );
+    });
+  } else {
+    ret = (
+      <TreeItem
+        key={nodes.visualTreeId}
+        nodeId={nodes.id}
+        label={showQname ? nodes.qname : nodes.name}
+        className="linked-tree-item"
+      >
+        {Array.isArray(nodes.children)
+          ? nodes.children.map((node: RenderTree) => toTree(node, showQname))
+          : null}
+      </TreeItem>
+    );
+    return ret;
+  }
+}
+
+export default function SchemaTree({
+                                     nodes,
+                                     treeSelectedArray,
+                                     treeExpanded,
+                                     performTreeAction,
+                                     showQname,
+                                     isSourceTree,
+                                   }: {
+  nodes: RenderTree[];
+  treeSelectedArray: string[];
+  treeExpanded: string[];
+  performTreeAction: (action: string, nodeIds: string[]) => void;
+  showQname: boolean;
+  isSourceTree: boolean | undefined;
+}) {
+  const { t } = useTranslation('common');
+
+  const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
+    performTreeAction('handleSelect', nodeIds);
+  };
+
+  const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
+    performTreeAction('treeToggle', nodeIds);
+  };
+
+  // console.log('TREEVIEW DATA', nodes, treeSelectedArray);
+  return (
+    <TreeView
+      id={isSourceTree ? 'source' : 'target'}
+      aria-label={t('schema-tree.tree-label')}
+      expanded={treeExpanded}
+      selected={treeSelectedArray}
+      onNodeSelect={handleSelect}
+      onNodeToggle={handleToggle}
+      defaultCollapseIcon={<ExpandMoreIcon />}
+      defaultExpandIcon={<ChevronRightIcon />}
+      multiSelect
+    >
+      {nodes.map((node: RenderTree) => toTree(node, showQname))}
+    </TreeView>
+  );
+}
