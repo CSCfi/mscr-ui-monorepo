@@ -23,9 +23,11 @@ import {cloneDeep} from 'lodash';
 import {useRef} from 'react';
 import {highlightOperation} from "@app/modules/crosswalk-editor/mappings-accordion";
 import { useTranslation } from 'next-i18next';
+import { SubType } from '@app/common/interfaces/crosswalk.interface';
 
 export default function NodeMappings(props: {
   nodeSelections: CrosswalkConnectionNew[];
+  crosswalkSubType: SubType;
   performMappingsModalAction: any;
   mappingFilters: any;
   mappingFunctions: any;
@@ -505,6 +507,7 @@ export default function NodeMappings(props: {
                   accordionCallbackFunction={accordionCallbackFunction}
                   isSourceAccordion={true}
                   isOneToManyMapping={props.isOneToManyMapping}
+                  isDataCrosswalk={props.crosswalkSubType == SubType.DataCrosswalk}
                   highlightOperation={highlightOperation}
                   showAttributeNames={false}
                 />
@@ -512,26 +515,26 @@ export default function NodeMappings(props: {
 
               {/* MID COLUMN */}
               <MidColumnWrapper className="col-4 d-flex flex-column">
-                <div>
-                  <Dropdown
-                    className='mt-2 node-info-dropdown'
-                    labelText={t('mapping-modal.mapping-operation')}
-                    ref={onMappingFunctionRefChange}
-                    visualPlaceholder={t('mapping-modal.operation-not-selected')}
-                    value={mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id}
-                    onChange={(newValue) => updateMappingOperationSelection(newValue)}
-                  >
-                    {mappingFunctions?.map((rt : {uri: string; name: string}) => (
-                      <DropdownItem key={rt.uri} value={rt.uri}>
-                        {rt.name}
-                      </DropdownItem>
-                    ))}
-                  </Dropdown>
-                </div>
-                {generateMappingOperationFields(mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id)}
-
-                <div>
-                  <br/>
+                {props.crosswalkSubType == SubType.DataCrosswalk &&
+                  <>
+                    <Dropdown
+                      className='mt-2 mb-4 node-info-dropdown'
+                      labelText={t('mapping-modal.mapping-operation')}
+                      ref={onMappingFunctionRefChange}
+                      visualPlaceholder={t('mapping-modal.operation-not-selected')}
+                      value={mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id}
+                      onChange={(newValue) => updateMappingOperationSelection(newValue)}
+                    >
+                      {mappingFunctions?.map((rt : {uri: string; name: string}) => (
+                        <DropdownItem key={rt.uri} value={rt.uri}>
+                          {rt.name}
+                        </DropdownItem>
+                      ))}
+                    </Dropdown>
+                    {generateMappingOperationFields(mappingOperationSelection ? mappingOperationSelection : props.nodeSelections[0]?.processing?.id)}
+                  </>
+                }
+                {[SubType.SemanticMapping, SubType.SemanticAnnotation].includes(props.crosswalkSubType) &&
                   <Dropdown
                     className="mt-2 mb-4 node-info-dropdown"
                     labelText={t('mapping-modal.predicate')}
@@ -550,15 +553,13 @@ export default function NodeMappings(props: {
                       </DropdownItem>
                     ))}
                   </Dropdown>
-
-                </div>
+                }
                 <Textarea
                   onChange={(event) => setNotesValue(event.target.value)}
                   labelText={t('mapping-modal.notes')}
                   visualPlaceholder={t('mapping-modal.no-notes-set')}
                   value={notesValue}
                 />
-                <br/>
               </MidColumnWrapper>
 
               {/* TARGET OPERATIONS */}
@@ -570,6 +571,7 @@ export default function NodeMappings(props: {
                   accordionCallbackFunction={accordionCallbackFunction}
                   isSourceAccordion={false}
                   isOneToManyMapping={props.isOneToManyMapping}
+                  isDataCrosswalk={props.crosswalkSubType == SubType.DataCrosswalk}
                   highlightOperation={highlightOperation}
                   showAttributeNames={false}
                 />

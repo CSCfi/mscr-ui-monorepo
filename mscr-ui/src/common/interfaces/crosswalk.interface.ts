@@ -18,6 +18,7 @@ export interface Crosswalk extends Metadata {
   targetSchemaInfo: {
     format: Format;
   };
+  subType: SubType;
   owner?: string[]; // Added owner for checking permission
 }
 
@@ -54,4 +55,10 @@ export interface FilesRow {
   added: any;
   format: any;
   file: any;
+}
+
+export enum SubType {
+  SemanticMapping = 'SEMANTIC_MAPPING',
+  SemanticAnnotation = 'SEMANTIC_ANNOTATION',
+  DataCrosswalk = 'DATA_CROSSWALK'
 }

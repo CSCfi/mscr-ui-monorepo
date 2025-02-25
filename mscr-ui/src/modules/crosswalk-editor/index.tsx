@@ -230,7 +230,7 @@ export default function CrosswalkEditor({
         }
       }
     }
-    
+
     if (isSourceTree) {
       setSelectedSourceNodes(nodeIds);
       if (isPatchMappingOperation) {
@@ -341,6 +341,7 @@ export default function CrosswalkEditor({
       {mappingToBeEdited && (
         <NodeMappingsModal
           nodeSelections={mappingToBeEdited}
+          crosswalkSubType={crosswalkData.subType}
           performMappingsModalAction={performCallbackFromMappingsModal}
           mappingFilters={mappingFilters}
           mappingFunctions={mappingFunctions}
