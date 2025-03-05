@@ -66,8 +66,6 @@ export default function SchemaInfo(props: {
   const [showAttributeNames, setShowAttributeNames] = useState(true);
   const [treeDataOriginal, setTreeDataOriginal] = useState<RenderTree[]>([]);
 
-  const [modalOpen, setModalOpen] = useState(false);
-
   useEffect(() => {
     if (getSchemaData?.content) {
       // Get two different representations of attributes: a tree and a dictionary with keys being the node ids and
@@ -107,27 +105,7 @@ export default function SchemaInfo(props: {
     setSelectedTreeNodes(selectedNodes);
   }, [treeSelectedArray, nodeIdToNodeDictionary]);
 
-  useEffect(() => {
-
-    if (modalOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-
-  }, [modalOpen]);
-
   const modalRef = useRef(null);
-
-
-  const handleClickOutside = (event: Event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
-      setModalOpen(false);
-    }
-  };
 
   const setFullyExpanded = () => {
     const nodeIdsToExpand: string[] = [];
@@ -208,7 +186,6 @@ export default function SchemaInfo(props: {
   }
 
   function handleTreeClick(nodeIds: string[]) {
-    setModalOpen(true);
     setTreeSelectedArray(nodeIds);
     // If there's several nodes with the same id, expand paths to all
     const isMultiple = nodeIds
@@ -228,7 +205,6 @@ export default function SchemaInfo(props: {
   }
 
   function handleTreeToggle(nodeIds: string[]) {
-    setModalOpen(true);
     setTreeExpandedArray(nodeIds);
   }
 
@@ -256,10 +232,6 @@ export default function SchemaInfo(props: {
         });
       }
     }
-  }
-
-  function closeModal() {
-    setModalOpen(false);
   }
 
   // @ts-ignore
@@ -336,7 +308,7 @@ export default function SchemaInfo(props: {
             <Box
               className="px-3 d-flex"
               sx={{
-                height: 460,
+                height: 260,
                 flexGrow: 1,
                 maxWidth: 700,
                 overflowY: 'auto',

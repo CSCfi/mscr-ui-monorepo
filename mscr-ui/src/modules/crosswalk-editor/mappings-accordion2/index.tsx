@@ -465,7 +465,7 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
           />
         </SearchWrapper>
       </div>
-      <AccordionContainer component={Paper} className="gx-0" style={{maxHeight: "600px", overflowY: "auto"}}>
+      <AccordionContainer component={Paper} className="gx-0" style={{maxHeight: "860px", overflowY: "auto"}}>
         <Table aria-label="collapsible table w-100" >
           {mappingData?.length > 0 && (
             <TableBody>

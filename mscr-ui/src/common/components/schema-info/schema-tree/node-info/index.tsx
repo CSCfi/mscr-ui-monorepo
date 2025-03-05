@@ -89,7 +89,7 @@ export default function NodeInfo(props: {
         <Box
           className="bg-wrap"
           sx={{
-            height: 300,
+            height: 150,
             flexGrow: 1,
             maxWidth: 300,
             overflowY: 'auto',

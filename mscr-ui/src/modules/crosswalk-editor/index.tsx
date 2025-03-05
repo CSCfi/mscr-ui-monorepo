@@ -213,21 +213,20 @@ export default function CrosswalkEditor({
           filteredSourceNodeMappings.some(sourceNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
         setFilteredCombinedNodeMappings(result);
       }
-
     } else {
       if (isSourceTree) {
-        setFilteredSourceNodeMappings(nodeMappings);
-        if (_.isEqual(nodeMappings, filteredTargetNodeMappings)) {
-          setFilteredCombinedNodeMappings(nodeMappings);
-        } else {
+        setFilteredSourceNodeMappings([]);
+        if (filteredTargetNodeMappings != null && filteredTargetNodeMappings.length > 0) {
           setFilteredCombinedNodeMappings(filteredTargetNodeMappings);
+        } else {
+          setFilteredCombinedNodeMappings([]);
         }
       } else {
-        setFilteredTargetNodeMappings(nodeMappings);
-        if (_.isEqual(nodeMappings, filteredSourceNodeMappings)) {
-          setFilteredCombinedNodeMappings(nodeMappings);
-        } else {
+        setFilteredTargetNodeMappings([]);
+        if (filteredSourceNodeMappings != null && filteredSourceNodeMappings.length > 0) {
           setFilteredCombinedNodeMappings(filteredSourceNodeMappings);
+        } else {
+          setFilteredCombinedNodeMappings([]);
         }
       }
     }
