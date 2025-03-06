@@ -18,6 +18,7 @@ export interface Crosswalk extends Metadata {
   targetSchemaInfo: {
     format: Format;
   };
+  generatedFileMetadata: GeneratedFile[];
   owner?: string[]; // Added owner for checking permission
 }
 
@@ -47,6 +48,12 @@ export interface CrosswalkFormMockupType {
   targetSchema: string;
   namespace?: string;
   versionLabel?: string;
+}
+
+export interface GeneratedFile {
+  name: string;
+  format: string;
+  url: string;
 }
 
 export interface FilesRow {
