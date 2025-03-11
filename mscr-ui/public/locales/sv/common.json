@@ -233,11 +233,13 @@
     "pid": "",
     "schema-details": "",
     "source-schema": "",
+    "source-schema-id": "",
     "source-url": "",
     "state": "",
     "stub-crosswalk-details": "",
     "stub-schema-details": "",
     "target-schema": "",
+    "target-schema-id": "",
     "version-label": "",
     "versions": "",
     "view": "",
@@ -408,8 +410,8 @@
     },
     "history-tab": "",
     "label": "",
-    "metadata-and-files": "",
     "mapping-accordion-tab": "",
+    "metadata-and-files": "",
     "schema": {
       "content-and-editor-tab": ""
     },

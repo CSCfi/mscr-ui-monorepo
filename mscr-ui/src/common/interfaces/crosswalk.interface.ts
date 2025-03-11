@@ -11,19 +11,24 @@ export interface Crosswalk extends Metadata {
   status?: string | undefined;
   organizations?: string[];
   sourceSchema: string;
-  sourceSchemaInfo: {
-    format: Format;
-  };
+  sourceSchemaInfo: SchemaSummary;
   targetSchema: string;
-  targetSchemaInfo: {
-    format: Format;
-  };
+  targetSchemaInfo: SchemaSummary;
   generatedFileMetadata: GeneratedFile[];
   owner?: string[]; // Added owner for checking permission
 }
 
 export interface CrosswalkWithVersionInfo extends Crosswalk {
   revisions: ContentRevision[];
+}
+
+interface SchemaSummary {
+  id: string;
+  handle: string;
+  name: string;
+  versionLabel: string;
+  versionIndex: number;
+  format: Format;
 }
 
 export interface CrosswalkFormType {
