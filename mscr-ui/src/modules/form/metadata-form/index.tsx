@@ -152,6 +152,16 @@ export default function MetadataForm({
     setFormData(newFormData);
   }
 
+  const isCrosswalk = (metadata: unknown): metadata is CrosswalkWithVersionInfo => {
+    return (
+      type === Type.Crosswalk &&
+      typeof metadata === 'object' &&
+      metadata !== null &&
+      'sourceSchemaInfo' in metadata &&
+      'targetSchemaInfo' in metadata
+    );
+  };
+
   return (
     <MetadataContainer>
       <Grid container>
@@ -225,6 +235,51 @@ export default function MetadataForm({
               )}
             </Grid>
           </MetadataRow>
+
+          {isCrosswalk(metadata) &&
+            <>
+              <MetadataRow container>
+                <Grid item xs={4}>
+                  <MetadataLabel>{t('metadata.source-schema')}:</MetadataLabel>
+                </Grid>
+                <Grid item xs={8}>
+                  <MetadataAttribute>
+                    {metadata.sourceSchemaInfo.name ?? ''}
+                  </MetadataAttribute>
+                </Grid>
+              </MetadataRow>
+              <MetadataRow container>
+                <Grid item xs={4}>
+                  <MetadataLabel>{t('metadata.source-schema-id')}:</MetadataLabel>
+                </Grid>
+                <Grid item xs={8}>
+                  <MetadataAttribute>
+                    {(metadata.sourceSchemaInfo.handle ?? metadata.sourceSchemaInfo.id) ?? ''}
+                  </MetadataAttribute>
+                </Grid>
+              </MetadataRow>
+              <MetadataRow container>
+                <Grid item xs={4}>
+                  <MetadataLabel>{t('metadata.target-schema')}:</MetadataLabel>
+                </Grid>
+                <Grid item xs={8}>
+                  <MetadataAttribute>
+                    {metadata.targetSchemaInfo.name ?? ''}
+                  </MetadataAttribute>
+                </Grid>
+              </MetadataRow>
+              <MetadataRow container>
+                <Grid item xs={4}>
+                  <MetadataLabel>{t('metadata.target-schema-id')}:</MetadataLabel>
+                </Grid>
+                <Grid item xs={8}>
+                  <MetadataAttribute>
+                    {(metadata.targetSchemaInfo.handle ?? metadata.targetSchemaInfo.id) ?? ''}
+                  </MetadataAttribute>
+                </Grid>
+              </MetadataRow>
+            </>
+          }
 
           <MetadataRow container>
             <Grid item xs={4}>

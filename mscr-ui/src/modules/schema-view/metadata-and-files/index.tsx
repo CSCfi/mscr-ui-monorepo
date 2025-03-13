@@ -16,7 +16,7 @@ export default function MetadataAndFiles({
 }) {
 
   const schemaFiles = schemaDetails?.fileMetadata;
-  
+
   return (
     <>
       <MetadataForm
@@ -24,7 +24,6 @@ export default function MetadataAndFiles({
         metadata={schemaDetails}
         refetchMetadata={refetch}
         hasEditPermission={hasEditPermission}
-        isMscrCopyAvailable={isMscrCopyAvailable}
       />
       <MetadataFilesTable
         filesRowInput={schemaFiles}
