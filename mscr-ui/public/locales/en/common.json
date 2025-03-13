@@ -233,11 +233,13 @@
     "pid": "PID",
     "schema-details": "Schema details",
     "source-schema": "Source schema",
+    "source-schema-id": "Source schema ID",
     "source-url": "Source URL",
     "state": "State",
     "stub-crosswalk-details": "Deleted crosswalk",
     "stub-schema-details": "Deleted schema",
     "target-schema": "Target schema",
+    "target-schema-id": "Target schema ID",
     "version-label": "Version label",
     "versions": "Versions",
     "view": "View",
@@ -408,8 +410,8 @@
     },
     "history-tab": "Version history",
     "label": "Content tabs",
-    "metadata-and-files": "Metadata & files",
     "mapping-accordion-tab": "Mapping",
+    "metadata-and-files": "Metadata & files",
     "schema": {
       "content-and-editor-tab": "Schema"
     },
