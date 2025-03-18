@@ -64,7 +64,7 @@ export default function TargetAndSourceSchemaSelector({
 
   const { data, isSuccess } = useGetPublicSchemasQuery(
     { formatRestrictions },
-    { skip: schemaSelectorDisabled || !createNew }
+    { skip: schemaSelectorDisabled }
   );
   const { data: dataWithDrafts } = useGetPublicSchemasQuery(
     { formatRestrictions, includePersonalDrafts: true },
