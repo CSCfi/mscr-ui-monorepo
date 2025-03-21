@@ -438,8 +438,11 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
     setMappingData(nodeMappings);
   }, [nodeMappings]);
 
+  useEffect(() => {
+    setMappingData([]);
+  }, []);
 
-  const nodeMappingsInput = nodeMappings;
+  const nodeMappingsInput = mappingData;
   return (
     <>
 

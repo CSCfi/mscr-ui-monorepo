@@ -97,9 +97,9 @@ export default function CrosswalkEditor({
   }, [crosswalkData]);
 
   useEffect( () => {
-    setFilteredSourceNodeMappings(nodeMappings);
-    setFilteredTargetNodeMappings(nodeMappings);
-    setFilteredCombinedNodeMappings(nodeMappings);
+    setFilteredSourceNodeMappings([]);
+    setFilteredTargetNodeMappings([]);
+    setFilteredCombinedNodeMappings([]);
   }, [nodeMappings]);
 
   function addMappingButtonClick() {
@@ -204,14 +204,22 @@ export default function CrosswalkEditor({
       foundNodeMappings = filterMappingsWithId(nodeMappings, ids, isSourceTree);
       if (isSourceTree) {
         setFilteredSourceNodeMappings(foundNodeMappings);
-        let result = foundNodeMappings.filter(sourceNodeMapping =>
-          filteredTargetNodeMappings.some(targetNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
-        setFilteredCombinedNodeMappings(result);
+        if (filteredTargetNodeMappings && filteredTargetNodeMappings.length > 0) {
+          let result = foundNodeMappings.filter(sourceNodeMapping =>
+            filteredTargetNodeMappings.some(targetNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
+          setFilteredCombinedNodeMappings(result);
+        } else {
+          setFilteredCombinedNodeMappings(foundNodeMappings);
+        }
       } else {
         setFilteredTargetNodeMappings(foundNodeMappings);
-        let result = foundNodeMappings.filter(targetNodeMapping =>
-          filteredSourceNodeMappings.some(sourceNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
-        setFilteredCombinedNodeMappings(result);
+        if (filteredSourceNodeMappings && filteredSourceNodeMappings.length > 0) {
+          let result = foundNodeMappings.filter(targetNodeMapping =>
+            filteredSourceNodeMappings.some(sourceNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
+          setFilteredCombinedNodeMappings(result);
+        } else {
+          setFilteredCombinedNodeMappings(foundNodeMappings);
+        }
       }
     } else {
       if (isSourceTree) {
