@@ -25,6 +25,7 @@ import { MscrUser } from '@app/common/interfaces/mscr-user.interface';
 import SiteInformationModule from '@app/modules/site-information';
 import SearchBar from 'src/modules/search/search-bar';
 import styled from 'styled-components';
+import PrivacyGuide from '@app/modules/privacy-guide';
 
 interface IndexPageProps extends CommonContextState {
   _netI18Next: SSRConfig;
