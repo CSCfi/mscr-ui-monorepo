@@ -8,7 +8,6 @@ import { Organization } from './organizations.interface';
 export interface Schema extends Metadata {
   status?: string;
   organizations: Organization[];
-  owner?: string[];
 }
 
 export interface SchemaWithContent {

@@ -22,8 +22,8 @@ export const MetadataFormContainer = styled(Grid)`
 
 export const MetadataRow = styled(Grid)`
   font-size: 0.9rem;
-  height: 60px;
   margin-top: 8px;
+  padding-right: 2rem;
 `;
 
 export const MetadataLabel = styled.p`

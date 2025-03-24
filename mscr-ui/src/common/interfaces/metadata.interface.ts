@@ -13,8 +13,6 @@ export interface Metadata {
   };
   languages?: string[];
   format: Format;
-  visibility: Visibility;
-  state: State;
   created: string;
   modified: string;
   versionLabel: string;
@@ -27,10 +25,27 @@ export interface Metadata {
   ];
   sourceSchema?: string;
   targetSchema?: string;
-  namespace?: string;
   prefix?: string;
   fileMetadata?: FileData[];
   sourceURL?: string;
+  mscr_namespace?: string;
+  mscr_owner?: string[];
+  // TODO: Assess if the fields below should be turned compulsory (remove '?') after backend is migrated to v2
+  mscr_creator?: string;
+  mscr_visibility?: Visibility;
+  mscr_state?: State;
+  creator?: string[];
+  domain?: string;
+  identifier?: string[];
+  language?: string;
+  license?: string;
+  publisher?: string;
+  fairsharing_doi?: string;
+  // TODO: Assess if fields below can be removed when backend migrated to v2
+  state?: State;
+  visibility?: Visibility;
+  namespace?: string;
+  owner?: string[];
 }
 
 export interface FileData {
@@ -46,8 +61,15 @@ export interface MetadataFormType {
   description: string;
   contact: string;
   versionLabel: string;
-  visibility: string;
-  namespace: string;
+  mscrVisibility: string;
+  mscrNamespace: string;
+  domain: string;
+  language: string;
+  license: string;
+  publisher: string;
+  fairsharingDoi: string;
+  creator: string[];
+  identifier: string[];
 }
 
 export const initialMetadataForm: MetadataFormType = {
@@ -55,6 +77,13 @@ export const initialMetadataForm: MetadataFormType = {
   description: '',
   contact: '',
   versionLabel: '',
-  visibility: '',
-  namespace: '',
+  mscrVisibility: '',
+  mscrNamespace: '',
+  domain: '',
+  language: '',
+  license: '',
+  publisher: '',
+  fairsharingDoi: '',
+  creator: [],
+  identifier: []
 };

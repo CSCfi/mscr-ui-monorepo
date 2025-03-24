@@ -109,8 +109,8 @@ export default function MetadataForm({
       description: { ...metadata.description, [lang]: formData.description },
       contact: formData.contact,
       versionLabel: formData.versionLabel,
-      visibility: formData.visibility as Visibility,
-      namespace: formData.namespace,
+      visibility: formData.mscrVisibility as Visibility,
+      mscr_namespace: formData.mscrNamespace,
     };
   };
 
@@ -130,10 +130,17 @@ export default function MetadataForm({
     const formValuesFromData: MetadataFormType = {
       label: localizedLabel,
       description: localizedDescription,
-      visibility: metadata.visibility ?? Visibility.Private,
+      mscrVisibility: metadata.mscr_visibility ?? metadata.visibility ?? Visibility.Private, // Todo: Remove metadata.visibility option when backend uses metadata v2 model
       versionLabel: metadata.versionLabel ?? '',
       contact: metadata.contact ?? '',
-      namespace: metadata.namespace ?? '',
+      mscrNamespace: metadata.mscr_namespace ?? '',
+      domain: metadata.domain ?? '',
+      language: metadata.language ?? '',
+      license: metadata.license ?? '',
+      publisher: metadata.publisher ?? '',
+      fairsharingDoi: metadata.fairsharing_doi ?? '',
+      creator: metadata.creator ?? [],
+      identifier: metadata.identifier ?? []
     };
     setFormData(formValuesFromData);
   }, [metadata, lang]);
@@ -148,6 +155,7 @@ export default function MetadataForm({
     value: string | number | undefined
   ) {
     const newFormData: MetadataFormType = { ...formData };
+    // TODO: Fix typing because of new array values
     newFormData[attributeName] = value?.toString() ?? '';
     setFormData(newFormData);
   }
@@ -161,6 +169,46 @@ export default function MetadataForm({
       'targetSchemaInfo' in metadata
     );
   };
+
+  function renderUneditableStringRow(label: string, data?: string | string[]) {
+    if (data === undefined || data === null) return <></>;
+    const dataList = Array.isArray(data) ? data : [data];
+    return (
+      <MetadataRow container>
+        <Grid item xs={4}>
+          <MetadataLabel>{label}:</MetadataLabel>
+        </Grid>
+        <Grid item xs={8}>
+          <MetadataAttribute>
+            {dataList.filter((item) => item.trim().length !== 0).join(', ')}
+          </MetadataAttribute>
+        </Grid>
+      </MetadataRow>
+    );
+  }
+
+  function renderEditableStringRow(label: string, data: string, formDataAttribute: keyof MetadataFormType) {
+    return (
+      <MetadataRow container>
+        <Grid item xs={4}>
+          <MetadataLabel>{label}:</MetadataLabel>
+        </Grid>
+        <Grid item xs={8}>
+          {isEditModeActive && (
+            <TextInput
+              labelText={label}
+              labelMode={'hidden'}
+              onChange={(value) => updateFormData(formDataAttribute, value)}
+              value={data}
+            />
+          )}
+          {!isEditModeActive && (
+            <MetadataAttribute>{data ?? ''}</MetadataAttribute>
+          )}
+        </Grid>
+      </MetadataRow>
+    );
+  }
 
   return (
     <MetadataContainer>
@@ -179,168 +227,21 @@ export default function MetadataForm({
       </Grid>
       <MetadataFormContainer container>
         <Grid item xs={12} md={7}>
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.name')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              {isEditModeActive && (
-                <TextInput
-                  labelText={t('metadata.name')}
-                  labelMode={'hidden'}
-                  onChange={(value) => updateFormData('label', value)}
-                  value={formData.label}
-                />
-              )}
-              {!isEditModeActive && (
-                <MetadataAttribute>{formData.label}</MetadataAttribute>
-              )}
-            </Grid>
-          </MetadataRow>
+          {renderEditableStringRow(t('metadata.name'), formData.label, 'label')}
+          {renderUneditableStringRow(t('metadata.pid'), metadata.handle ?? t('metadata.not-available'))}
+          {renderEditableStringRow(t('metadata.version-label'), formData.versionLabel, 'versionLabel')}
+          {renderEditableStringRow(t('metadata.name-space-label'), formData.mscrNamespace, 'mscrNamespace')}
 
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.name-space-label')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              {isEditModeActive && (
-                <TextInput
-                  labelText={t('metadata.name-space-label')}
-                  labelMode={'hidden'}
-                  onChange={(value) => updateFormData('namespace', value)}
-                  value={formData.namespace}
-                />
-              )}
-              {!isEditModeActive && (
-                <MetadataAttribute>{formData.namespace}</MetadataAttribute>
-              )}
-            </Grid>
-          </MetadataRow>
+          {renderEditableStringRow(t('metadata.contact'), formData.contact, 'contact')}
+          {renderEditableStringRow(t('metadata.domain'), formData.domain, 'domain')}
+          {renderEditableStringRow(t('metadata.language'), formData.language, 'language')}
+          {renderEditableStringRow(t('metadata.license'), formData.license, 'license')}
+          {renderEditableStringRow(t('metadata.publisher'), formData.publisher, 'publisher')}
+          {renderEditableStringRow(t('metadata.fairsharing-doi'), formData.fairsharingDoi, 'fairsharingDoi')}
 
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.version-label')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              {isEditModeActive && (
-                <TextInput
-                  labelText={t('metadata.version-label')}
-                  labelMode={'hidden'}
-                  onChange={(value) => updateFormData('versionLabel', value)}
-                  value={formData.versionLabel}
-                />
-              )}
-              {!isEditModeActive && (
-                <MetadataAttribute>{metadata.versionLabel}</MetadataAttribute>
-              )}
-            </Grid>
-          </MetadataRow>
-
-          {isCrosswalk(metadata) &&
-            <>
-              <MetadataRow container>
-                <Grid item xs={4}>
-                  <MetadataLabel>{t('metadata.source-schema')}:</MetadataLabel>
-                </Grid>
-                <Grid item xs={8}>
-                  <MetadataAttribute>
-                    {metadata.sourceSchemaInfo.name ?? ''}
-                  </MetadataAttribute>
-                </Grid>
-              </MetadataRow>
-              <MetadataRow container>
-                <Grid item xs={4}>
-                  <MetadataLabel>{t('metadata.source-schema-id')}:</MetadataLabel>
-                </Grid>
-                <Grid item xs={8}>
-                  <MetadataAttribute>
-                    {(metadata.sourceSchemaInfo.handle ?? metadata.sourceSchemaInfo.id) ?? ''}
-                  </MetadataAttribute>
-                </Grid>
-              </MetadataRow>
-              <MetadataRow container>
-                <Grid item xs={4}>
-                  <MetadataLabel>{t('metadata.target-schema')}:</MetadataLabel>
-                </Grid>
-                <Grid item xs={8}>
-                  <MetadataAttribute>
-                    {metadata.targetSchemaInfo.name ?? ''}
-                  </MetadataAttribute>
-                </Grid>
-              </MetadataRow>
-              <MetadataRow container>
-                <Grid item xs={4}>
-                  <MetadataLabel>{t('metadata.target-schema-id')}:</MetadataLabel>
-                </Grid>
-                <Grid item xs={8}>
-                  <MetadataAttribute>
-                    {(metadata.targetSchemaInfo.handle ?? metadata.targetSchemaInfo.id) ?? ''}
-                  </MetadataAttribute>
-                </Grid>
-              </MetadataRow>
-            </>
-          }
-
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.contact')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              {isEditModeActive && (
-                <TextInput
-                  labelText={t('metadata.contact')}
-                  labelMode={'hidden'}
-                  onChange={(value) => updateFormData('contact', value)}
-                  value={formData.contact}
-                />
-              )}
-              {!isEditModeActive && (
-                <MetadataAttribute>{metadata.contact}</MetadataAttribute>
-              )}
-            </Grid>
-          </MetadataRow>
-
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.owner')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              <MetadataAttribute>
-                {metadata.ownerMetadata.map((o) => o.name ?? o.id).join(', ')}
-              </MetadataAttribute>
-            </Grid>
-          </MetadataRow>
-
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.pid')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              <MetadataAttribute>
-                {metadata.handle ?? t('metadata.not-available')}
-              </MetadataAttribute>
-            </Grid>
-          </MetadataRow>
-
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.source-url')}</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              <MetadataAttribute>
-                {metadata.sourceURL ?? t('metadata.not-available')}
-              </MetadataAttribute>
-            </Grid>
-          </MetadataRow>
-
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.format')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              <MetadataAttribute>{metadata.format}</MetadataAttribute>
-            </Grid>
-          </MetadataRow>
+          {renderUneditableStringRow(t('metadata.mscr-creator'), metadata.mscr_creator)}
+          {renderUneditableStringRow(t('metadata.mscr-owner'), metadata.ownerMetadata.map((o) => o.name ?? o.id))}
+          {renderUneditableStringRow(t('metadata.format'), metadata.format)}
 
           <MetadataRow container>
             <Grid item xs={4}>
@@ -364,26 +265,22 @@ export default function MetadataForm({
             </Grid>
           </MetadataRow>
 
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.state')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              <MetadataAttribute>{metadata.state}</MetadataAttribute>
-            </Grid>
-          </MetadataRow>
+          {renderUneditableStringRow(t('metadata.mscr-state'), metadata.mscr_state?.toString())}
+
+          {/*TODO: Remove this or modify when backend uses v2 model for metadata*/}
+          {renderUneditableStringRow(t('metadata.mscr-state'), metadata.state?.toString())}
 
           <MetadataRow container>
             <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.visibility')}:</MetadataLabel>
+              <MetadataLabel>{t('metadata.mscr-visibility')}:</MetadataLabel>
             </Grid>
             <Grid item xs={8}>
               {isEditModeActive && metadata.state === State.Draft && (
                 <Dropdown
-                  labelText={t('metadata.visibility')}
+                  labelText={t('metadata.mscr-visibility')}
                   labelMode={'hidden'}
-                  value={formData.visibility}
-                  onChange={(value) => updateFormData('visibility', value)}
+                  value={formData.mscrVisibility}
+                  onChange={(value) => updateFormData('mscrVisibility', value)}
                 >
                   <DropdownItem
                     key={Visibility.Public}
@@ -407,11 +304,11 @@ export default function MetadataForm({
         </Grid>
 
         <Grid item xs={12} md={5}>
-          <Grid container>
-            <MetadataRow item xs={6} md={7}>
-              <Grid item xs={12}>
-                <MetadataLabel>{t('metadata.description')}:</MetadataLabel>
-              </Grid>
+          <MetadataRow container>
+            <Grid item xs={4}>
+              <MetadataLabel>{t('metadata.description')}:</MetadataLabel>
+            </Grid>
+            <Grid item xs={8}>
               {isEditModeActive && (
                 <Textarea
                   labelText={t('metadata.description')}
@@ -424,11 +321,20 @@ export default function MetadataForm({
                 ></Textarea>
               )}
               {!isEditModeActive && <p>{formData.description}</p>}
-            </MetadataRow>
-            <Grid item xs={6} md={5}>
-              <Grid container direction="row" justifyContent="flex-end"></Grid>
             </Grid>
-          </Grid>
+          </MetadataRow>
+
+          {/*TODO: wrapping*/}
+          {renderUneditableStringRow(t('metadata.source-url'), metadata.sourceURL)}
+
+          {isCrosswalk(metadata) &&
+            <>
+              {renderUneditableStringRow(t('metadata.source-schema'), metadata.sourceSchemaInfo.name)}
+              {renderUneditableStringRow(t('metadata.source-schema-id'), metadata.sourceSchemaInfo.handle ?? metadata.sourceSchemaInfo.id)}
+              {renderUneditableStringRow(t('metadata.target-schema'), metadata.targetSchemaInfo.name)}
+              {renderUneditableStringRow(t('metadata.target-schema-id'), metadata.targetSchemaInfo.handle ?? metadata.targetSchemaInfo.id)}
+            </>
+          }
         </Grid>
 
         <Grid container direction="row" justifyContent="flex-end">

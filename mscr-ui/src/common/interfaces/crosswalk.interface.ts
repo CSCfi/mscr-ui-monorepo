@@ -16,7 +16,6 @@ export interface Crosswalk extends Metadata {
   targetSchemaInfo: SchemaSummary;
   generatedFileMetadata: GeneratedFile[];
   subType: SubType;
-  owner?: string[]; // Added owner for checking permission
 }
 
 export interface CrosswalkWithVersionInfo extends Crosswalk {
