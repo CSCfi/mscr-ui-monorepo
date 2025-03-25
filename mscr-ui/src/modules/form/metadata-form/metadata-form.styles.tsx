@@ -17,6 +17,7 @@ export const MetadataHeading = styled(Heading)`
 export const MetadataFormContainer = styled(Grid)`
   background-color: ${(props) => props.theme.suomifi.colors.highlightLight3};
   padding: 1rem;
+  border: 1px solid ${(props) => props.theme.suomifi.colors.highlightBase};
 `;
 
 export const MetadataRow = styled(Grid)`

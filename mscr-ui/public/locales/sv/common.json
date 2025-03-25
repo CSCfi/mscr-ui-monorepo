@@ -286,6 +286,7 @@
     "crosswalk-details": "",
     "description": "",
     "file": {
+      "download": "",
       "download-file": "",
       "format": "",
       "label": "",
@@ -301,11 +302,13 @@
     "pid": "",
     "schema-details": "",
     "source-schema": "",
+    "source-schema-id": "",
     "source-url": "",
     "state": "",
     "stub-crosswalk-details": "",
     "stub-schema-details": "",
     "target-schema": "",
+    "target-schema-id": "",
     "version-label": "",
     "versions": "",
     "view": "",
@@ -501,6 +504,7 @@
     },
     "history-tab": "",
     "label": "",
+    "mapping-accordion-tab": "",
     "metadata-and-files": "",
     "schema": {
       "content-and-editor-tab": ""
