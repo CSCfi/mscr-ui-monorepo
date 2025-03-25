@@ -120,6 +120,7 @@ function Row(props: {
   rowCount: number;
   isSourceAccordion: boolean;
   isOneToManyMapping: boolean;
+  isDataCrosswalk: boolean;
   highlightOperation: highlightOperation | undefined;
 }) {
 
@@ -203,33 +204,38 @@ function Row(props: {
     <>
       <StyledTableRow className="row">
         <StyledTableCell className="col-9 d-flex flex-row justify-content-start">
-
-          <div
-            className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center d-none'}>
-            <div>
-              <Tooltip className={props.index !== 0 ? '' : 'd-none'}
-                       title={'Order node up'}
-                       placement="left"
-              >
-                <StyledArrowCircleUp
-                  onClick={() => moveNode(true)}></StyledArrowCircleUp>
-              </Tooltip>
-            </div>
-            <div>
-              {props.index !== props.rowCount - 1 && props.rowCount > 1 &&
+          {props.isDataCrosswalk &&
+            <div
+              className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center d-none'}
+            >
+              <div>
+                <Tooltip
+                  className={props.index !== 0 ? '' : 'd-none'}
+                  title={'Order node up'}
+                  placement="left"
+                >
+                  <StyledArrowCircleUp onClick={() => moveNode(true)} />
+                </Tooltip>
+              </div>
+              <div>
+                {props.index !== props.rowCount - 1 && props.rowCount > 1 &&
                   <Tooltip
-                      title={'Order node down'}
-                      placement="left"
+                    title={'Order node down'}
+                    placement="left"
                   >
-                      <StyledArrowCircleDown
-                          onClick={() => moveNode(false)}></StyledArrowCircleDown>
+                    <StyledArrowCircleDown onClick={() => moveNode(false)} />
                   </Tooltip>
-              }
+                }
+              </div>
             </div>
-          </div>
-
+          }
           <div
-            className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center ms-3'}>{props.row.name}</div>
+            className={props.rowCount > 1 && props.isDataCrosswalk
+              ? 'd-flex flex-column justify-content-center'
+              : 'd-flex flex-column justify-content-center ms-3'}
+          >
+            {props.row.name}
+          </div>
         </StyledTableCell>
 
         <StyledTableButtonCell className="col-3 fw-bold">
@@ -270,7 +276,9 @@ function Row(props: {
                     <span className="fw-bold">Description: </span>
                     {props?.row?.description?.length > 0 ? props?.row?.description : 'N/A'}
                   </p>
-                      <><Dropdown className='mt-2 node-info-dropdown'
+                  {props.isDataCrosswalk &&
+                    <>
+                      <Dropdown className='mt-2 node-info-dropdown'
                                   labelText={props.isSourceAccordion ? "Source operation" : "Target operation"}
                                   ref={functionDropdownRef}
                                   visualPlaceholder="Operation not selected"
@@ -284,11 +292,9 @@ function Row(props: {
                           </DropdownItem>
                         ))}
                       </Dropdown>
-
-
-                          <br/>
-                      </>
-                  {generateOperationFields(props.row?.processing?.id, props.row.id)}
+                      {generateOperationFields(props.row?.processing?.id, props.row.id)}
+                    </>
+                  }
                 </div>
                 <br/>
               </div>
@@ -314,14 +320,15 @@ function Row(props: {
 }
 
 interface nodeListingAccordionProps {
-  nodes: any,
-  mappingFunctions: any,
-  predicateOperationValues: any,
-  accordionCallbackFunction: any,
-  isSourceAccordion: boolean,
-  isOneToManyMapping: boolean,
-  showAttributeNames: boolean,
-  highlightOperation: highlightOperation | undefined
+  nodes: any;
+  mappingFunctions: any;
+  predicateOperationValues: any;
+  accordionCallbackFunction: any;
+  isSourceAccordion: boolean;
+  isOneToManyMapping: boolean;
+  isDataCrosswalk: boolean;
+  showAttributeNames: boolean;
+  highlightOperation: highlightOperation | undefined;
 }
 
 //TODO: create interface for exact props attributes
@@ -416,6 +423,7 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
                     row={row}
                     callBackFunction={props.accordionCallbackFunction}
                     showAttributeNames={showAttributeNames}
+                    isDataCrosswalk={props.isDataCrosswalk}
                     mappingFunctions={mappingFunctions}
                     predicateOperationValues={props.predicateOperationValues}
                     rowCount={nodeData.length}
