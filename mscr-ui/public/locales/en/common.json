@@ -38,20 +38,9 @@
   "and": "and",
   "association": "",
   "attribute": "",
-  "automated-decision": {
-    "description": {
-      "1": "Data is not used for profiling purposes. We may use automated decision-making in some cases, if the law allows it, or if you have given your consent separately, or if it’s necessary for the execution of the contract.  ",
-      "2": "Note! Not always true e.g., recruitment. "
-    },
-    "title": "Do we use automated decision-making or profiling?"
-  },
   "breadcrumb": "",
   "cancel": "Cancel",
   "card-organizations": "",
-  "change-in-policy": {
-    "description": "Changes to this policy will be dated. We may inform you of any significant changes by email or notice on our website. ",
-    "title": "Changes to the privacy policy"
-  },
   "change-language-selected-language": "Current language",
   "choose-language": "",
   "class": "",
@@ -97,17 +86,6 @@
     "unset-root-selection": "Are you sure you want to reset custom root selection?"
   },
   "confirm-page-leave": "Are you sure you want to leave the page? Changes you made won't be saved.",
-  "contact": {
-    "description": {
-      "1": "Data asset owner: servicedesk(at)csc.fi. ",
-      "2": "Data Protection Officer: privacy(at)csc.fi"
-    },
-    "label": "Contact person for register-related matters "
-  },
-  "contact-person": {
-    "description": "All communications and requests regarding this policy should be made in writing or in person to the contact person named in section two (2). ",
-    "title": " Who should you contact? "
-  },
   "content-form": {
     "button": {
       "crosswalk-create": "Create Crosswalk",
@@ -137,19 +115,6 @@
     },
     "version-label": "Version label"
   },
-  "controller": {
-    "description": {
-      "1": "CSC – IT Center for Science Ltd",
-      "2": "P.O. Box 405 (Keilaranta 14) ",
-      "3": "02101 Espoo, Finland ",
-      "4": "Tel. +358 (0)9 457 2821 (operator)",
-      "5": "servicedesk(at)csc.fi ",
-      "6": "Business ID: 0920632-0 ",
-      "7": "www.csc.fi",
-      "8": "(Hereinafter referred to as 'we' or 'CSC') "
-    },
-    "label": "Controller"
-  },
   "crosswalk-editor": {
     "search-from-source-schema": "Search from source schema",
     "search-from-target-schema": "Search from target schema",
@@ -170,37 +135,6 @@
     "source-schema-workspace": "Source schema workspace",
     "supported-file-formats": "Supported crosswalk file formats are ",
     "target-schema-workspace": "Target schema workspace"
-  },
-  "data-disclose": {
-    "description": "The data is only disclosed the authentication identity provider and no one else. ",
-    "title": "To whom do we disclose your data? "
-  },
-  "data-persistense": {
-    "description": {
-      "1": "Service-related metadata will be kept until the service is running.",
-      "2": "Personal data which is used for group management will be kept 1 year after the last login.",
-      "3": "Service-related metadata will be kept until the service is running.",
-      "4": "Personal data which is used for group management will be kept 1 year after the last login.",
-      "5": "Once the retention period for personal data has expired and there are no longer grounds for processing them within the limits permitted by data protection legislation, the personal data will be deleted.",
-      "6": "Data Persistense in MSCR followed by the following rules: "
-    },
-    "title": " How long do we keep your data?"
-  },
-  "data-source": {
-    "description": "All the data we process is provided by the data subject themselves.",
-    "title": "Where do we get your data from? "
-  },
-  "data-subject-right": {
-    "description": {
-      "1": "Data subjects have the rights under the General Data Protection Regulation to, among other things, inspect their own data, access personal data and demand the correction of incorrect data concerning them. The right of inspection or access to data is carried out according to resources without undue delay, but always within the time limit required by the General Data Protection Regulation at the latest. The identity of the data subject is checked before providing the information. On request, the information is provided in written form. ",
-      "2": "The controller must, independently or at the request of the data subject, correct or supplement the incorrect or deficient information. The controller shall, independently or at the request of the data subject, remove unnecessary or outdated data, unless the law or the contract entitles or obligates the controller to retain data. ",
-      "3": "The data subject has the right to withdraw the consent he has given, if the processing is based on consent. Withdrawal of consent does not affect the processing that took place before the withdrawal. ",
-      "4": "The data subject has the right to request restriction of processing or to object to processing within the limits and in accordance with applicable data protection legislation. ",
-      "5": "Data subjects have the right to transfer data from one system to another, i.e., to receive the personal data concerning them in a structured and commonly used format, and to transfer it to another controller within the limits and in accordance with applicable data protection legislation. ",
-      "6": "You can send the above requests and questions regarding this privacy policy and CSC's processing of personal data to privacy(at)csc.fi. ",
-      "7": "You also have the right to lodge a complaint with the Data Protection Ombudsman. The contact details of the Data Protection Ombudsman can be found on the Data Protection Ombudsman's website at tietosuoja.fi."
-    },
-    "title": "What are your rights as a data subject? "
   },
   "datamodel-title": "",
   "datamodels-all": "",
@@ -236,10 +170,6 @@
   "filter-with-current_one": "",
   "filter-with-current_other": "",
   "go-to": "",
-  "ground": {
-    "description": "The data subjects for this processing activity are the users of the Metadata Schema and Crosswalk Registry Service. Processing of personal data is based on a Contract.  ",
-    "title": "What are the legal grounds for processing personal data?"
-  },
   "impersonate-user": "Impersonate user",
   "interoperability-logo-title": "",
   "items-to-be-unscribed-from_one": "",
@@ -287,7 +217,6 @@
     "crosswalk-details": "Crosswalk details",
     "description": "Description",
     "file": {
-      "download": "Download",
       "download-file": "File",
       "format": "Format",
       "label": "Files",
@@ -303,13 +232,11 @@
     "pid": "PID",
     "schema-details": "Schema details",
     "source-schema": "Source schema",
-    "source-schema-id": "Source schema ID",
     "source-url": "Source URL",
     "state": "State",
     "stub-crosswalk-details": "Deleted crosswalk",
     "stub-schema-details": "Deleted schema",
     "target-schema": "Target schema",
-    "target-schema-id": "Target schema ID",
     "version-label": "Version label",
     "versions": "Versions",
     "view": "View",
@@ -370,10 +297,6 @@
   },
   "organization": "",
   "organizations-and-roles": "",
-  "outside-eea": {
-    "description": "Personal data is not transferred outside the European Union (EU) or the European Economic Area (EEA).  ",
-    "title": "Do we transfer data outside the EU or EEA or to international organizations? Or to which countries do we transfer data and what are the grounds for these transfers? "
-  },
   "own-information": "",
   "page-indicator-text": "",
   "page-number": "",
@@ -387,28 +310,7 @@
     "page": "Page"
   },
   "previous-page": "",
-  "privacy-link": "Privacy Guidelines",
-  "privacy-text": {
-    "1": "Please check the",
-    "2": "before Registering or Using MSCR."
-  },
   "profile": "",
-  "protect-data": {
-    "description": {
-      "1": "Information in Information Systems: Only persons who have the right to process the personal data on behalf of CSC can access the data files in accordance with their job descriptions. Access to personal data is restricted and users are identified by a username and password.",
-      "2": "With outsourced service providers, CSC has agreed on the necessary data protection obligations in accordance with the General Data Protection Regulation. "
-    },
-    "title": "How do we protect your data? "
-  },
-  "purpose": {
-    "description": {
-      "1": "Personal data is processed to:",
-      "2": "Provide and improve our services",
-      "3": "Perform our contractual obligations",
-      "4": "As a part of our customer relationship.The lawful basis for processing user data is the performance of a contract between user and CSC."
-    },
-    "title": "What are the purposes of processing personal data?"
-  },
   "recommended-term": "",
   "remove": "Remove",
   "remove-all-subscriptions": "",
@@ -475,7 +377,7 @@
   "site-information": "",
   "site-login": "Sign in",
   "site-login-info-1": "You must be signed in to register and edit content",
-  "site-login-info-2": "Pressing Sign in will redirect you to EOSC Portal AAI demo to choose a login method. ",
+  "site-login-info-2": "Pressing Sign in will redirect you to EOSC Portal AAI demo to choose a login method",
   "site-login-title": "Sign in to MSCR",
   "site-logout": "Log out",
   "site-open-link-new-window": "",
@@ -505,7 +407,6 @@
     },
     "history-tab": "Version history",
     "label": "Content tabs",
-    "mapping-accordion-tab": "Mapping",
     "metadata-and-files": "Metadata & files",
     "schema": {
       "content-and-editor-tab": "Schema"
@@ -549,15 +450,6 @@
   "vocabulary-info-fi": "",
   "vocabulary-info-sv": "",
   "vocabulary-results-more": "",
-  "what-we-process": {
-    "description": {
-      "1": "We are processing the following personal data:",
-      "2": "Data subject’s basic data such as name, user ID, password. ",
-      "3": "Data subject’s contact detail such as email address ",
-      "4": "Contents registered by the user for MSCR Service use. "
-    },
-    "title": "What data do we process? "
-  },
   "word-class": {
     "adjective": "",
     "verb": ""

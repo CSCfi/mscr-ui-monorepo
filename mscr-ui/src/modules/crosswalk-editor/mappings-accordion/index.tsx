@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Dispatch, SetStateAction, useEffect} from 'react';
+import {useEffect} from 'react';
 import Collapse from '@mui/material/Collapse';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -45,18 +45,16 @@ export interface highlightOperation {
   nodeId?: any;
 }
 
-function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttributeNames, rowcount, mappingFunctions,
-               schemaFormats, schemaDatas, setNodeMappingsModalOpen}: {
+function Row(props: {
   row: NodeMapping;
   viewOnlyMode: boolean;
   isEditModeActive: boolean;
-  callBackFunction: Function;
+  callBackFunction: any;
   showAttributeNames: boolean;
   rowcount: number;
   mappingFunctions: any;
   schemaFormats: {sourceSchemaFormat: Format | undefined, targetSchemaFormat: Format | undefined};
   schemaDatas: {sourceSchemaData: SchemaWithContent | undefined, targetSchemaData: SchemaWithContent | undefined};
-  setNodeMappingsModalOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const { t } = useTranslation('common');
   const [open, setOpen] = React.useState(false);
@@ -65,7 +63,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
     React.useState<boolean>(false);
 
   function selectFromTrees(row: any, mappingId: any, isSourceTree: boolean) {
-    callBackFunction(
+    props.callBackFunction.performAccordionAction(
       row,
       'selectFromTreesByMapping',
       mappingId,
@@ -76,8 +74,8 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
 
   function performDeleteMappingAction() {
     setIsDeleteMappingConfirmModalOpen(false);
-    callBackFunction(
-      row,
+    props.callBackFunction.performAccordionAction(
+      props.row,
       'removeMapping'
     );
   }
@@ -87,7 +85,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
       <StyledTableRow className="accordion-row row">
         <StyledTableCell className="col-4">
 
-          {row.source.map((mapping, index) => {
+          {props.row.source.map((mapping, index) => {
               return (<>
                 <div className='d-flex justify-content-between'>
                   <div className='d-flex justify-content-center'>
@@ -95,13 +93,13 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title={showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
+                        title={props.showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
                         onClick={(e) => {
-                          selectFromTrees(row, mapping.id, true);
+                          selectFromTrees(props.row, mapping.id, true);
                           e.stopPropagation();
                         }}
-                      >{showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
-                        schemaFormats?.sourceSchemaFormat, schemaDatas?.sourceSchemaData)}</StyledButton>
+                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
+                        props.schemaFormats?.sourceSchemaFormat, props.schemaDatas?.sourceSchemaData)}</StyledButton>
 
                       <HorizontalLineStart>
                         <div></div>
@@ -113,22 +111,22 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                     <div></div>
                   </HorizontalLineStart>
                   {mapping['processing']?.id &&
-                      <FunctionTooltipBox callBackFunction={callBackFunction}
-                                          isEditModeActive={isEditModeActive}
+                      <FunctionTooltipBox callBackFunction={props.callBackFunction}
+                                          isEditModeActive={props.isEditModeActive}
                                           tooltipHeading={'source operation'} tooltipHoverText={'source operation'}
                                           processingId={mapping.id} functionName={'sourceOperation'}
-                                          mappingFunctions={mappingFunctions}
-                                          row={row}></FunctionTooltipBox>
+                                          mappingFunctions={props.mappingFunctions}
+                                          row={props.row}></FunctionTooltipBox>
                   }
                   <HorizontalLineStartSecond>
                     <div></div>
                   </HorizontalLineStartSecond>
                   <div className='d-flex flex-column'>
-                    {index === 0 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
-                    {row.source.length > 1 && <VerticalLine>
+                    {index === 0 && props.row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                    {props.row.source.length > 1 && <VerticalLine>
                         <div></div>
                     </VerticalLine>}
-                    {index === row.source.length - 1 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                    {index === props.row.source.length - 1 && props.row.source.length > 1 && <EmptyBlock></EmptyBlock>}
                   </div>
                 </div>
               </>)
@@ -142,22 +140,22 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
             <HorizontalLineMidStart>
               <div></div>
             </HorizontalLineMidStart>
-            {row.processing &&
-                <FunctionTooltipBox callBackFunction={callBackFunction} isEditModeActive={isEditModeActive}
+            {props.row.processing &&
+                <FunctionTooltipBox callBackFunction={props.callBackFunction} isEditModeActive={props.isEditModeActive}
                                     tooltipHeading={'mapping function'} tooltipHoverText={'mapping function'}
-                                    processingId={row.processing.id} functionName={'mappingFunction'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>
+                                    processingId={props.row.processing.id} functionName={'mappingFunction'}
+                                    mappingFunctions={props.mappingFunctions} row={props.row}></FunctionTooltipBox>
             }
-            {!row.processing &&
+            {!props.row.processing &&
                 <IconSpacer></IconSpacer>
             }
-            {row.predicate &&
-                <FunctionTooltipBox alternateIconLetter={'P'} callBackFunction={callBackFunction}
-                                    isEditModeActive={isEditModeActive} tooltipHeading={'predicate'}
+            {props.row.predicate &&
+                <FunctionTooltipBox alternateIconLetter={'P'} callBackFunction={props.callBackFunction}
+                                    isEditModeActive={props.isEditModeActive} tooltipHeading={'predicate'}
                                     processingId={''} tooltipHoverText={'predicate'} functionName={'predicate'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>
+                                    mappingFunctions={props.mappingFunctions} row={props.row}></FunctionTooltipBox>
             }
-            {!row.predicate &&
+            {!props.row.predicate &&
                 <IconSpacer></IconSpacer>
             }
             <HorizontalLineMidEnd>
@@ -168,29 +166,29 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
 
         <StyledTableCell className="col-4">
           <div className='d-flex flex-column'>
-            {row.target.map((mapping, index) => {
+            {props.row.target.map((mapping, index) => {
                 return (<>
                   <div className='d-flex justify-content-between'>
                     <div className='d-flex justify-content-center'>
                       <div className='d-flex flex-column'>
-                        {index === 0 && row.target.length > 1 && <EmptyBlock></EmptyBlock>}
-                        {row.target.length > 1 && <VerticalLine>
+                        {index === 0 && props.row.target.length > 1 && <EmptyBlock></EmptyBlock>}
+                        {props.row.target.length > 1 && <VerticalLine>
                             <div></div>
                         </VerticalLine>}
-                        {index === row.target.length - 1 && row.target.length > 1 &&
+                        {index === props.row.target.length - 1 && props.row.target.length > 1 &&
                             <EmptyBlock></EmptyBlock>}
                       </div>
                       {mapping['processing']?.id &&
                           <><HorizontalLineTargetStart>
                               <div></div>
-                          </HorizontalLineTargetStart><FunctionTooltipBox callBackFunction={callBackFunction}
-                                                                          isEditModeActive={isEditModeActive}
+                          </HorizontalLineTargetStart><FunctionTooltipBox callBackFunction={props.callBackFunction}
+                                                                          isEditModeActive={props.isEditModeActive}
                                                                           tooltipHeading={'target operation'}
                                                                           tooltipHoverText={'target operation'}
                                                                           processingId={mapping.id}
                                                                           functionName={'targetOperation'}
-                                                                          mappingFunctions={mappingFunctions}
-                                                                          row={row}></FunctionTooltipBox><HorizontalLineTargetEnd>
+                                                                          mappingFunctions={props.mappingFunctions}
+                                                                          row={props.row}></FunctionTooltipBox><HorizontalLineTargetEnd>
                               <div></div>
                           </HorizontalLineTargetEnd></>
                       }{!mapping['processing']?.id && <HorizontalLineTarget><div></div></HorizontalLineTarget>}
@@ -198,13 +196,13 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                       <StyledButton
                         className="px-3 py-0"
                         style={{textTransform: 'none'}}
-                        title={showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
+                        title={props.showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
                         onClick={(e) => {
-                          selectFromTrees(row, mapping.id, false);
+                          selectFromTrees(props.row, mapping.id, false);
                           e.stopPropagation();
                         }}
-                      >{showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
-                        schemaFormats?.targetSchemaFormat, schemaDatas?.targetSchemaData)}</StyledButton>
+                      >{props.showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
+                        props.schemaFormats?.targetSchemaFormat, props.schemaDatas?.targetSchemaData)}</StyledButton>
                     </div>
                   </div>
                 </>)
@@ -219,15 +217,14 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
             <div className='d-flex flex-row flex-wrap align-content-center'>
               <>
                 <Tooltip
-                  title={isEditModeActive ? 'Edit mapping' : 'Activate edit mode to edit mapping'}
+                  title={props.isEditModeActive ? 'Edit mapping' : 'Activate edit mode to edit mapping'}
                   placement="bottom"
                 >
                   <Sbutton
-                    disabled={!(isEditModeActive)}
+                    disabled={!(props.isEditModeActive)}
                     onClick={(e) => {
-                      setNodeMappingsModalOpen(true);
-                      callBackFunction(
-                        row,
+                      props.callBackFunction.performAccordionAction(
+                        props.row,
                         'openMappingDetails'
                       );
                     }}
@@ -236,11 +233,11 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                   </Sbutton>
                 </Tooltip>
                 <Tooltip
-                  title={isEditModeActive ? t('actionmenu.delete-mapping') : t('actionmenu.activate-edit-mode-to-delete-mapping')}
+                  title={props.isEditModeActive ? t('actionmenu.delete-mapping') : t('actionmenu.activate-edit-mode-to-delete-mapping')}
                   placement="bottom"
                 >
                   <Sbutton
-                    disabled={!(isEditModeActive)}
+                    disabled={!(props.isEditModeActive)}
                     className="ms-2"
                     onClick={(e) => {
                       setIsDeleteMappingConfirmModalOpen(true);
@@ -285,7 +282,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
       <StyledTableRow>
         <TableCell className="accordion-fold-content">
           <Collapse
-            in={open && !viewOnlyMode}
+            in={open && !props.viewOnlyMode}
             timeout="auto"
             unmountOnExit
           >
@@ -299,15 +296,15 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                                 </Box>*/}
                   <div className="ms-0 mt-1 mb-2">
                     <div>Mapping type:</div>
-                    <div className="fw-normal mt-2">{row.predicate}</div>
+                    <div className="fw-normal mt-2">{props.row.predicate}</div>
                   </div>
                   <br/>
                 </div>
                 <div className="col-5 mt-1 mx-3">
-                  {row.notes &&
+                  {props.row.notes &&
                       <>
                           <div>Notes:</div>
-                          <div className="fw-normal mt-2">{row.notes}</div>
+                          <div className="fw-normal mt-2">{props.row.notes}</div>
                       </>
                   }
                 </div>
@@ -449,26 +446,19 @@ function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAtt
   return results;
 }
 
-export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditModeActive, showAttributeNames,
-                                            mappingFunctions, performAccordionAction, schemaFormats, schemaDatas, setNodeMappingsModalOpen}
-                                            :
-{nodeMappings: NodeMapping[];
-  viewOnlyMode: boolean;
-  isEditModeActive: boolean;
-  showAttributeNames: boolean;
-  mappingFunctions: any;
-  performAccordionAction: Function;
-  schemaFormats: {sourceSchemaFormat: Format | undefined; targetSchemaFormat: Format | undefined};
-  schemaDatas: {sourceSchemaData: SchemaWithContent | undefined; targetSchemaData: SchemaWithContent | undefined; };
-  setNodeMappingsModalOpen:  Dispatch<SetStateAction<boolean>>;
-}) {
+export default function MappingsAccordion(props: any) {
   const {t} = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
-
+  const [showAttributeNames, setShowAttributeNames] = React.useState<boolean>(false);
+  const [schemaFormats, setSchemaFormats] = React.useState<{}>({sourceSchemaFormat: undefined, targetSchemaFormat: undefined});
+  const [schemaDatas, setSchemaDatas] = React.useState<{}>({sourceSchemaData: undefined, targetSchemaData: undefined});
   useEffect(() => {
-    setMappingData(nodeMappings);
-  }, [nodeMappings]);
-  const nodeMappingsInput = nodeMappings;
+    setMappingData(props.nodeMappings);
+    setShowAttributeNames(props.showAttributeNames);
+    setSchemaFormats(props.schemaFormats);
+    setSchemaDatas(props.schemaDatas);
+  }, [props]);
+  const nodeMappingsInput = props.nodeMappings;
   return (
     <>
 
@@ -488,7 +478,7 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
             }}
             onChange={(value) => {
               if (!value) {
-                setMappingData(nodeMappings);
+                setMappingData(props.nodeMappings);
               }
             }}
           />
@@ -526,15 +516,14 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
                   <Row
                     key={row.pid}
                     row={row}
-                    viewOnlyMode={viewOnlyMode}
-                    isEditModeActive={isEditModeActive}
-                    callBackFunction={performAccordionAction}
+                    viewOnlyMode={props.viewOnlyMode}
+                    isEditModeActive={props.isEditModeActive}
+                    callBackFunction={props}
                     showAttributeNames={showAttributeNames}
                     rowcount={mappingData.length}
-                    mappingFunctions={mappingFunctions}
+                    mappingFunctions={props.mappingFunctions}
                     schemaFormats={schemaFormats}
                     schemaDatas={schemaDatas}
-                    setNodeMappingsModalOpen={setNodeMappingsModalOpen}
                   />
                 );
               })}

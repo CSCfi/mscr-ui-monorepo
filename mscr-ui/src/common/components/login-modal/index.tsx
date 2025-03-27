@@ -1,11 +1,5 @@
 import { useTranslation } from 'next-i18next';
-import {
-  Button,
-  Link,
-  ModalFooter,
-  Paragraph,
-  Text,
-} from 'suomifi-ui-components';
+import { Button, ModalFooter, Paragraph, Text } from 'suomifi-ui-components';
 import { KeyboardEvent, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
 import { useBreakpoints } from 'yti-common-ui/components/media-query';
@@ -38,12 +32,11 @@ export default function LoginModalView({
           <Paragraph>
             <Text>{t('site-login-info-1')}</Text>
           </Paragraph>
-          <br/>
+          <br />
           <Paragraph>
             <Text>{t('site-login-info-2')} </Text>
           </Paragraph>
-         <br/>
-          
+          <br />
         </ModalContentSmPadding>
 
         <ModalFooter>

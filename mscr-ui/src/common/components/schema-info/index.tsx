@@ -85,7 +85,7 @@ export default function SchemaInfo(props: {
     if (props.treeSelection) {
       expandAndSelectNodes(props.treeSelection);
     }
-  }, [props.treeSelection, props.scrollToSelectedNodeId]);
+  }, [props.treeSelection]);
 
   useEffect(() => {
     // Update selections for node info and parent component for mappings
@@ -119,11 +119,9 @@ export default function SchemaInfo(props: {
     let idsOnPath: string[] = [];
     nodeIds.forEach((nodeId) => {
       const nodes = nodeIdToNodeDictionary[nodeId];
-      if (nodes) {
-        nodes.map((node) => {
-          idsOnPath = idsOnPath.concat(node.rootPathIds);
-        });
-      }
+      nodes.map((node) => {
+        idsOnPath = idsOnPath.concat(node.rootPathIds);
+      });
     });
 
     const nodesToSelect: Set<string> = new Set();

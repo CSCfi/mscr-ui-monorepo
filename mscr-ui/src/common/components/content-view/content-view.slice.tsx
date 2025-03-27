@@ -43,7 +43,7 @@ export const contentViewSlice = createSlice({
       }
       return {
         ...state,
-        //selectedTab: ContentTab.Editor,
+        selectedTab: ContentTab.Editor,
         isEditContentActive: true,
         isEditMetadataActive: false,
       };
