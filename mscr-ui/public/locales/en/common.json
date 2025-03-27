@@ -172,7 +172,7 @@
     "target-schema-workspace": "Target schema workspace"
   },
   "data-disclose": {
-    "description": "The data is only disclosed the authentication identity provider and no one else. ",
+    "description": "The data is only disclosed the authentication identity provider and to no one else. ",
     "title": "To whom do we disclose your data? "
   },
   "data-persistense": {
@@ -180,7 +180,6 @@
       "1": "Service-related metadata will be kept until the service is running.",
       "2": "Personal data which is used for group management will be kept 1 year after the last login.",
       "3": "Service-related metadata will be kept until the service is running.",
-      "4": "Personal data which is used for group management will be kept 1 year after the last login.",
       "5": "Once the retention period for personal data has expired and there are no longer grounds for processing them within the limits permitted by data protection legislation, the personal data will be deleted.",
       "6": "Data Persistense in MSCR followed by the following rules: "
     },

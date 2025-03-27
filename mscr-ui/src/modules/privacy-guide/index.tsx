@@ -15,7 +15,7 @@ export default function PrivacyGuide() {
           <Paragraph>Effective as of Date 15.3.2025 </Paragraph>
           <br></br>
       <StyledTableContainer>
-        <Grid container rowSpacing={4}>
+        <Grid container rowSpacing={4} columnSpacing={4}>
           <Grid item xs={4}>
             {t('controller.label')}
           </Grid>
@@ -118,7 +118,6 @@ export default function PrivacyGuide() {
               <li> {t('data-persistense.description.1')}</li>
               <li> {t('data-persistense.description.2')}</li>
               <li> {t('data-persistense.description.3')}</li>
-              <li>{t('data-persistense.description.4')}</li>
               <li>{t('data-persistense.description.5')}</li>
             </ul>
           </Grid>
