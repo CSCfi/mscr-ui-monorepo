@@ -1,22 +1,22 @@
 import { SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
 import MetadataForm from '@app/modules/form/metadata-form';
 import { Type } from '@app/common/interfaces/search.interface';
-import HasPermission from '@app/common/utils/has-permission';
 import MetadataFilesTable from '@app/common/components/metadata-files-table';
 
 export default function MetadataAndFiles({
   schemaDetails,
   refetch,
+  isMscrCopyAvailable,
+  hasEditPermission
 }: {
   schemaDetails: SchemaWithVersionInfo;
   refetch: () => void;
+  hasEditPermission: boolean;
+  isMscrCopyAvailable?: boolean;
 }) {
-  // TODO: Editing -> Only edit with permission, we have util has-permission
-  const hasEditPermission = HasPermission({
-    actions: ['EDIT_SCHEMA_METADATA'],
-  });
-  const schemaFiles = schemaDetails?.fileMetadata;
 
+  const schemaFiles = schemaDetails?.fileMetadata;
+  
   return (
     <>
       <MetadataForm
@@ -24,6 +24,7 @@ export default function MetadataAndFiles({
         metadata={schemaDetails}
         refetchMetadata={refetch}
         hasEditPermission={hasEditPermission}
+        isMscrCopyAvailable={isMscrCopyAvailable}
       />
       <MetadataFilesTable
         filesRowInput={schemaFiles}

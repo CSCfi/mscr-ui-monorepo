@@ -8,8 +8,14 @@ export default function MetadataAndFiles(props: {
   crosswalkData: CrosswalkWithVersionInfo;
   refetch: () => void;
 }) {
-  const hasEditRights = HasPermission({ actions: ['EDIT_CROSSWALK_METADATA'] });
-  const hasFileRights = HasPermission({ actions: ['EDIT_CROSSWALK_FILES'] });
+  const hasEditRights = HasPermission({
+    action: 'EDIT_CONTENT',
+    owner: props.crosswalkData.owner,
+  });
+  const hasFileRights = HasPermission({
+    action: 'EDIT_CONTENT',
+    owner: props.crosswalkData.owner,
+  });
 
   return (
     <>
@@ -18,7 +24,9 @@ export default function MetadataAndFiles(props: {
         metadata={props.crosswalkData}
         refetchMetadata={props.refetch}
         hasEditPermission={hasEditRights}
+        isMscrCopyAvailable={false}
       />
+      <br />
       <MetadataFilesTable
         filesRowInput={props.crosswalkData.fileMetadata}
         crosswalkData={props.crosswalkData}

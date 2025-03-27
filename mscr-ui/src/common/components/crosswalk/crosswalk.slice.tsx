@@ -9,18 +9,19 @@ import {
   CrosswalkWithVersionInfo,
 } from '@app/common/interfaces/crosswalk.interface';
 import { NodeMapping } from '@app/common/interfaces/crosswalk-connection.interface';
+import { Metadata } from '@app/common/interfaces/metadata.interface';
 
 export const crosswalkApi = createApi({
   reducerPath: 'crosswalkApi',
   baseQuery: getDatamodelApiBaseQuery(),
-  tagTypes: ['crosswalkApi'],
+  tagTypes: ['Crosswalk', 'Mappings'],
   extractRehydrationInfo(action, { reducerPath }) {
     if (action.type === HYDRATE) {
       return action.payload[reducerPath];
     }
   },
   endpoints: (builder) => ({
-    putCrosswalk: builder.mutation<any, any>({
+    putCrosswalk: builder.mutation<Crosswalk, Partial<Metadata>>({
       query: (value) => ({
         url: '/crosswalk',
         method: 'PUT',
@@ -28,7 +29,7 @@ export const crosswalkApi = createApi({
       }),
     }),
     //Register Crosswalk with file
-    putCrosswalkFull: builder.mutation<any, FormData>({
+    putCrosswalkFull: builder.mutation<Crosswalk, FormData>({
       query: (file) => ({
         url: '/crosswalkFull',
         method: 'PUT',
@@ -37,6 +38,24 @@ export const crosswalkApi = createApi({
           'content-Type': 'multipart/form-data;',
         },
       }),
+    }),
+
+    putCrosswalkRevision: builder.mutation<Crosswalk, { pid: string; data: Partial<Metadata> }>({
+      query: ({pid, data }) => ({
+        url: `/crosswalk?action=revisionOf&target=${pid}`,
+        method: 'PUT',
+        data: data,
+      })
+    }),
+    putCrosswalkFullRevision: builder.mutation<Crosswalk, { pid: string; data: FormData }>({
+      query: ({pid, data }) => ({
+        url: `/crosswalkFull?action=revisionOf&target=${pid}`,
+        method: 'PUT',
+        data: data,
+        headers: {
+          'content-Type': 'multipart/form-data;',
+        },
+      })
     }),
 
     getCrosswalk: builder.query<Crosswalk, string>({
@@ -51,6 +70,7 @@ export const crosswalkApi = createApi({
         url: `/crosswalk/${pid}?includeVersionInfo=true`,
         method: 'GET',
       }),
+      providesTags: ['Crosswalk'],
     }),
 
     getMappings: builder.query<NodeMapping[], any>({
@@ -58,6 +78,7 @@ export const crosswalkApi = createApi({
         url: `/crosswalk/${pid}/mapping`,
         method: 'GET',
       }),
+      providesTags: ['Mappings'],
     }),
 
     putMapping: builder.mutation<
@@ -72,6 +93,7 @@ export const crosswalkApi = createApi({
         method: 'PUT',
         data: value.payload,
       }),
+      invalidatesTags: ['Mappings'],
     }),
 
     patchMapping: builder.mutation<
@@ -86,6 +108,7 @@ export const crosswalkApi = createApi({
         method: 'PUT',
         data: value.payload,
       }),
+      invalidatesTags: ['Mappings'],
     }),
 
     deleteMapping: builder.mutation<string, string>({
@@ -93,6 +116,7 @@ export const crosswalkApi = createApi({
         url: `/crosswalk/${value}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Mappings'],
     }),
 
     patchCrosswalk: builder.mutation<
@@ -107,6 +131,7 @@ export const crosswalkApi = createApi({
         method: 'PATCH',
         data: value.payload,
       }),
+      invalidatesTags: ['Crosswalk'],
     }),
 
     deleteCrosswalk: builder.mutation<string, string>({
@@ -114,6 +139,7 @@ export const crosswalkApi = createApi({
         url: `/crosswalk/${value}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Crosswalk'],
     }),
   }),
 });
@@ -121,6 +147,8 @@ export const crosswalkApi = createApi({
 export const {
   usePutCrosswalkMutation,
   usePutCrosswalkFullMutation,
+  usePutCrosswalkRevisionMutation,
+  usePutCrosswalkFullRevisionMutation,
   useGetCrosswalkQuery,
   useGetCrosswalkWithRevisionsQuery,
   useGetMappingsQuery,
@@ -135,180 +163,10 @@ export const {
 export const {
   putCrosswalk,
   putCrosswalkFull,
+  putCrosswalkRevision,
+  putCrosswalkFullRevision,
   getCrosswalk,
   getCrosswalkWithRevisions,
   patchCrosswalk,
   deleteCrosswalk,
 } = crosswalkApi.endpoints;
-
-// Slice setup below
-
-export type ViewListItem = {
-  edit: boolean;
-  info: boolean;
-  list: boolean;
-};
-
-export interface ViewList {
-  search: boolean;
-  links: boolean;
-  graph: boolean;
-  info: {
-    edit: boolean;
-    info: boolean;
-  };
-  classes: ViewListItem;
-  attributes: ViewListItem;
-  associations: ViewListItem;
-}
-
-const initialView: ViewList = {
-  search: false,
-  graph: false,
-  links: false,
-  info: {
-    info: false,
-    edit: false,
-  },
-  classes: {
-    list: false,
-    info: false,
-    edit: false,
-  },
-  attributes: {
-    list: false,
-    info: false,
-    edit: false,
-  },
-  associations: {
-    list: false,
-    info: false,
-    edit: false,
-  },
-};
-
-const initialState = {
-  selected: {
-    id: '',
-    type: '',
-  },
-  hovered: {
-    id: '',
-    type: '',
-  },
-  highlighted: [],
-  view: initialView,
-};
-
-export const crosswalkSlice = createSlice({
-  name: 'crosswalk',
-  initialState: {
-    ...initialState,
-    view: {
-      ...initialView,
-      info: {
-        info: true,
-        edit: false,
-      },
-    },
-  },
-  extraReducers: (builder) => {
-    builder.addMatcher(isHydrate, (state, action) => {
-      return {
-        ...state,
-        ...action.payload.crosswalk,
-      };
-    });
-  },
-  reducers: {
-    setSelected(state, action) {
-      return {
-        ...state,
-        selected: {
-          id: action.payload.id,
-          type: action.payload.type,
-        },
-        view: {
-          ...initialView,
-          [action.payload.type]: ['search', 'links'].includes(
-            action.payload.type
-          )
-            ? true
-            : {
-                ...(initialView[
-                  action.payload.type as keyof typeof initialView
-                ] as object),
-                info: true,
-              },
-        },
-      };
-    },
-    setHovered(state, action) {
-      return {
-        ...state,
-        hovered: {
-          id: action.payload.id,
-          type: action.payload.type,
-        },
-      };
-    },
-    setView(state, action) {
-      return {
-        ...state,
-        view: {
-          ...initialView,
-          [action.payload.key]:
-            typeof initialView[
-              action.payload.key as keyof typeof initialView
-            ] !== 'boolean' && action.payload.subkey
-              ? {
-                  ...(initialView[
-                    action.payload.key as keyof typeof initialView
-                  ] as object),
-                  [action.payload.subkey]: true,
-                }
-              : true,
-        },
-      };
-    },
-  },
-});
-
-export function selectSelected() {
-  // return (state: AppState) => state.schema.selected;
-}
-
-export function setSelected(
-  id: string,
-  type: keyof typeof initialView
-): AppThunk {
-  return (dispatch) =>
-    dispatch(crosswalkSlice.actions.setSelected({ id, type }));
-}
-
-export function resetSelected(): AppThunk {
-  return (dispatch) =>
-    dispatch(crosswalkSlice.actions.setSelected({ id: '', type: '' }));
-}
-
-export function selectHovered() {
-  //return (state: AppState) => state.model.hovered;
-}
-
-export function setHovered(id: string, type: keyof ViewList): AppThunk {
-  return (dispatch) =>
-    dispatch(crosswalkSlice.actions.setHovered({ id, type }));
-}
-
-export function resetHovered(): AppThunk {
-  return (dispatch) =>
-    dispatch(crosswalkSlice.actions.setHovered({ id: '', type: '' }));
-}
-
-export function selectViews() {
-  //return (state: AppState) => state.model.view;
-}
-
-export function selectClassView() {
-  //return (state: AppState) => state.model.view.classes;
-}

@@ -2,6 +2,7 @@ import { Organization } from '@app/common/interfaces/organizations.interface';
 import { State } from '@app/common/interfaces/state.interface';
 import { Format } from '@app/common/interfaces/format.interface';
 import { ContentRevision } from '@app/common/interfaces/content-revision.interface';
+import { UrlState } from '@app/common/utils/hooks/use-url-state';
 
 export interface Label {
   [key: string]: string;
@@ -9,16 +10,17 @@ export interface Label {
 
 export enum Visibility {
   Private = 'PRIVATE',
-  Public = 'PUBLIC'
+  Public = 'PUBLIC',
 }
 
 export enum Type {
   Crosswalk = 'CROSSWALK',
-  Schema = 'SCHEMA'
+  Schema = 'SCHEMA',
 }
 
 export interface ResultInfo {
   id: string;
+  handle: string;
   label: Label;
   state: State;
   comment: { [key: string]: string };
@@ -34,6 +36,7 @@ export interface ResultInfo {
   versionLabel: string;
   namespace: string;
   format?: Format;
+  owner: [] | undefined;
 }
 
 export interface PaginatedQuery {
@@ -41,7 +44,7 @@ export interface PaginatedQuery {
   type?: Type;
   ownerOrg?: string;
   pageSize: number;
-  pageFrom: number;
+  urlState: UrlState;
 }
 
 export interface MscrSearchResult {

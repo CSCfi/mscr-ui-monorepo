@@ -1,21 +1,18 @@
-import { Dispatch, SetStateAction } from 'react';
-import { Pagination as SFPagination } from 'suomifi-ui-components';
 import { useTranslation } from 'next-i18next';
+import useUrlState from '@app/common/utils/hooks/use-url-state';
+import { StyledPagination } from '@app/common/components/pagination/pagination.styles';
 
 interface PaginationProps {
-  currentPage: number;
-  setCurrentPage: Dispatch<SetStateAction<number>>;
   lastPage: number;
 }
 
 export default function Pagination({
-  currentPage,
-  setCurrentPage,
   lastPage,
 }: PaginationProps) {
   const { t } = useTranslation('common');
+  const { urlState, patchUrlState } = useUrlState();
   return (
-    <SFPagination
+    <StyledPagination
       aria-label={t('pagination.aria.label')}
       pageIndicatorText={(currentPage, lastPage) =>
         t('pagination.page') + ' ' + currentPage + ' / ' + lastPage
@@ -24,8 +21,8 @@ export default function Pagination({
         t('pagination.aria.info', { currentPage, lastPage })
       }
       lastPage={lastPage}
-      currentPage={currentPage}
-      onChange={(page) => setCurrentPage(+page)}
+      currentPage={urlState.page}
+      onChange={(e) => patchUrlState({ page: +e })}
       nextButtonAriaLabel={t('pagination.aria.next')}
       previousButtonAriaLabel={t('pagination.aria.prev')}
       pageInput={false}

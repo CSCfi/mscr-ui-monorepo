@@ -1,37 +1,47 @@
 import { useTranslation } from 'next-i18next';
-import { Dispatch, SetStateAction } from 'react';
-import { Dropdown, DropdownItem } from 'suomifi-ui-components';
-import { FormErrors } from './validate-crosswalk-form';
-import { CrosswalkFormType } from '@app/common/interfaces/crosswalk.interface';
+import { DropdownItem, Text } from 'suomifi-ui-components';
 import TargetAndSourceSchemaSelector from './target-and-source-schema-selector';
-import { possibleStatesAtRegistration, State } from '@app/common/interfaces/state.interface';
+import {
+  possibleStatesAtRegistration,
+  State,
+} from '@app/common/interfaces/state.interface';
 import {
   ModelFormContainer,
   WideMultiSelect,
 } from '@app/modules/form/form.styles';
 import MscrLanguageSelector from '@app/common/components/language-selector/mscr-language-selector';
-import { Format, formatsAvailableForCrosswalkRegistration } from '@app/common/interfaces/format.interface';
+import {
+  Format,
+  formatsAvailableForCrosswalkCreation,
+  formatsAvailableForCrosswalkRegistration,
+} from '@app/common/interfaces/format.interface';
+import { WideDropdown } from '@app/modules/form/crosswalk-form/crosswalk-form.styles';
+import { FormType } from '@app/common/utils/hooks/use-initial-form';
+import { InputErrors } from '@app/modules/form/validate-form';
 
 interface RegisterCrosswalkFormProps {
-  formData: CrosswalkFormType;
-  setFormData: Dispatch<SetStateAction<CrosswalkFormType>>;
+  formData: FormType;
+  setFormData: (value: FormType) => void;
   createNew: boolean;
+  hasInitialData?: boolean;
   userPosted: boolean;
   disabled?: boolean;
-  errors?: FormErrors;
+  errors?: InputErrors;
   editMode?: boolean;
+  groupWorkspacePid: string | undefined;
 }
 
 export default function CrosswalkFormFields({
   formData,
   setFormData,
   createNew,
+  hasInitialData,
   userPosted,
   disabled,
   errors,
-  editMode,
+  groupWorkspacePid,
 }: RegisterCrosswalkFormProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation();
 
   return (
     <ModelFormContainer>
@@ -39,33 +49,71 @@ export default function CrosswalkFormFields({
         formData={formData}
         setFormData={setFormData}
         createNew={createNew}
+        schemaSelectorDisabled={hasInitialData}
+        groupWorkspacePid={groupWorkspacePid}
       ></TargetAndSourceSchemaSelector>
-      {!createNew && renderCrosswalkFormat()}
+      {createNew && (
+        <Text>
+          {t('crosswalk-form.format-note')}
+          {formatsAvailableForCrosswalkCreation.join(', ')}
+        </Text>
+      )}
       {renderLanguages()}
-      {!createNew && renderState()}
+      {!createNew && renderCrosswalkFormatAndState()}
     </ModelFormContainer>
   );
 
-  function renderCrosswalkFormat() {
+  function renderCrosswalkFormatAndState() {
     // may be load the formats from an array
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <Dropdown
-          labelText={'Format'}
-          defaultValue={formData.format ?? ''}
-          visualPlaceholder={'Select Crosswalk File Format'}
-          onChange={(e: Format) =>
-            setFormData({
-              ...formData,
-              format: e,
-            })
-          }
-        >
-          {formatsAvailableForCrosswalkRegistration.map((format) => (
-            <DropdownItem key={format} value={format}>{format}</DropdownItem>
-          ))}
-        </Dropdown>
-      </div>
+      <>
+        <div className="row">
+          <div className="col-6">
+            <WideDropdown
+              disabled={hasInitialData}
+              labelText={t('content-form.format-label')}
+              defaultValue={formData.format ?? ''}
+              visualPlaceholder={
+                hasInitialData
+                  ? formData.format
+                  : t('content-form.format-placeholder')
+              }
+              onChange={(e: Format) =>
+                setFormData({
+                  ...formData,
+                  format: e,
+                })
+              }
+            >
+              {formatsAvailableForCrosswalkRegistration.map((format) => (
+                <DropdownItem key={format} value={format}>
+                  {format}
+                </DropdownItem>
+              ))}
+            </WideDropdown>
+          </div>
+          <div className="col-6">
+            <WideDropdown
+              disabled={hasInitialData}
+              labelText={t('content-form.state')}
+              visualPlaceholder={t('content-form.state-select')}
+              defaultValue={formData.state ?? ''}
+              onChange={(e: State) =>
+                setFormData({
+                  ...formData,
+                  state: e,
+                })
+              }
+            >
+              {possibleStatesAtRegistration.map((state) => (
+                <DropdownItem key={state} value={state}>
+                  {state}
+                </DropdownItem>
+              ))}
+            </WideDropdown>
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -76,9 +124,13 @@ export default function CrosswalkFormFields({
       <div>
         <MscrLanguageSelector
           items={formData.languages}
-          labelText={t('information-description-languages')}
-          hintText={t('information-description-languages-hint-text')}
-          visualPlaceholder={t('select-information-description-languages')}
+          labelText={t('content-form.information-description-languages')}
+          hintText={t(
+            'content-form.information-description-languages-hint-text'
+          )}
+          visualPlaceholder={t(
+            'content-form.information-description-languages-placeholder'
+          )}
           isWide={true}
           setLanguages={(e) =>
             setFormData({
@@ -86,11 +138,14 @@ export default function CrosswalkFormFields({
               languages: e,
             })
           }
+          versionLabelCaption={t('content-form.version-label')}
+          versionLabel={formData.versionLabel ?? '1'}
+          setVersionLabel={(e) => setVersionLabel(e)}
           userPosted={userPosted}
           translations={{
-            textInput: t('language-input-text'),
-            textDescription: t('description'),
-            optionalText: t('optional'),
+            textInput: t('crosswalk-form.name'),
+            textDescription: t('content-form.description'),
+            optionalText: t('content-form.optional'),
           }}
           allowItemAddition={false}
           ariaChipActionLabel={''}
@@ -108,26 +163,11 @@ export default function CrosswalkFormFields({
     );
   }
 
-  function renderState() {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <Dropdown
-          labelText={'State'}
-          visualPlaceholder={'Select state'}
-          defaultValue={formData.state ?? ''}
-          onChange={(e: State) =>
-            setFormData({
-              ...formData,
-              state: e,
-            })
-          }
-        >
-          {possibleStatesAtRegistration.map((state) => (
-            <DropdownItem key={state} value={state}>{state}</DropdownItem>
-          ))}
-        </Dropdown>
-      </div>
-    );
+  function setVersionLabel(value: string) {
+    setFormData({
+      ...formData,
+      versionLabel: value as string,
+    });
   }
 
   //Currently Hidden from the form

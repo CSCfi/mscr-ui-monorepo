@@ -1,6 +1,4 @@
-import { useGetPersonalContentQuery } from '@app/common/components/personal/personal.slice';
-import { PaginatedQuery, Type } from '@app/common/interfaces/search.interface';
-import WorkspaceTable from 'src/modules/workspace/workspace-table';
+import { Type } from '@app/common/interfaces/search.interface';
 import { useTranslation } from 'next-i18next';
 import Title from 'yti-common-ui/components/title';
 import {
@@ -8,43 +6,99 @@ import {
   TitleDescriptionWrapper,
 } from 'yti-common-ui/components/title/title.styles';
 import Separator from 'yti-common-ui/components/separator';
-import SchemaFormModal from '@app/modules/form/schema-form/schema-form-modal';
 import { useBreakpoints } from 'yti-common-ui/components/media-query';
-import { useGetOrganizationsQuery } from '@app/common/components/organizations/organizations.slice';
-import CrosswalkFormModal from '@app/modules/form/crosswalk-form/crosswalk-form-modal';
 import { ButtonBlock } from '@app/modules/workspace/workspace.styles';
-import { useState } from 'react';
 import Pagination from '@app/common/components/pagination';
+import useUrlState from '@app/common/utils/hooks/use-url-state';
+import { useGetPersonalContentQuery } from '@app/common/components/mscr-search/mscr-search.slice';
+import { useRouter } from 'next/router';
+import { getLanguageVersion } from '@app/common/utils/get-language-version';
+import { useEffect, useMemo, useState } from 'react';
+import WorkspaceTable, {
+  ContentRow,
+} from '@app/modules/workspace/workspace-table';
+import { ModalVisibilityButton } from '@app/modules/form/modal-visibility-button';
+import FormModal, { ModalType } from '@app/modules/form';
+import Link from 'next/link';
+import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
+import SpinnerOverlay from '@app/common/components/spinner-overlay';
 
 export default function PersonalWorkspace({
   contentType,
 }: {
   contentType: Type;
 }) {
-  const { t, i18n } = useTranslation('common');
+  const { t } = useTranslation('common');
+  const router = useRouter();
+  const lang = router.locale ?? '';
   const { isSmall } = useBreakpoints();
-  const [currentPage, setCurrentPage] = useState(1);
+  const { urlState } = useUrlState();
   const pageSize = 20;
-  const query: PaginatedQuery = {
+  const [registerCrosswalkModalVisible, setRegisterCrosswalkModalVisible] =
+    useState(false);
+  const [createCrosswalkModalVisible, setCreateCrosswalkModalVisible] =
+    useState(false);
+  const [registerSchemaModalVisible, setRegisterSchemaModalVisible] =
+    useState(false);
+  const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
+  const [content, setContent] = useState(new Array<ContentRow>());
+  const { data, isLoading } = useGetPersonalContentQuery({
     type: contentType,
     pageSize,
-    pageFrom: (currentPage - 1) * pageSize,
-  };
-  const { data, isLoading } = useGetPersonalContentQuery(query);
+    urlState,
+  });
   const lastPage = data?.hits.total?.value
     ? Math.ceil(data?.hits.total.value / pageSize)
     : 0;
-  const { refetch: refetchOrganizationsData } = useGetOrganizationsQuery(
-    i18n.language
-  );
 
-  // Need to decide what data we want to fetch loading the application
-  const refetchInfo = () => {
-    refetchOrganizationsData();
-  };
+  // Todo: Refactor workspaces to share code to avoid repeated code
+  const fetchedContent = useMemo(() => {
+    if (data) {
+      return data.hits.hits.map((result) => {
+        const info = result._source;
+        const label = getLanguageVersion({
+          data: info.label,
+          lang,
+        });
+        const linkUrl =
+          contentType == Type.Schema
+            ? router.basePath + '/schema/' + info.id
+            : router.basePath + '/crosswalk/' + info.id;
+        const linkLabel = `${t('workspace.view')} ${label}`;
+        return {
+          label: label,
+         /*  // ...(contentType == Type.Schema && { namespace: info.namespace }), */
+          state: info.state,
+          numberOfRevisions: info.numberOfRevisions.toString(),
+          pid: info.handle ?? t('metadata.not-available'),
+          format: info.format,
+          // eslint-disable-next-line jsx-a11y/anchor-is-valid
+          linkUrl: (
+            <Link href={linkUrl} passHref>
+              <a aria-label={linkLabel}>{t('workspace.view')}</a>
+            </Link>
+          ),
+        };
+      });
+    } else {
+      return [];
+    }
+  }, [contentType, data, lang, router.basePath, t]);
+
+  useEffect(() => {
+    setContent(fetchedContent);
+  }, [fetchedContent]);
 
   if (isLoading) {
-    return <div> Is Loading </div>; //ToDo: A loading circle or somesuch
+    setTimeout(() => setLoadingSpinnerVisible(true), 500);
+    return (
+      <SpinnerWrapper>
+        <SpinnerOverlay
+          animationVisible={loadingSpinnerVisible}
+          transparentBackground={true}
+        />
+      </SpinnerWrapper>
+    );
   } else {
     return (
       <main id="main">
@@ -59,23 +113,45 @@ export default function PersonalWorkspace({
             </TitleDescriptionWrapper>
           }
         />
-        <Separator isLarge />
         <ButtonBlock>
           {contentType == 'SCHEMA' ? (
             <>
-              <SchemaFormModal refetch={refetchInfo}></SchemaFormModal>
+              <ModalVisibilityButton
+                setVisible={setRegisterSchemaModalVisible}
+                label={t('content-form.button.schema-register')}
+              />
+              <FormModal
+                modalType={ModalType.RegisterNewFull}
+                contentType={Type.Schema}
+                visible={registerSchemaModalVisible}
+                setVisible={setRegisterSchemaModalVisible}
+              />
             </>
           ) : (
             <>
-              <CrosswalkFormModal refetch={refetchInfo}></CrosswalkFormModal>
-              <CrosswalkFormModal
-                refetch={refetchInfo}
-                createNew={true}
-              ></CrosswalkFormModal>
+              <ModalVisibilityButton
+                setVisible={setRegisterCrosswalkModalVisible}
+                label={t('content-form.button.crosswalk-register')}
+              />
+              <FormModal
+                modalType={ModalType.RegisterNewFull}
+                contentType={Type.Crosswalk}
+                visible={registerCrosswalkModalVisible}
+                setVisible={setRegisterCrosswalkModalVisible}
+              />
+              <ModalVisibilityButton
+                setVisible={setCreateCrosswalkModalVisible}
+                label={t('content-form.button.crosswalk-create')}
+              />
+              <FormModal
+                modalType={ModalType.RegisterNewMscr}
+                contentType={Type.Crosswalk}
+                visible={createCrosswalkModalVisible}
+                setVisible={setCreateCrosswalkModalVisible}
+              />
             </>
           )}
         </ButtonBlock>
-        <Separator isLarge />
         {data?.hits.hits && data?.hits.hits.length < 1 ? (
           <div>
             {contentType == 'SCHEMA'
@@ -83,15 +159,9 @@ export default function PersonalWorkspace({
               : t('workspace.no-crosswalks')}
           </div>
         ) : (
-          <WorkspaceTable data={data} contentType={contentType} />
+          <WorkspaceTable content={content} contentType={contentType} />
         )}
-        {lastPage > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            lastPage={lastPage}
-          />
-        )}
+        {lastPage > 1 && <Pagination lastPage={lastPage} />}
       </main>
     );
   }

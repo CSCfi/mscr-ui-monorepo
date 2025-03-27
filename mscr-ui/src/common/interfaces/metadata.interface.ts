@@ -4,12 +4,14 @@ import { State } from '@app/common/interfaces/state.interface';
 
 export interface Metadata {
   pid: string;
+  handle: string;
   label: {
     [key: string]: string;
   };
   description: {
     [key: string]: string;
   };
+  languages?: string[];
   format: Format;
   visibility: Visibility;
   state: State;
@@ -17,11 +19,18 @@ export interface Metadata {
   modified: string;
   versionLabel: string;
   contact: string;
+  ownerMetadata: [
+    {
+      id: string;
+      name: string;
+    }
+  ];
   sourceSchema?: string;
   targetSchema?: string;
   namespace?: string;
   prefix?: string;
   fileMetadata?: FileData[];
+  sourceURL?: string;
 }
 
 export interface FileData {
@@ -38,6 +47,7 @@ export interface MetadataFormType {
   contact: string;
   versionLabel: string;
   visibility: string;
+  namespace: string;
 }
 
 export const initialMetadataForm: MetadataFormType = {
@@ -46,4 +56,5 @@ export const initialMetadataForm: MetadataFormType = {
   contact: '',
   versionLabel: '',
   visibility: '',
+  namespace: '',
 };

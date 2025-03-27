@@ -32,27 +32,41 @@ export interface RenderTreeOld {
 
 export interface RenderTree {
     name: string;
+    qname: string;
     visualTreeId: string;
     id: string;
     properties: any;
-    elementPath: string;
-    parentElementPath: string | undefined;
+    rootPathIds: string[];
     children: RenderTree[];
+    uri: string;
 }
 
 export interface CrosswalkConnectionNew {
     source: RenderTree;
     target: RenderTree;
     id: string;
-    description: string | undefined;
+    notes: string | undefined;
+    predicate: string;
+    processing: any;
     isSelected: boolean;
     isDraft: boolean;
     sourceJsonPath: string | undefined;
     targetJsonPath: string | undefined;
     sourcePredicate: string | undefined;
-    sourceProcessing: string | undefined;
+    sourceProcessing?: { id: string; params: any };
     targetPredicate: string | undefined;
-    targetProcessing: string | undefined;
+    targetProcessing?: { id: string; params: any };
+}
+
+export interface NodeListingRow {
+    name: string;
+    type: string;
+    description: string;
+    id: string;
+    notes: string | undefined;
+    isSelected: boolean;
+    processingSelection?: string;
+    processing?: { id: string; params: any };
 }
 
 export interface CrosswalkConnectionsNew {
@@ -66,16 +80,17 @@ export interface NodeMapping {
     isPartOf?: string;
     id?: string;
     depends_on?: string[];
-    source: { processing?: { id: string; params: { additionalProp1: {}; additionalProp3: {}; additionalProp2: {} } }; id: string; label: string }[];
+    source: { processing?: { id: string; params: any }; id: string; label: string; uri: string }[];
     sourceType?: string;
     sourceDescription?: string;
     predicate: string;
     filter?: { path: string; distinctValues: boolean; value: {}; operator: string };
-    target: { processing?: { id: string; params: { additionalProp1: {}; additionalProp3: {}; additionalProp2: {} } }; id: string; label: string }[];
+    target: { processing?: { id: string; params: any }; id: string; label: string; uri: string }[];
     targetType?: string;
     targetDescription?: string;
-    processing?: { id: string; params: { additionalProp1: {}; additionalProp3: {}; additionalProp2: {} } };
+    processing?: { id: string; params: any };
     oneOf?: { filter: { path: string; distinctValues: boolean; value: {}; operator: string } }[];
     pid?: string;
+    notes?: string;
 }
 

@@ -26,6 +26,7 @@ export function translateResourceType(type: ResourceType, t: TFunction) {
 }
 
 export function translateModelFormErrors(error: string, t: TFunction) {
+  // console.log(error);
   switch (error) {
     case 'languageAmount':
       return t('missing-languages', { ns: 'admin' });
@@ -45,6 +46,10 @@ export function translateModelFormErrors(error: string, t: TFunction) {
       return t('missing-description', { ns: 'admin' });
     case 'name':
       return t('missing-name', { ns: 'admin' });
+    case 'fileData':
+      return t('missing-file', { ns: 'admin' });
+    case 'format':
+      return t('missing-format', { ns: 'admin' });
     default:
       return t('missing-general', { ns: 'admin' });
   }
@@ -302,10 +307,7 @@ export function translateFileUploadError(
   }
 }
 
-export function translateNotification(
-  key: NotificationKeys,
-  t: TFunction
-) {
+export function translateNotification(key: NotificationKeys, t: TFunction) {
   switch (key) {
     case 'CROSSWALK_SAVE':
       return t('notifications.crosswalk-saved');
@@ -315,6 +317,40 @@ export function translateNotification(
       return t('notifications.crosswalk-published');
     case 'SCHEMA_PUBLISH':
       return t('notifications.schema-published');
+    case 'CROSSWALK_DELETE':
+      return t('notifications.crosswalk-deleted');
+    case 'SCHEMA_DELETE':
+      return t('notifications.schema-deleted');
+    case 'CROSSWALK_INVALIDATE':
+      return t('notifications.crosswalk-invalidated');
+    case 'SCHEMA_INVALIDATE':
+      return t('notifications.schema-invalidated');
+    case 'CROSSWALK_DEPRECATE':
+      return t('notifications.crosswalk-deprecated');
+    case 'SCHEMA_DEPRECATE':
+      return t('notifications.schema-deprecated');
+    case 'EDIT_MAPPINGS':
+      return t('notifications.mappings-edit');
+    case 'EDIT_SCHEMA':
+      return t('notifications.schema-edit');
+    case 'FINISH_EDITING_MAPPINGS':
+      return t('notifications.mappings-finish-editing');
+    case 'FINISH_EDITING_SCHEMA':
+      return t('notifications.schema-finish-editing');
+    case 'CROSSWALK_REVISION':
+      return t('notifications.add-crosswalk-revision');
+    case 'SCHEMA_REVISION':
+      return t('notifications.add-schema-revision');
+    case 'CROSSWALK_ADD':
+      return t('notifications.add-crosswalk');
+    case 'SCHEMA_ADD':
+      return t('notifications.add-schema');
+    case 'CROSSWALK_COPY':
+      return t('notifications.copy-crosswalk');
+    case 'SCHEMA_COPY':
+      return t('notifications.copy-schema');
+    case 'SCHEMA_SET_ROOT_SELECTION':
+      return t('notifications.set-root-selection');
     default:
       return '';
   }

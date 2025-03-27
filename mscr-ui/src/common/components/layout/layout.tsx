@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from 'yti-common-ui/theme';
 import {
   ContentContainer,
   SiteContainer,
   MarginContainer,
+  FlexContainer,
 } from './layout.styles';
 import { useTranslation } from 'next-i18next';
 import SmartHeader from '../smart-header';
@@ -14,106 +14,74 @@ import { FakeableUser } from '../../interfaces/fakeable-user.interface';
 import generateFakeableUsers from 'yti-common-ui/utils/generate-impersonate';
 import SideNavigationPanel from '../side-navigation';
 import { MscrUser } from '@app/common/interfaces/mscr-user.interface';
-import { SearchContext } from '@app/common/components/search-context-provider';
 import SearchScreen from 'src/modules/search/search-screen';
-import { Grid } from '@mui/material';
+import ActionPanel from '@app/common/components/action-panel';
+import useUrlState, {
+  initialUrlState,
+} from '@app/common/utils/hooks/use-url-state';
+import { ReactNode } from 'react';
+import SpinnerRouterListener from '@app/common/components/spinner-router-listener';
 
 export default function Layout({
   children,
-  sideNavigationHidden,
-  feedbackSubject,
   user,
   fakeableUsers,
-  matomo,
+  isActionMenu,
   alerts,
-  fullScreenElements,
 }: {
-  children: React.ReactNode;
-  sideNavigationHidden: boolean;
-  feedbackSubject?: string;
+  children: ReactNode;
   user?: MscrUser;
   fakeableUsers?: FakeableUser[] | null;
-  matomo?: React.ReactNode;
-  alerts?: React.ReactNode;
-  fullScreenElements?: React.ReactNode;
+  isActionMenu?: boolean;
+  alerts?: ReactNode;
+  fullScreenElements?: ReactNode;
 }) {
   const { t, i18n } = useTranslation('common');
   const { breakpoint } = useBreakpoints();
-  const [isSearchActive, setIsSearchActive] = useState(false);
+  const { urlState } = useUrlState();
+  const showSearchScreen = urlState.q !== initialUrlState.q;
 
   return (
     <ThemeProvider theme={lightTheme}>
-      <SearchContext.Provider
-        value={{
-          isSearchActive,
-          setIsSearchActive,
-        }}
-      >
-        {matomo && matomo}
-        <SkipLink href="#main">{t('skip-link-main')}</SkipLink>
-        {fullScreenElements ? (
-          <SiteContainer>
-            <SmartHeader
-              user={user}
-              fakeableUsers={generateFakeableUsers(
-                i18n.language,
-                fakeableUsers
-              )}
-              fullScreenElements={fullScreenElements}
-            />
-
-            <ContentContainer
-              $fullScreen={typeof fullScreenElements !== 'undefined'}
-            >
-              {children}
+      <SkipLink href="#main">{t('skip-link-main')}</SkipLink>
+      <SiteContainer>
+        <SmartHeader
+          user={user}
+          fakeableUsers={generateFakeableUsers(i18n.language, fakeableUsers)}
+        />
+        {user && !user.anonymous ? (
+          <FlexContainer>
+            <SpinnerRouterListener />
+            <ContentContainer>
+              {alerts && alerts}
+              <MarginContainer
+                $breakpoint={breakpoint}
+                className={showSearchScreen ? 'hidden' : ''}
+              >
+                <ActionPanel isActionMenu={isActionMenu} />
+                {showSearchScreen && <SearchScreen />}
+                {children}
+              </MarginContainer>
             </ContentContainer>
-          </SiteContainer>
+            <SideNavigationPanel user={user} />
+          </FlexContainer>
         ) : (
-          <SiteContainer>
-            <SmartHeader
-              user={user}
-              fakeableUsers={generateFakeableUsers(
-                i18n.language,
-                fakeableUsers
-              )}
-            />
-            {!sideNavigationHidden && user && !user.anonymous ? (
-              <Grid container spacing={2}>
-                <Grid item xs={2}>
-                  <SideNavigationPanel user={user} />
-                </Grid>
-                <Grid item xs={10}>
-                  <ContentContainer>
-                    {alerts && alerts}
-                    <MarginContainer
-                      $breakpoint={breakpoint}
-                      className={isSearchActive ? 'hidden' : ''}
-                    >
-                      {isSearchActive && <SearchScreen />}
-                      {children}
-                    </MarginContainer>
-                  </ContentContainer>
-                </Grid>
-              </Grid>
-            ) : (
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <ContentContainer>
-                    {alerts && alerts}
-                    <MarginContainer
-                      $breakpoint={breakpoint}
-                      className={isSearchActive ? 'hidden' : ''}
-                    >
-                      {isSearchActive && <SearchScreen />}
-                      {children}
-                    </MarginContainer>
-                  </ContentContainer>
-                </Grid>
-              </Grid>
-            )}
-          </SiteContainer>
+          <>
+            <SpinnerRouterListener />
+            <ContentContainer className={'w-100'}>
+              {alerts && alerts}
+              <MarginContainer
+                $breakpoint={breakpoint}
+                className={showSearchScreen ? 'hidden' : ''}
+              >
+                <ActionPanel isActionMenu={isActionMenu} />
+                {showSearchScreen && <SearchScreen />}
+                {children}
+              </MarginContainer>
+            </ContentContainer>
+          </>
         )}
-      </SearchContext.Provider>
+      </SiteContainer>
     </ThemeProvider>
   );
 }

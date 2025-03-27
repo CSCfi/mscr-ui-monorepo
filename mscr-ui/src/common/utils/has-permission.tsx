@@ -7,54 +7,37 @@ import {
   useGetAuthenticatedUserQuery,
 } from '../components/login/login.slice';
 import { User } from 'yti-common-ui/interfaces/user.interface';
+import { Roles } from '../interfaces/format.interface';
 
-// Need to specify the acctions permitted for each type of user
+// Need to specify the actions permitted for each type of user
 const actions = [
-  'ADMIN_DATA_MODEL',
-  'CREATE_DATA_MODEL',
-  'EDIT_DATA_MODEL',
-  'DELETE_DATA_MODEL',
-  'ADMIN_CLASS',
-  'CREATE_CLASS',
-  'DELETE_CLASS',
-  'EDIT_CLASS',
-  'ADMIN_ASSOCIATION',
-  'CREATE_ASSOCIATION',
-  'EDIT_ASSOCIATION',
-  'DELETE_ASSOCIATION',
-  'ADMIN_ATTRIBUTE',
-  'CREATE_ATTRIBUTE',
-  'EDIT_ATTRIBUTE',
-  'DELETE_ATTRIBUTE',
-  'CREATE_SCHEMA',
-  'EDIT_SCHEMA',
-  'EDIT_SCHEMA_METADATA',
-  'EDIT_SCHEMA_FILES',
-  'DELETE_SCHEMA',
-  'CREATE_CROSSWALK',
-  'EDIT_CROSSWALK_MAPPINGS',
-  'EDIT_CROSSWALK_METADATA',
-  'EDIT_CROSSWALK_FILES',
-  'DELETE_CROSSWALK',
+  // 'EDIT_SCHEMA',
+  // 'EDIT_SCHEMA_METADATA',
+  // 'EDIT_SCHEMA_FILES',
+  // 'DELETE_SCHEMA',
+  // 'EDIT_CROSSWALK_MAPPINGS',
+  // 'EDIT_CROSSWALK_METADATA',
+  // 'EDIT_CROSSWALK_FILES',
+  // 'DELETE_CROSSWALK',
+  'CREATE_CONTENT',
+  'EDIT_CONTENT',
+  'MAKE_MSCR_COPY',
 ] as const;
 
-export type Actions = typeof actions[number];
+export type Action = typeof actions[number];
 
 export interface hasPermissionProps {
-  actions: Actions | Actions[];
-  targetOrganization?: string;
+  action: Action;
+  owner?: string[];
 }
 
 export interface checkPermissionProps {
   user: User;
-  actions: Actions[];
-  targetOrganizations?: string[];
+  action: Action;
+  owner?: string[];
 }
 
-export default function HasPermission({
-  actions,
-  targetOrganization,
-}: hasPermissionProps) {
+export default function HasPermission({ action, owner }: hasPermissionProps) {
   const { data: authenticatedUser } = useGetAuthenticatedUserQuery();
   const dispatch = useStoreDispatch();
   const user = useSelector(selectLogin());
@@ -78,48 +61,49 @@ export default function HasPermission({
     return false;
   }
 
-  if (!targetOrganization) {
+  if (!owner || owner.length == 0) {
     return checkPermission({
       user,
-      actions: Array.isArray(actions) ? actions : [actions],
+      action,
     });
   }
 
   return checkPermission({
     user,
-    actions: Array.isArray(actions) ? actions : [actions],
-    targetOrganizations: [targetOrganization],
+    action,
+    owner,
   });
 }
 
-export function checkPermission({
-  user,
-  actions,
-  targetOrganizations,
-}: checkPermissionProps) {
-  const rolesInOrganizations = Object.keys(user.organizationsInRole);
-  const rolesInTargetOrganizations =
-    targetOrganizations &&
-    targetOrganizations
-      ?.flatMap((org) => user.rolesInOrganizations[org])
-      .filter((t) => t);
-
-  // Return true if user is superuser
-  if (user.superuser) {
+export function checkPermission({ user, action, owner }: checkPermissionProps) {
+  //making MSCR Copy allowed for all
+  if (action == 'MAKE_MSCR_COPY') {
     return true;
   }
+  if (action == 'EDIT_CONTENT' || action == 'CREATE_CONTENT') {
+    if (owner?.includes(user.id)) {
+      //user is the owner, Check for personal Contents
+      return true;
+    } else {
+      //Group Content
+      if (
+        owner &&
+        user.organizationsInRole[Roles.admin] &&
+        user.organizationsInRole[Roles.admin].includes(owner[0])
+      ) {
+        // User has admin right for this group
+        return true;
+      }
 
-  // Return true if target organization is undefined and user has admin role
-  if (rolesInOrganizations.includes('ADMIN') && !targetOrganizations) {
-    return true;
-  }
-
-  // Return true if user has admin role in target organization
-  if (
-    rolesInOrganizations.includes('ADMIN') &&
-    rolesInTargetOrganizations?.includes('ADMIN')
-  ) {
-    return true;
+      if (
+        owner &&
+        user.organizationsInRole[Roles.dataModelEditor] &&
+        user.organizationsInRole[Roles.dataModelEditor].includes(owner[0])
+      ) {
+        // User has data model editor right for this group
+        return true;
+      }
+    }
   }
 
   return false;

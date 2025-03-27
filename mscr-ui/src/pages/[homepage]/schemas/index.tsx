@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import PersonalWorkspace from 'src/modules/workspace/personal-home';
 import GroupWorkspace from 'src/modules/workspace/group-home';
 import { createCommonGetServerSideProps } from '@app/common/utils/create-getserversideprops';
+import { Type } from '@app/common/interfaces/search.interface';
 
 interface SchemasPageProps extends CommonContextState {
   user: MscrUser;
@@ -28,14 +29,14 @@ export default function SchemasPage(props: SchemasPageProps) {
         fakeableUsers={props.fakeableUsers}
       >
         <PageHead
-          baseUrl="http:/localhost:3000"
+          baseUrl="https://mscr-test.rahtiapp.fi"
           title={t('mscr-title')}
           description={t('service-description')}
         />
         {contentOwner == 'personal' ? (
-          <PersonalWorkspace contentType={'SCHEMA'} />
+          <PersonalWorkspace contentType={Type.Schema} />
         ) : (
-          <GroupWorkspace user={props.user} pid={contentOwner} contentType={'SCHEMA'} />
+          <GroupWorkspace user={props.user} pid={contentOwner} contentType={Type.Schema} />
         )}
       </Layout>
     </CommonContextProvider>

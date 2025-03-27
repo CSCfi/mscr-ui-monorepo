@@ -17,19 +17,17 @@ import { countApi } from '@app/common/components/counts/counts.slice';
 import { visualizationApi } from '@app/common/components/visualization/visualization.slice';
 import { activeSlice } from '@app/common/components/active/active.slice';
 import { importApi } from '@app/common/components/import/import.slice';
-import {
-  schemaApi,
-  schemaSlice,
-} from '@app/common/components/schema/schema.slice';
+import { schemaApi } from '@app/common/components/schema/schema.slice';
 import {
   crosswalkApi,
-  crosswalkSlice,
 } from '@app/common/components/crosswalk/crosswalk.slice';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
-import { mscrSearchPersonalContentApi } from '@app/common/components/personal/personal.slice';
 import { crosswalkMappingFunctionsApi } from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
-import { mscrSearchOrgContentApi } from '@app/common/components/organization/organization.slice';
 import { notificationsSlice } from '@app/common/components/notifications/notifications.slice';
+import { actionmenuSlice } from '@app/common/components/actionmenu/actionmenu.slice';
+import { contentViewSlice } from '@app/common/components/content-view/content-view.slice';
+import { navigationSlice } from '@app/common/components/navigation/navigation.slice';
+import { dataTypeSlice } from '@app/common/components/data-type-registry-search/data-type-registry-search.slice';
 
 // make Context from next-redux-wrapper compatible with next-iron-session
 export type NextIronContext = Context | (Context & { req: NextApiRequest });
@@ -41,13 +39,10 @@ export function makeStore(ctx: NextIronContext) {
       [loginApi.reducerPath]: loginApi.reducer,
       [serviceCategoriesApi.reducerPath]: serviceCategoriesApi.reducer,
       [organizationsApi.reducerPath]: organizationsApi.reducer,
-
       [fakeableUsersApi.reducerPath]: fakeableUsersApi.reducer,
       [prefixApi.reducerPath]: prefixApi.reducer,
       [schemaApi.reducerPath]: schemaApi.reducer,
-      [schemaSlice.name]: schemaSlice.reducer,
       [crosswalkApi.reducerPath]: crosswalkApi.reducer,
-      [crosswalkSlice.name]: crosswalkSlice.reducer,
       [searchInternalResourcesApi.reducerPath]:
         searchInternalResourcesApi.reducer,
       [resourceApi.reducerPath]: resourceApi.reducer,
@@ -60,10 +55,11 @@ export function makeStore(ctx: NextIronContext) {
       [crosswalkMappingFunctionsApi.reducerPath]:
         crosswalkMappingFunctionsApi.reducer,
       [mscrSearchApi.reducerPath]: mscrSearchApi.reducer,
-      [mscrSearchPersonalContentApi.reducerPath]:
-        mscrSearchPersonalContentApi.reducer,
-      [mscrSearchOrgContentApi.reducerPath]: mscrSearchOrgContentApi.reducer,
       [notificationsSlice.name]: notificationsSlice.reducer,
+      [actionmenuSlice.name]: actionmenuSlice.reducer,
+      [contentViewSlice.name]: contentViewSlice.reducer,
+      [navigationSlice.name]: navigationSlice.reducer,
+      [dataTypeSlice.name]: dataTypeSlice.reducer,
     },
 
     middleware: (getDefaultMiddleware) =>
@@ -82,9 +78,7 @@ export function makeStore(ctx: NextIronContext) {
         fakeableUsersApi.middleware,
         importApi.middleware,
         crosswalkMappingFunctionsApi.middleware,
-        mscrSearchApi.middleware,
-        mscrSearchPersonalContentApi.middleware,
-        mscrSearchOrgContentApi.middleware
+        mscrSearchApi.middleware
       ),
 
     // Development tools should be available only in development environments
