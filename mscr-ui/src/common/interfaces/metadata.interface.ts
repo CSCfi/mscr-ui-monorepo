@@ -38,7 +38,7 @@ export interface FileData {
   contentType?: string;
   size?: number;
   fileID: number;
-  filename?: string;
+  name?: string;
 }
 
 export interface MetadataFormType {

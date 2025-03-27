@@ -44,7 +44,7 @@ export default function NodeInfo(props: {
   }, [props.treeData, props.currentlySelectedNodeId]);
 
   const handleDropDownSelect = (nodeId: string) => {
-    const newSelectedNode = props.treeData.find((item) => item?.id === nodeId);
+    const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
     setSelectedNode(newSelectedNode ?? selectedNode);
   };
 
@@ -123,8 +123,8 @@ export default function NodeInfo(props: {
                 onChange={(newValue) => handleDropDownSelect(newValue)}
               >
                 {dropDownList.map((rt) => (
-                  <DropdownItem key={rt?.visualTreeId} value={rt?.id}>
-                    {rt?.name}
+                  <DropdownItem key={rt.visualTreeId} value={rt.id}>
+                    {rt.name}
                   </DropdownItem>
                 ))}
               </Dropdown>

@@ -11,25 +11,12 @@ export interface Crosswalk extends Metadata {
   status?: string | undefined;
   organizations?: string[];
   sourceSchema: string;
-  sourceSchemaInfo: SchemaSummary;
   targetSchema: string;
-  targetSchemaInfo: SchemaSummary;
-  generatedFileMetadata: GeneratedFile[];
-  subType: SubType;
   owner?: string[]; // Added owner for checking permission
 }
 
 export interface CrosswalkWithVersionInfo extends Crosswalk {
   revisions: ContentRevision[];
-}
-
-interface SchemaSummary {
-  id: string;
-  handle: string;
-  name: string;
-  versionLabel: string;
-  versionIndex: number;
-  format: Format;
 }
 
 export interface CrosswalkFormType {
@@ -56,21 +43,9 @@ export interface CrosswalkFormMockupType {
   versionLabel?: string;
 }
 
-export interface GeneratedFile {
-  name: string;
-  format: string;
-  url: string;
-}
-
 export interface FilesRow {
   name: any;
   added: any;
   format: any;
   file: any;
-}
-
-export enum SubType {
-  SemanticMapping = 'SEMANTIC_MAPPING',
-  SemanticAnnotation = 'SEMANTIC_ANNOTATION',
-  DataCrosswalk = 'DATA_CROSSWALK'
 }
