@@ -40,7 +40,6 @@ export interface Metadata {
   language?: string;
   license?: string;
   publisher?: string;
-  fairsharing_doi?: string;
   // TODO: Assess if fields below can be removed when backend migrated to v2
   state?: State;
   visibility?: Visibility;
@@ -67,7 +66,6 @@ export interface MetadataFormType {
   language: string;
   license: string;
   publisher: string;
-  fairsharingDoi: string;
   creator: string[];
   identifier: string[];
 }

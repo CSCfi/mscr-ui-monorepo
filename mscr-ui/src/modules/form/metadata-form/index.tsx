@@ -9,11 +9,13 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { Grid } from '@mui/material';
 import {
+  Button,
   Button as Sbutton,
   Dropdown,
   DropdownItem,
+  IconRemove,
   Textarea,
-  TextInput,
+  TextInput
 } from 'suomifi-ui-components';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
@@ -25,12 +27,14 @@ import { useStoreDispatch } from '@app/store';
 import { setNotification } from '@app/common/components/notifications/notifications.slice';
 import FormattedDate from 'yti-common-ui/components/formatted-date';
 import {
+  DeletableInputWrapper,
   MetadataAttribute,
   MetadataContainer,
   MetadataFormContainer,
   MetadataHeading,
   MetadataLabel,
   MetadataRow,
+  RemoveButton,
 } from '@app/modules/form/metadata-form/metadata-form.styles';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
 import { SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
@@ -44,6 +48,7 @@ import {
   selectConfirmModalState,
   setConfirmModalState,
 } from '@app/common/components/actionmenu/actionmenu.slice';
+import Tooltip from '@mui/material/Tooltip';
 
 interface MetadataFormProps {
   type: Type;
@@ -109,8 +114,14 @@ export default function MetadataForm({
       description: { ...metadata.description, [lang]: formData.description },
       contact: formData.contact,
       versionLabel: formData.versionLabel,
-      visibility: formData.mscrVisibility as Visibility,
+      mscr_visibility: formData.mscrVisibility as Visibility,
       mscr_namespace: formData.mscrNamespace,
+      domain: formData.domain,
+      language: formData.language,
+      license: formData.license,
+      publisher: formData.publisher,
+      identifier: formData.identifier.filter((item) => item !== ''),
+      creator: formData.creator.filter((item) => item !== '')
     };
   };
 
@@ -130,7 +141,8 @@ export default function MetadataForm({
     const formValuesFromData: MetadataFormType = {
       label: localizedLabel,
       description: localizedDescription,
-      mscrVisibility: metadata.mscr_visibility ?? metadata.visibility ?? Visibility.Private, // Todo: Remove metadata.visibility option when backend uses metadata v2 model
+      mscrVisibility:
+        metadata.mscr_visibility ?? metadata.visibility ?? Visibility.Private, // Todo: Remove metadata.visibility option when backend uses metadata v2 model
       versionLabel: metadata.versionLabel ?? '',
       contact: metadata.contact ?? '',
       mscrNamespace: metadata.mscr_namespace ?? '',
@@ -138,9 +150,8 @@ export default function MetadataForm({
       language: metadata.language ?? '',
       license: metadata.license ?? '',
       publisher: metadata.publisher ?? '',
-      fairsharingDoi: metadata.fairsharing_doi ?? '',
       creator: metadata.creator ?? [],
-      identifier: metadata.identifier ?? []
+      identifier: metadata.identifier ?? [],
     };
     setFormData(formValuesFromData);
   }, [metadata, lang]);
@@ -152,15 +163,29 @@ export default function MetadataForm({
   // Todo: Make a confirm modal for if you try to cancel with unsaved changes
   function updateFormData(
     attributeName: keyof MetadataFormType,
-    value: string | number | undefined
+    newValue?: string | number | undefined,
+    index?: number
   ) {
-    const newFormData: MetadataFormType = { ...formData };
-    // TODO: Fix typing because of new array values
-    newFormData[attributeName] = value?.toString() ?? '';
-    setFormData(newFormData);
+    let attribute = formData[attributeName];
+    if (typeof attribute === 'string') {
+      attribute = newValue?.toString() ?? '';
+    } else if (Array.isArray(attribute)) {
+      if (typeof index !== 'undefined') {
+        if (typeof newValue !== 'undefined') { // Index and value -> replace value at index
+          attribute[index] = newValue?.toString() ?? '';
+        } else { // Index but no value -> remove index from array
+          attribute.splice(index, 1);
+        }
+      } else { // No index -> add new to array
+        attribute.push('');
+      }
+    }
+    setFormData({ ...formData, [attributeName]: attribute });
   }
 
-  const isCrosswalk = (metadata: unknown): metadata is CrosswalkWithVersionInfo => {
+  const isCrosswalk = (
+    metadata: unknown
+  ): metadata is CrosswalkWithVersionInfo => {
     return (
       type === Type.Crosswalk &&
       typeof metadata === 'object' &&
@@ -170,9 +195,9 @@ export default function MetadataForm({
     );
   };
 
-  function renderUneditableStringRow(label: string, data?: string | string[]) {
-    if (data === undefined || data === null) return <></>;
-    const dataList = Array.isArray(data) ? data : [data];
+  function renderUneditableStringRow(label: string, value?: string | string[]) {
+    if (value === undefined || value === null) return <></>;
+    const dataList = Array.isArray(value) ? value : [value];
     return (
       <MetadataRow container>
         <Grid item xs={4}>
@@ -187,7 +212,11 @@ export default function MetadataForm({
     );
   }
 
-  function renderEditableStringRow(label: string, data: string, formDataAttribute: keyof MetadataFormType) {
+  function renderEditableStringRow(
+    label: string,
+    value: string,
+    formDataAttribute: keyof MetadataFormType
+  ) {
     return (
       <MetadataRow container>
         <Grid item xs={4}>
@@ -198,12 +227,72 @@ export default function MetadataForm({
             <TextInput
               labelText={label}
               labelMode={'hidden'}
-              onChange={(value) => updateFormData(formDataAttribute, value)}
-              value={data}
+              onChange={(newValue) =>
+                updateFormData(formDataAttribute, newValue)
+              }
+              value={value}
             />
           )}
           {!isEditModeActive && (
-            <MetadataAttribute>{data ?? ''}</MetadataAttribute>
+            <MetadataAttribute>{value ?? ''}</MetadataAttribute>
+          )}
+        </Grid>
+      </MetadataRow>
+    );
+  }
+
+  function renderDeletableInput(
+    value: string,
+    formDataAttribute: keyof MetadataFormType,
+    index: number
+  ) {
+    return (
+      <DeletableInputWrapper key={index}>
+        <TextInput
+          labelText={formDataAttribute + '-' + index}
+          labelMode={'hidden'}
+          onChange={(newValue) =>
+            updateFormData(formDataAttribute, newValue, index)
+          }
+          value={value}
+        />
+        <Tooltip title={t('remove')} placement={'right-end'}>
+          <RemoveButton
+            icon={<IconRemove />}
+            variant={'secondary'}
+            onClick={() => updateFormData(formDataAttribute, undefined, index)}
+          ></RemoveButton>
+        </Tooltip>
+      </DeletableInputWrapper>
+    );
+  }
+
+  function renderEditableListRow(
+    label: string,
+    valueArray: string[],
+    formDataAttribute: keyof MetadataFormType
+  ) {
+    const values = Array.isArray(valueArray) ? valueArray : [valueArray]; // May be simplified when backend only returns array of strings
+    return (
+      <MetadataRow container>
+        <Grid item xs={4}>
+          <MetadataLabel>{label}:</MetadataLabel>
+        </Grid>
+        <Grid item xs={8}>
+          {isEditModeActive && (
+            <>
+              {values.map((item, index) =>
+                renderDeletableInput(item, formDataAttribute, index)
+              )}
+              <Button onClick={() => updateFormData(formDataAttribute)}>
+                {t('add') + ' ' + formDataAttribute}
+              </Button>
+            </>
+          )}
+          {!isEditModeActive && (
+            <MetadataAttribute>
+              {values.join(', ')}
+            </MetadataAttribute>
           )}
         </Grid>
       </MetadataRow>
@@ -228,19 +317,65 @@ export default function MetadataForm({
       <MetadataFormContainer container>
         <Grid item xs={12} md={7}>
           {renderEditableStringRow(t('metadata.name'), formData.label, 'label')}
-          {renderUneditableStringRow(t('metadata.pid'), metadata.handle ?? t('metadata.not-available'))}
-          {renderEditableStringRow(t('metadata.version-label'), formData.versionLabel, 'versionLabel')}
-          {renderEditableStringRow(t('metadata.name-space-label'), formData.mscrNamespace, 'mscrNamespace')}
+          {renderUneditableStringRow(
+            t('metadata.pid'),
+            metadata.handle ?? t('metadata.not-available')
+          )}
+          {renderEditableListRow(
+            t('metadata.identifier'),
+            formData.identifier,
+            'identifier'
+          )}
+          {renderEditableStringRow(
+            t('metadata.version-label'),
+            formData.versionLabel,
+            'versionLabel'
+          )}
+          {renderEditableStringRow(
+            t('metadata.name-space-label'),
+            formData.mscrNamespace,
+            'mscrNamespace'
+          )}
 
-          {renderEditableStringRow(t('metadata.contact'), formData.contact, 'contact')}
-          {renderEditableStringRow(t('metadata.domain'), formData.domain, 'domain')}
-          {renderEditableStringRow(t('metadata.language'), formData.language, 'language')}
-          {renderEditableStringRow(t('metadata.license'), formData.license, 'license')}
-          {renderEditableStringRow(t('metadata.publisher'), formData.publisher, 'publisher')}
-          {renderEditableStringRow(t('metadata.fairsharing-doi'), formData.fairsharingDoi, 'fairsharingDoi')}
+          {renderEditableListRow(
+            t('metadata.creator'),
+            formData.creator,
+            'creator'
+          )}
+          {renderEditableStringRow(
+            t('metadata.contact'),
+            formData.contact,
+            'contact'
+          )}
+          {renderEditableStringRow(
+            t('metadata.domain'),
+            formData.domain,
+            'domain'
+          )}
+          {renderEditableStringRow(
+            t('metadata.language'),
+            formData.language,
+            'language'
+          )}
+          {renderEditableStringRow(
+            t('metadata.license'),
+            formData.license,
+            'license'
+          )}
+          {renderEditableStringRow(
+            t('metadata.publisher'),
+            formData.publisher,
+            'publisher'
+          )}
 
-          {renderUneditableStringRow(t('metadata.mscr-creator'), metadata.mscr_creator)}
-          {renderUneditableStringRow(t('metadata.mscr-owner'), metadata.ownerMetadata.map((o) => o.name ?? o.id))}
+          {renderUneditableStringRow(
+            t('metadata.mscr-creator'),
+            metadata.mscr_creator
+          )}
+          {renderUneditableStringRow(
+            t('metadata.mscr-owner'),
+            metadata.ownerMetadata.map((o) => o.name ?? o.id)
+          )}
           {renderUneditableStringRow(t('metadata.format'), metadata.format)}
 
           <MetadataRow container>
@@ -265,10 +400,16 @@ export default function MetadataForm({
             </Grid>
           </MetadataRow>
 
-          {renderUneditableStringRow(t('metadata.mscr-state'), metadata.mscr_state?.toString())}
+          {renderUneditableStringRow(
+            t('metadata.mscr-state'),
+            metadata.mscr_state?.toString()
+          )}
 
           {/*TODO: Remove this or modify when backend uses v2 model for metadata*/}
-          {renderUneditableStringRow(t('metadata.mscr-state'), metadata.state?.toString())}
+          {renderUneditableStringRow(
+            t('metadata.mscr-state'),
+            metadata.state?.toString()
+          )}
 
           <MetadataRow container>
             <Grid item xs={4}>
@@ -280,7 +421,9 @@ export default function MetadataForm({
                   labelText={t('metadata.mscr-visibility')}
                   labelMode={'hidden'}
                   value={formData.mscrVisibility}
-                  onChange={(value) => updateFormData('mscrVisibility', value)}
+                  onChange={(newValue) =>
+                    updateFormData('mscrVisibility', newValue)
+                  }
                 >
                   <DropdownItem
                     key={Visibility.Public}
@@ -325,16 +468,31 @@ export default function MetadataForm({
           </MetadataRow>
 
           {/*TODO: wrapping*/}
-          {renderUneditableStringRow(t('metadata.source-url'), metadata.sourceURL)}
+          {renderUneditableStringRow(
+            t('metadata.source-url'),
+            metadata.sourceURL
+          )}
 
-          {isCrosswalk(metadata) &&
+          {isCrosswalk(metadata) && (
             <>
-              {renderUneditableStringRow(t('metadata.source-schema'), metadata.sourceSchemaInfo.name)}
-              {renderUneditableStringRow(t('metadata.source-schema-id'), metadata.sourceSchemaInfo.handle ?? metadata.sourceSchemaInfo.id)}
-              {renderUneditableStringRow(t('metadata.target-schema'), metadata.targetSchemaInfo.name)}
-              {renderUneditableStringRow(t('metadata.target-schema-id'), metadata.targetSchemaInfo.handle ?? metadata.targetSchemaInfo.id)}
+              {renderUneditableStringRow(
+                t('metadata.source-schema'),
+                metadata.sourceSchemaInfo.name
+              )}
+              {renderUneditableStringRow(
+                t('metadata.source-schema-id'),
+                metadata.sourceSchemaInfo.handle ?? metadata.sourceSchemaInfo.id
+              )}
+              {renderUneditableStringRow(
+                t('metadata.target-schema'),
+                metadata.targetSchemaInfo.name
+              )}
+              {renderUneditableStringRow(
+                t('metadata.target-schema-id'),
+                metadata.targetSchemaInfo.handle ?? metadata.targetSchemaInfo.id
+              )}
             </>
-          }
+          )}
         </Grid>
 
         <Grid container direction="row" justifyContent="flex-end">
