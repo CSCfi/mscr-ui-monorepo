@@ -53,6 +53,7 @@ export default function GroupWorkspace({
     useState(false);
   const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
   const [content, setContent] = useState(new Array<ContentRow>());
+  const [searchParameter, setSearchParameter] = useState('');
   const { data, isLoading } = useGetOrgContentQuery({
     type: contentType,
     pageSize,
@@ -62,6 +63,16 @@ export default function GroupWorkspace({
   const lastPage = data?.hits.total?.value
     ? Math.ceil(data?.hits.total.value / pageSize)
     : 0;
+
+  const filteredContent = useMemo(() => {
+    if (searchParameter && searchParameter.length > 0) {
+      return content.filter((row) =>
+        row?.label.toLowerCase().includes(searchParameter.toLowerCase())
+      );
+    } else {
+      return content;
+    }
+  }, [searchParameter, content]);
 
   // Todo: Refactor workspaces to share code to avoid repeated code
   const fetchedContent = useMemo(() => {
@@ -100,7 +111,7 @@ export default function GroupWorkspace({
   useEffect(() => {
     setContent(fetchedContent);
   }, [fetchedContent]);
-
+  
   if (isLoading) {
     setTimeout(() => setLoadingSpinnerVisible(true), 500);
     return (
@@ -182,7 +193,10 @@ export default function GroupWorkspace({
               : t('workspace.no-crosswalks')}
           </div>
         ) : (
-          <WorkspaceTable content={content} contentType={contentType} />
+          <div>
+          <input onChange={e => setSearchParameter(e.target.value)}></input>
+          <WorkspaceTable content={filteredContent} contentType={contentType} />
+          </div>
         )}
         {lastPage > 1 && <Pagination lastPage={lastPage} />}
       </main>

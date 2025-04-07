@@ -13,7 +13,7 @@ import useUrlState from '@app/common/utils/hooks/use-url-state';
 import { useGetPersonalContentQuery } from '@app/common/components/mscr-search/mscr-search.slice';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import { useEffect, useMemo, useState } from 'react';
+import {ChangeEvent, useEffect, useMemo, useState} from 'react';
 import WorkspaceTable, {
   ContentRow,
 } from '@app/modules/workspace/workspace-table';
@@ -42,6 +42,7 @@ export default function PersonalWorkspace({
     useState(false);
   const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
   const [content, setContent] = useState(new Array<ContentRow>());
+  const [searchParameter, setSearchParameter] = useState('');
   const { data, isLoading } = useGetPersonalContentQuery({
     type: contentType,
     pageSize,
@@ -50,6 +51,17 @@ export default function PersonalWorkspace({
   const lastPage = data?.hits.total?.value
     ? Math.ceil(data?.hits.total.value / pageSize)
     : 0;
+
+  const filteredContent = useMemo(() => {
+    if (searchParameter && searchParameter.length > 0) {
+      return content.filter((row) =>
+        row?.label.toLowerCase().includes(searchParameter.toLowerCase())
+      );
+    } else {
+      return content;
+    }
+  }, [searchParameter, content]);
+
 
   // Todo: Refactor workspaces to share code to avoid repeated code
   const fetchedContent = useMemo(() => {
@@ -88,6 +100,18 @@ export default function PersonalWorkspace({
   useEffect(() => {
     setContent(fetchedContent);
   }, [fetchedContent]);
+
+  function updateSearchParameter(e:  ChangeEvent<HTMLInputElement>) {
+    let param = undefined;
+    if (e?.target?.value) {
+      param = e.target.value;
+    }
+    console.log('param=' + param + ', searchParameter=' + searchParameter);
+    if (param != undefined && param !== searchParameter) {
+      console.log('setting searchParam');
+      setSearchParameter(param);
+    }
+  }
 
   if (isLoading) {
     setTimeout(() => setLoadingSpinnerVisible(true), 500);
@@ -159,9 +183,12 @@ export default function PersonalWorkspace({
               : t('workspace.no-crosswalks')}
           </div>
         ) : (
-          <WorkspaceTable content={content} contentType={contentType} />
+          <div>
+            <input onChange={(e) => updateSearchParameter(e)}></input>
+            <WorkspaceTable content={filteredContent} contentType={contentType}/>
+          </div>
         )}
-        {lastPage > 1 && <Pagination lastPage={lastPage} />}
+        {lastPage > 1 && <Pagination lastPage={lastPage}/>}
       </main>
     );
   }
