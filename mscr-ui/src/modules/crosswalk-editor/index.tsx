@@ -290,7 +290,6 @@ export default function CrosswalkEditor({
               crosswalkData={crosswalkData}
             />
           </div>
-          {/*  MID BUTTONS */}
 
           {/*  TARGET TREE */}
           <div className="col-3">

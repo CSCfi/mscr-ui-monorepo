@@ -21,7 +21,7 @@ function returnIconForMappedNode(nodeMappings: NodeMapping[], node: any, isSourc
   }
   if (foundMappings != null) {
     return <Tooltip title={'Schema tree node is used on Crosswalk mapping.'} placement="bottom">
-      <CircleIcon string={'Schema tree node is used on Crosswalk mappinng.'} style={{color: "#1976d2", maxHeight: "25%", maxWidth: "25%"}}/>
+      <CircleIcon style={{color: "#1976d2", maxHeight: "25%", maxWidth: "25%"}}/>
     </Tooltip>;
   } else {
     return <></>;

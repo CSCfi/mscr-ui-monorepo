@@ -15,14 +15,7 @@ import {useTranslation} from 'next-i18next';
 import {
   AccordionContainer,
   EmptyBlock,
-  HorizontalLineMidEnd,
-  HorizontalLineMidStart,
   HorizontalLineStart,
-  HorizontalLineStartSecond,
-  HorizontalLineTarget,
-  HorizontalLineTargetEnd,
-  HorizontalLineTargetStart,
-  IconSpacer,
   SearchWrapper,
   StyledArrowRightIcon,
   StyledButton,
@@ -38,18 +31,8 @@ import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion
 import ConfirmModal from "@app/common/components/confirmation-modal";
 import {Format} from "@app/common/interfaces/format.interface";
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
-import Box from "@mui/material/Box";
 import {CrosswalkWithVersionInfo} from "@app/common/interfaces/crosswalk.interface";
 import {State} from "@app/common/interfaces/state.interface";
-import withWidth from "@mui/material/Hidden/withWidth";
-import {Panel} from "reactflow";
-import {StyledPanel} from "@app/common/components/action-panel/action-panel.styles";
-
-export interface highlightOperation {
-  operationId: string;
-  nodeId?: any;
-}
-
 function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttributeNames, rowcount, mappingFunctions,
                schemaFormats, schemaDatas, setNodeMappingsModalOpen}: {
   row: NodeMapping;
@@ -117,9 +100,6 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                       </TableCellPadder>
                     </div>
                     <StyledArrowRightIcon></StyledArrowRightIcon>
-                    {/*<HorizontalLineStart>
-                    <div></div>
-                  </HorizontalLineStart>*/}
                     {mapping['processing']?.id &&
                       <FunctionTooltipBox callBackFunction={callBackFunction}
                                           isEditModeActive={isEditModeActive}
@@ -167,19 +147,16 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                             <EmptyBlock></EmptyBlock>}
                       </div>
                       {mapping['processing']?.id &&
-                          <>{/*<HorizontalLineTargetStart>
-                              <div></div>
-                          </HorizontalLineTargetStart>*/}<FunctionTooltipBox callBackFunction={callBackFunction}
+                          <><FunctionTooltipBox callBackFunction={callBackFunction}
                                                                           isEditModeActive={isEditModeActive}
                                                                           tooltipHeading={'target operation'}
                                                                           tooltipHoverText={'target operation'}
                                                                           processingId={mapping.id}
                                                                           functionName={'targetOperation'}
                                                                           mappingFunctions={mappingFunctions}
-                                                                          row={row}></FunctionTooltipBox>{/*<HorizontalLineTargetEnd>
-                              <div></div>
-                          </HorizontalLineTargetEnd>*/}</>
-                      }{!mapping['processing']?.id && <></> /*<HorizontalLineTarget><div></div></HorizontalLineTarget>*/}
+                                                                          row={row}></FunctionTooltipBox>
+                          </>
+                      }{!mapping['processing']?.id && <></>}
                       <StyledArrowRightIcon></StyledArrowRightIcon>
                       <StyledButton
                         className="px-3 py-0"

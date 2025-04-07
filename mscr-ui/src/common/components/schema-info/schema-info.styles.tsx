@@ -102,8 +102,7 @@ export const NodeInfoWrapper = styled.div`
     max-width: 100%;
   }
 `;
-
-export const StyledSchemaModal = styled(Modal)`
+styled(Modal)`
   background-color: ${(props) => props.theme.suomifi.colors.whiteBase};
   && {
     margin: auto;
@@ -124,8 +123,7 @@ export const StyledSchemaModal = styled(Modal)`
     cursor: pointer;
   }
 `;
-
-export const StyledSchemaModalContent = styled(ModalContent)`
+styled(ModalContent)`
   font-size: 0.9rem;
   && {
     padding: 5px 5px 5px 5px;

@@ -15,7 +15,7 @@ import {
   ExpandButtonWrapper,
   NodeInfoWrapper,
   SchemaHeading,
-  SearchWrapper, StyledSchemaModal, StyledSchemaModalContent,
+  SearchWrapper,
   TreeviewWrapper,
   TreeWrapper,
 } from '@app/common/components/schema-info/schema-info.styles';
@@ -24,8 +24,6 @@ import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
 import {StyledPanel} from "@app/common/components/action-panel/action-panel.styles";
-import { Panel } from 'reactflow';
-import ActionPanel from '../action-panel';
 
 export default function SchemaInfo(props: {
   updateTreeNodeSelectionsOutput?: (
