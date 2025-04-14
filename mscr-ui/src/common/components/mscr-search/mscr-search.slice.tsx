@@ -12,13 +12,13 @@ function createUrl(
   { type, pageSize, urlState, ownerOrg }: PaginatedQuery
 ) {
   const pageFrom = (urlState.page - 1) * pageSize;
-  return `/frontend/mscrSearch${scope}Content?query=&type=${type}${
+  return `/mscrSearch${scope}Content?query=&type=${type}${
     scope === 'Org' ? `&ownerOrg=${ownerOrg}` : ''
   }&pageSize=${pageSize}&pageFrom=${pageFrom}`;
 }
 
 function createSearchUrl(urlState: UrlState) {
-  let baseQuery = '/frontend/mscrSearch?';
+  let baseQuery = '/mscrSearch?';
 
   baseQuery = baseQuery.concat(`query=${urlState.q}`);
 

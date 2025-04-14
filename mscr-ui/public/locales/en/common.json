@@ -35,7 +35,6 @@
     "revision": "Add new revision",
     "unset-root-node-selection": "Reset custom root selection"
   },
-  "add": "Add",
   "and": "and",
   "association": "",
   "attribute": "",
@@ -213,6 +212,8 @@
     "select-linked-nodes": "Select linked nodes from schema trees"
   },
   "metadata": {
+    "add-creator": "Add creator",
+    "add-identifier": "Add identifier",
     "contact": "Contact",
     "created": "Created",
     "creator": "Creator",
@@ -232,7 +233,6 @@
     "language": "Language",
     "license": "License",
     "modified": "Modified",
-    "mscr-creator": "MSCR creator",
     "mscr-owner": "MSCR owner",
     "mscr-state": "MSCR state",
     "mscr-visibility": "MSCR visibility",

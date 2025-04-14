@@ -3,15 +3,13 @@ import { Format } from '@app/common/interfaces/format.interface';
 import { LanguageBlockType } from 'yti-common-ui/components/form/language-selector';
 import { ContentRevision } from '@app/common/interfaces/content-revision.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
-import { Organization } from './organizations.interface';
 
 export interface Schema extends Metadata {
-  status?: string;
-  organizations: Organization[];
+  namespace: string;
 }
 
 export interface SchemaWithContent {
-  metadata: Metadata;
+  metadata: Schema;
   content: {
     tree: unknown;
     definitions: unknown;

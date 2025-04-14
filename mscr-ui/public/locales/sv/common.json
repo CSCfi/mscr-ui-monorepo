@@ -35,7 +35,6 @@
     "revision": "",
     "unset-root-node-selection": ""
   },
-  "add": "",
   "and": "",
   "association": "",
   "attribute": "",
@@ -213,6 +212,8 @@
     "select-linked-nodes": ""
   },
   "metadata": {
+    "add-creator": "",
+    "add-identifier": "",
     "contact": "",
     "created": "",
     "creator": "",
@@ -232,7 +233,6 @@
     "language": "",
     "license": "",
     "modified": "",
-    "mscr-creator": "",
     "mscr-owner": "",
     "mscr-state": "",
     "mscr-visibility": "",

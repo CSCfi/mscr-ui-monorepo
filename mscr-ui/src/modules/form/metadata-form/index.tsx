@@ -114,14 +114,13 @@ export default function MetadataForm({
       description: { ...metadata.description, [lang]: formData.description },
       contact: formData.contact,
       versionLabel: formData.versionLabel,
-      mscr_visibility: formData.mscrVisibility as Visibility,
-      mscr_namespace: formData.mscrNamespace,
+      visibility: formData.visibility as Visibility,
+      namespace: formData.namespace,
       domain: formData.domain,
-      language: formData.language,
-      license: formData.license,
-      publisher: formData.publisher,
-      identifier: formData.identifier.filter((item) => item !== ''),
-      creator: formData.creator.filter((item) => item !== '')
+      dctLicense: formData.dctLicense,
+      dctPublisher: formData.dctPublisher,
+      dctIdentifiers: formData.dctIdentifiers.filter((item) => item !== ''),
+      dctCreators: formData.dctCreators.filter((item) => item !== '')
     };
   };
 
@@ -141,17 +140,15 @@ export default function MetadataForm({
     const formValuesFromData: MetadataFormType = {
       label: localizedLabel,
       description: localizedDescription,
-      mscrVisibility:
-        metadata.mscr_visibility ?? metadata.visibility ?? Visibility.Private, // Todo: Remove metadata.visibility option when backend uses metadata v2 model
+      visibility: metadata.visibility ?? Visibility.Private,
       versionLabel: metadata.versionLabel ?? '',
       contact: metadata.contact ?? '',
-      mscrNamespace: metadata.mscr_namespace ?? '',
+      namespace: isCrosswalk(metadata) ? '' : metadata.namespace ?? '',
       domain: metadata.domain ?? '',
-      language: metadata.language ?? '',
-      license: metadata.license ?? '',
-      publisher: metadata.publisher ?? '',
-      creator: metadata.creator ?? [],
-      identifier: metadata.identifier ?? [],
+      dctLicense: metadata.dctLicense ?? '',
+      dctPublisher: metadata.dctPublisher ?? '',
+      dctCreators: metadata.dctCreators ?? [],
+      dctIdentifiers: metadata.dctIdentifiers ?? [],
     };
     setFormData(formValuesFromData);
   }, [metadata, lang]);
@@ -285,7 +282,11 @@ export default function MetadataForm({
                 renderDeletableInput(item, formDataAttribute, index)
               )}
               <Button onClick={() => updateFormData(formDataAttribute)}>
-                {t('add') + ' ' + formDataAttribute}
+                {formDataAttribute == 'dctCreators'
+                  ? t('metadata.add-creator')
+                  : formDataAttribute == 'dctIdentifiers'
+                    ? t('metadata.add-identifier')
+                    : ''}
               </Button>
             </>
           )}
@@ -323,24 +324,24 @@ export default function MetadataForm({
           )}
           {renderEditableListRow(
             t('metadata.identifier'),
-            formData.identifier,
-            'identifier'
+            formData.dctIdentifiers,
+            'dctIdentifiers'
           )}
           {renderEditableStringRow(
             t('metadata.version-label'),
             formData.versionLabel,
             'versionLabel'
           )}
-          {renderEditableStringRow(
+          {!isCrosswalk(metadata) && renderEditableStringRow(
             t('metadata.name-space-label'),
-            formData.mscrNamespace,
-            'mscrNamespace'
+            formData.namespace,
+            'namespace'
           )}
 
           {renderEditableListRow(
             t('metadata.creator'),
-            formData.creator,
-            'creator'
+            formData.dctCreators,
+            'dctCreators'
           )}
           {renderEditableStringRow(
             t('metadata.contact'),
@@ -352,98 +353,20 @@ export default function MetadataForm({
             formData.domain,
             'domain'
           )}
-          {renderEditableStringRow(
+          {renderUneditableStringRow(
             t('metadata.language'),
-            formData.language,
-            'language'
+            metadata.languages
           )}
           {renderEditableStringRow(
             t('metadata.license'),
-            formData.license,
-            'license'
+            formData.dctLicense,
+            'dctLicense'
           )}
           {renderEditableStringRow(
             t('metadata.publisher'),
-            formData.publisher,
-            'publisher'
+            formData.dctPublisher,
+            'dctPublisher'
           )}
-
-          {renderUneditableStringRow(
-            t('metadata.mscr-creator'),
-            metadata.mscr_creator
-          )}
-          {renderUneditableStringRow(
-            t('metadata.mscr-owner'),
-            metadata.ownerMetadata.map((o) => o.name ?? o.id)
-          )}
-          {renderUneditableStringRow(t('metadata.format'), metadata.format)}
-
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.created')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              <MetadataAttribute>
-                <FormattedDate date={metadata.created} />
-              </MetadataAttribute>
-            </Grid>
-          </MetadataRow>
-
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.modified')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              <MetadataAttribute>
-                <FormattedDate date={metadata.modified} />
-              </MetadataAttribute>
-            </Grid>
-          </MetadataRow>
-
-          {renderUneditableStringRow(
-            t('metadata.mscr-state'),
-            metadata.mscr_state?.toString()
-          )}
-
-          {/*TODO: Remove this or modify when backend uses v2 model for metadata*/}
-          {renderUneditableStringRow(
-            t('metadata.mscr-state'),
-            metadata.state?.toString()
-          )}
-
-          <MetadataRow container>
-            <Grid item xs={4}>
-              <MetadataLabel>{t('metadata.mscr-visibility')}:</MetadataLabel>
-            </Grid>
-            <Grid item xs={8}>
-              {isEditModeActive && metadata.state === State.Draft && (
-                <Dropdown
-                  labelText={t('metadata.mscr-visibility')}
-                  labelMode={'hidden'}
-                  value={formData.mscrVisibility}
-                  onChange={(newValue) =>
-                    updateFormData('mscrVisibility', newValue)
-                  }
-                >
-                  <DropdownItem
-                    key={Visibility.Public}
-                    value={Visibility.Public}
-                  >
-                    {Visibility.Public}
-                  </DropdownItem>
-                  <DropdownItem
-                    key={Visibility.Private}
-                    value={Visibility.Private}
-                  >
-                    {Visibility.Private}
-                  </DropdownItem>
-                </Dropdown>
-              )}
-              {(!isEditModeActive || metadata.state !== State.Draft) && (
-                <MetadataAttribute>{metadata.visibility}</MetadataAttribute>
-              )}
-            </Grid>
-          </MetadataRow>
         </Grid>
 
         <Grid item xs={12} md={5}>
@@ -493,6 +416,73 @@ export default function MetadataForm({
               )}
             </>
           )}
+
+          {renderUneditableStringRow(
+            t('metadata.mscr-owner'),
+            metadata.ownerMetadata.map((o) => o.name ?? o.id)
+          )}
+          {renderUneditableStringRow(t('metadata.format'), metadata.format)}
+
+          <MetadataRow container>
+            <Grid item xs={4}>
+              <MetadataLabel>{t('metadata.created')}:</MetadataLabel>
+            </Grid>
+            <Grid item xs={8}>
+              <MetadataAttribute>
+                <FormattedDate date={metadata.created} />
+              </MetadataAttribute>
+            </Grid>
+          </MetadataRow>
+
+          <MetadataRow container>
+            <Grid item xs={4}>
+              <MetadataLabel>{t('metadata.modified')}:</MetadataLabel>
+            </Grid>
+            <Grid item xs={8}>
+              <MetadataAttribute>
+                <FormattedDate date={metadata.modified} />
+              </MetadataAttribute>
+            </Grid>
+          </MetadataRow>
+
+          {renderUneditableStringRow(
+            t('metadata.mscr-state'),
+            metadata.state?.toString()
+          )}
+
+          <MetadataRow container>
+            <Grid item xs={4}>
+              <MetadataLabel>{t('metadata.mscr-visibility')}:</MetadataLabel>
+            </Grid>
+            <Grid item xs={8}>
+              {isEditModeActive && metadata.state === State.Draft && (
+                <Dropdown
+                  labelText={t('metadata.mscr-visibility')}
+                  labelMode={'hidden'}
+                  value={formData.visibility}
+                  onChange={(newValue) =>
+                    updateFormData('visibility', newValue)
+                  }
+                >
+                  <DropdownItem
+                    key={Visibility.Public}
+                    value={Visibility.Public}
+                  >
+                    {Visibility.Public}
+                  </DropdownItem>
+                  <DropdownItem
+                    key={Visibility.Private}
+                    value={Visibility.Private}
+                  >
+                    {Visibility.Private}
+                  </DropdownItem>
+                </Dropdown>
+              )}
+              {(!isEditModeActive || metadata.state !== State.Draft) && (
+                <MetadataAttribute>{metadata.visibility}</MetadataAttribute>
+              )}
+            </Grid>
+          </MetadataRow>
         </Grid>
 
         <Grid container direction="row" justifyContent="flex-end">

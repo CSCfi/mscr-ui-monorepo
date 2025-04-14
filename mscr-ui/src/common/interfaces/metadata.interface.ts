@@ -11,8 +11,10 @@ export interface Metadata {
   description: {
     [key: string]: string;
   };
-  languages?: string[];
+  languages: string[];
   format: Format;
+  visibility: Visibility;
+  state: State;
   created: string;
   modified: string;
   versionLabel: string;
@@ -23,28 +25,20 @@ export interface Metadata {
       name: string;
     }
   ];
-  sourceSchema?: string;
-  targetSchema?: string;
+  owner: string[];
   prefix?: string;
   fileMetadata?: FileData[];
   sourceURL?: string;
-  mscr_namespace?: string;
-  mscr_owner?: string[];
-  // TODO: Assess if the fields below should be turned compulsory (remove '?') after backend is migrated to v2
-  mscr_creator?: string;
-  mscr_visibility?: Visibility;
-  mscr_state?: State;
-  creator?: string[];
-  domain?: string;
-  identifier?: string[];
-  language?: string;
-  license?: string;
-  publisher?: string;
-  // TODO: Assess if fields below can be removed when backend migrated to v2
-  state?: State;
-  visibility?: Visibility;
-  namespace?: string;
-  owner?: string[];
+  domain: string;
+  dctCreators: string[];
+  dctIdentifiers: string[];
+  dctLicense: string;
+  dctPublisher: string;
+  // Below fields are in the metadata model but not in use in UI yet
+  dctContributors?: string[];
+  dctIssued?: string;
+  dctRelations?: string[];
+  dcatKeywords?: string[];
 }
 
 export interface FileData {
@@ -60,28 +54,33 @@ export interface MetadataFormType {
   description: string;
   contact: string;
   versionLabel: string;
-  mscrVisibility: string;
-  mscrNamespace: string;
+  visibility: string;
   domain: string;
-  language: string;
-  license: string;
-  publisher: string;
-  creator: string[];
-  identifier: string[];
+  dctCreators: string[];
+  dctIdentifiers: string[];
+  dctLicense: string;
+  dctPublisher: string;
+  namespace: string; // Schemas only
+  // Below properties are accepted by endpoint, but not present or not editable in UI metadata form
+  status?: string;
+  format?: string;
+  language?:string;
+  dctContributors?: string[];
+  dctIssued?: string;
+  dctRelations?: string[];
+  dcatKeywords?: string[];
 }
 
 export const initialMetadataForm: MetadataFormType = {
-  label: '',
-  description: '',
   contact: '',
-  versionLabel: '',
-  mscrVisibility: '',
-  mscrNamespace: '',
+  dctCreators: [],
+  dctIdentifiers: [],
+  dctLicense: '',
+  dctPublisher: '',
+  description: '',
   domain: '',
-  language: '',
-  license: '',
-  publisher: '',
-  fairsharingDoi: '',
-  creator: [],
-  identifier: []
+  label: '',
+  versionLabel: '',
+  visibility: '',
+  namespace: ''
 };

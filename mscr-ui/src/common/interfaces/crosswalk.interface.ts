@@ -1,15 +1,10 @@
-import { MultiSelectData } from 'suomifi-ui-components';
 import { LanguageBlockType } from 'yti-common-ui/form/language-selector';
 import { State } from '@app/common/interfaces/state.interface';
 import { ContentRevision } from '@app/common/interfaces/content-revision.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
 import { Format } from '@app/common/interfaces/format.interface';
-import { Visibility } from '@app/common/interfaces/search.interface';
-import { Organization } from './organizations.interface';
 
 export interface Crosswalk extends Metadata {
-  status?: string | undefined;
-  organizations?: string[];
   sourceSchema: string;
   sourceSchemaInfo: SchemaSummary;
   targetSchema: string;
