@@ -5,7 +5,6 @@ import {
   Description,
   TitleDescriptionWrapper,
 } from 'yti-common-ui/components/title/title.styles';
-import Separator from 'yti-common-ui/components/separator';
 import { useBreakpoints } from 'yti-common-ui/components/media-query';
 import { ButtonBlock } from '@app/modules/workspace/workspace.styles';
 import Pagination from '@app/common/components/pagination';
@@ -13,7 +12,7 @@ import useUrlState from '@app/common/utils/hooks/use-url-state';
 import { useGetPersonalContentQuery } from '@app/common/components/mscr-search/mscr-search.slice';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import {ChangeEvent, useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import WorkspaceTable, {
   ContentRow,
 } from '@app/modules/workspace/workspace-table';
@@ -32,8 +31,8 @@ export default function PersonalWorkspace({
   const router = useRouter();
   const lang = router.locale ?? '';
   const { isSmall } = useBreakpoints();
-  const { urlState } = useUrlState();
   const pageSize = 20;
+  const { urlState } = useUrlState();
   const [registerCrosswalkModalVisible, setRegisterCrosswalkModalVisible] =
     useState(false);
   const [createCrosswalkModalVisible, setCreateCrosswalkModalVisible] =
@@ -47,21 +46,11 @@ export default function PersonalWorkspace({
     type: contentType,
     pageSize,
     urlState,
+    query: searchParameter,
   });
   const lastPage = data?.hits.total?.value
     ? Math.ceil(data?.hits.total.value / pageSize)
     : 0;
-
-  const filteredContent = useMemo(() => {
-    if (searchParameter && searchParameter.length > 0) {
-      return content.filter((row) =>
-        row?.label.toLowerCase().includes(searchParameter.toLowerCase())
-      );
-    } else {
-      return content;
-    }
-  }, [searchParameter, content]);
-
 
   // Todo: Refactor workspaces to share code to avoid repeated code
   const fetchedContent = useMemo(() => {
@@ -100,18 +89,6 @@ export default function PersonalWorkspace({
   useEffect(() => {
     setContent(fetchedContent);
   }, [fetchedContent]);
-
-  function updateSearchParameter(e:  ChangeEvent<HTMLInputElement>) {
-    let param = undefined;
-    if (e?.target?.value) {
-      param = e.target.value;
-    }
-    console.log('param=' + param + ', searchParameter=' + searchParameter);
-    if (param != undefined && param !== searchParameter) {
-      console.log('setting searchParam');
-      setSearchParameter(param);
-    }
-  }
 
   if (isLoading) {
     setTimeout(() => setLoadingSpinnerVisible(true), 500);
@@ -176,18 +153,8 @@ export default function PersonalWorkspace({
             </>
           )}
         </ButtonBlock>
-        {data?.hits.hits && data?.hits.hits.length < 1 ? (
-          <div>
-            {contentType == 'SCHEMA'
-              ? t('workspace.no-schemas')
-              : t('workspace.no-crosswalks')}
-          </div>
-        ) : (
-          <div>
-            <input onChange={(e) => updateSearchParameter(e)}></input>
-            <WorkspaceTable content={filteredContent} contentType={contentType}/>
-          </div>
-        )}
+        <WorkspaceTable content={content} contentType={contentType} searchParameter={searchParameter}
+                        setSearchParameter={setSearchParameter}/>
         {lastPage > 1 && <Pagination lastPage={lastPage}/>}
       </main>
     );

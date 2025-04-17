@@ -15,7 +15,7 @@ import Pagination from '@app/common/components/pagination';
 import { ButtonBlock } from '../workspace.styles';
 import useUrlState from '@app/common/utils/hooks/use-url-state';
 import { useGetOrgContentQuery } from '@app/common/components/mscr-search/mscr-search.slice';
-import { useEffect, useMemo, useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { useRouter } from 'next/router';
 import { ModalVisibilityButton } from '@app/modules/form/modal-visibility-button';
@@ -64,16 +64,6 @@ export default function GroupWorkspace({
     ? Math.ceil(data?.hits.total.value / pageSize)
     : 0;
 
-  const filteredContent = useMemo(() => {
-    if (searchParameter && searchParameter.length > 0) {
-      return content.filter((row) =>
-        row?.label.toLowerCase().includes(searchParameter.toLowerCase())
-      );
-    } else {
-      return content;
-    }
-  }, [searchParameter, content]);
-
   // Todo: Refactor workspaces to share code to avoid repeated code
   const fetchedContent = useMemo(() => {
     if (data) {
@@ -111,7 +101,7 @@ export default function GroupWorkspace({
   useEffect(() => {
     setContent(fetchedContent);
   }, [fetchedContent]);
-  
+
   if (isLoading) {
     setTimeout(() => setLoadingSpinnerVisible(true), 500);
     return (
@@ -186,18 +176,10 @@ export default function GroupWorkspace({
             <Separator isLarge />
           </div>
         }
-        {data?.hits.hits && data?.hits.hits.length < 1 ? (
           <div>
-            {contentType == 'SCHEMA'
-              ? t('workspace.no-schemas')
-              : t('workspace.no-crosswalks')}
+            <WorkspaceTable content={content} contentType={contentType} searchParameter={searchParameter}
+                            setSearchParameter={setSearchParameter}/>
           </div>
-        ) : (
-          <div>
-          <input onChange={e => setSearchParameter(e.target.value)}></input>
-          <WorkspaceTable content={filteredContent} contentType={contentType} />
-          </div>
-        )}
         {lastPage > 1 && <Pagination lastPage={lastPage} />}
       </main>
     );
