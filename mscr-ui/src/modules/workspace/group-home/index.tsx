@@ -15,7 +15,7 @@ import Pagination from '@app/common/components/pagination';
 import { ButtonBlock } from '../workspace.styles';
 import useUrlState from '@app/common/utils/hooks/use-url-state';
 import { useGetOrgContentQuery } from '@app/common/components/mscr-search/mscr-search.slice';
-import {useEffect, useMemo, useState} from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { useRouter } from 'next/router';
 import { ModalVisibilityButton } from '@app/modules/form/modal-visibility-button';
@@ -176,10 +176,12 @@ export default function GroupWorkspace({
             <Separator isLarge />
           </div>
         }
-          <div>
-            <WorkspaceTable content={content} contentType={contentType} searchParameter={searchParameter}
-                            setSearchParameter={setSearchParameter}/>
-          </div>
+        <WorkspaceTable
+          content={content}
+          contentType={contentType}
+          searchParameter={searchParameter}
+          setSearchParameter={setSearchParameter}
+        />
         {lastPage > 1 && <Pagination lastPage={lastPage} />}
       </main>
     );

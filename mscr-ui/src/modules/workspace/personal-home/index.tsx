@@ -12,7 +12,7 @@ import useUrlState from '@app/common/utils/hooks/use-url-state';
 import { useGetPersonalContentQuery } from '@app/common/components/mscr-search/mscr-search.slice';
 import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
-import {useEffect, useMemo, useState} from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import WorkspaceTable, {
   ContentRow,
 } from '@app/modules/workspace/workspace-table';
@@ -153,8 +153,12 @@ export default function PersonalWorkspace({
             </>
           )}
         </ButtonBlock>
-        <WorkspaceTable content={content} contentType={contentType} searchParameter={searchParameter}
-                        setSearchParameter={setSearchParameter}/>
+        <WorkspaceTable
+          content={content}
+          contentType={contentType}
+          searchParameter={searchParameter}
+          setSearchParameter={setSearchParameter}
+        />
         {lastPage > 1 && <Pagination lastPage={lastPage}/>}
       </main>
     );

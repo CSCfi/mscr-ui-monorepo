@@ -2,8 +2,8 @@ import { useTranslation } from 'next-i18next';
 import { Type } from '@app/common/interfaces/search.interface';
 import GenericTable from '@app/common/components/generic-table';
 import { State } from '@app/common/interfaces/state.interface';
-import useUrlState from "@app/common/utils/hooks/use-url-state";
-import {TextInput} from "suomifi-ui-components";
+import useUrlState from '@app/common/utils/hooks/use-url-state';
+import { TextInput } from 'suomifi-ui-components';
 
 export interface ContentRow {
   label: string;
@@ -24,7 +24,7 @@ export default function WorkspaceTable({
 }: {
   content: ContentRow[];
   contentType: Type;
-  searchParameter: string,
+  searchParameter: string;
   setSearchParameter: Function;
 }) {
   const { patchUrlState } = useUrlState();
@@ -34,6 +34,11 @@ export default function WorkspaceTable({
     contentType == Type.Schema
       ? t('workspace.schemas')
       : t('workspace.crosswalks');
+
+  const noResults =
+    contentType == Type.Schema
+      ? t('workspace.no-schemas')
+      : t('workspace.no-crosswalks');
 
   const headings = [
     t('workspace.label'),
@@ -50,16 +55,30 @@ export default function WorkspaceTable({
     if (e) {
       param = e.toString();
     }
-    console.log('param=' + param + ', searchParameter=' + searchParameter);
     if (param !== searchParameter) {
-      console.log('setting searchParam');
       setSearchParameter(param);
       patchUrlState({ page: 1 });
     }
   }
 
-  return <div>
-    <TextInput onChange={(e) => updateSearchParameter(e)} placeholder={t('search.bar.placeholder')} labelText={""}></TextInput>
-    <GenericTable items={content} headings={headings} caption={caption}/>
-    </div>;
+  function renderSearchInput() {
+    const label = contentType == Type.Schema ? t('workspace.search.schemas') : t('workspace.search.crosswalks')
+    return (
+      <TextInput
+        labelText={label}
+        onChange={(e) => updateSearchParameter(e)}
+        visualPlaceholder={t('search.bar.placeholder')}
+      />
+    );
+  }
+
+  return (
+    <GenericTable
+      items={content}
+      headings={headings}
+      caption={caption}
+      noResultsInfo={noResults}
+      searchInput={renderSearchInput}
+    />
+  );
 }
