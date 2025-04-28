@@ -3,7 +3,7 @@ import { Visibility } from '@app/common/interfaces/search.interface';
 import { State } from '@app/common/interfaces/state.interface';
 
 export interface Metadata {
-  pid: string;
+  id: string;
   handle: string;
   label: {
     [key: string]: string;

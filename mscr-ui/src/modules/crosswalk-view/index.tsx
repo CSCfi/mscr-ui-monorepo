@@ -243,7 +243,7 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
 
   const changeCrosswalkState = (payload: StatePayload, notificationKey: NotificationKeys) => {
     if (!crosswalkData) return;
-    patchCrosswalk({ payload: payload, pid: crosswalkData.pid })
+    patchCrosswalk({ payload: payload, pid: crosswalkData.id })
       .unwrap()
       .then(() => {
         dispatch(
@@ -259,7 +259,7 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
 
   const deleteCrosswalkDraft = () => {
     if (!crosswalkData) return;
-    deleteCrosswalk(crosswalkData.pid)
+    deleteCrosswalk(crosswalkData.id)
       .unwrap()
       .then(() => {
         dispatch(

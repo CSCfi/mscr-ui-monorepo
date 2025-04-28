@@ -1,6 +1,5 @@
 import {
   initialMetadataForm,
-  Metadata,
   MetadataFormType,
 } from '@app/common/interfaces/metadata.interface';
 import { usePatchCrosswalkMutation } from '@app/common/components/crosswalk/crosswalk.slice';
@@ -37,7 +36,7 @@ import {
   RemoveButton,
 } from '@app/modules/form/metadata-form/metadata-form.styles';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
-import { SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
+import { Schema, SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
 import { CrosswalkWithVersionInfo } from '@app/common/interfaces/crosswalk.interface';
 import {
   selectIsEditMetadataActive,
@@ -77,7 +76,7 @@ export default function MetadataForm({
     dispatch(setIsEditMetadataActive(false));
     const payload = generatePayload();
     if (type === Type.Crosswalk) {
-      patchCrosswalk({ payload: payload, pid: metadata.pid })
+      patchCrosswalk({ payload: payload, pid: metadata.id })
         .unwrap()
         .then(() => {
           dispatch(
@@ -92,7 +91,7 @@ export default function MetadataForm({
         });
       // ToDo: Error notifications with .catch
     } else if (type === Type.Schema) {
-      patchSchema({ payload: payload, pid: metadata.pid })
+      patchSchema({ payload: payload, pid: metadata.id })
         .unwrap()
         .then(() => {
           dispatch(
@@ -108,7 +107,7 @@ export default function MetadataForm({
     }
   };
 
-  const generatePayload = (): Partial<Metadata> => {
+  const generatePayload = (): Partial<Schema> => {
     return {
       label: { ...metadata.label, [lang]: formData.label },
       description: { ...metadata.description, [lang]: formData.description },
@@ -174,7 +173,7 @@ export default function MetadataForm({
           attribute.splice(index, 1);
         }
       } else { // No index -> add new to array
-        attribute.push('');
+        attribute = attribute.concat(['']);
       }
     }
     setFormData({ ...formData, [attributeName]: attribute });

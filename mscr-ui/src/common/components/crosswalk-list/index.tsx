@@ -47,9 +47,9 @@ export default function CrosswalkList({
             {items &&
               items.map((item) => (
                 <TableRow
-                  key={item.pid}
+                  key={item.id}
                   hover={true}
-                  onClick={() => handleClick(item.pid)}
+                  onClick={() => handleClick(item.id)}
                   sx={{ cursor: 'pointer' }}
                 >
                   <TableCell>
@@ -59,7 +59,7 @@ export default function CrosswalkList({
                   <TableCell>{item.namespace}</TableCell>
                   <TableCell>{item.state}</TableCell>
                   <TableCell>{item.versionLabel}</TableCell>
-                  <TableCell>{item.pid}</TableCell>
+                  <TableCell>{item.id}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
