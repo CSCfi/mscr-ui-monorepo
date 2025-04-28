@@ -574,6 +574,10 @@
     "personal": "",
     "pid": "",
     "schemas": "",
+    "search": {
+      "crosswalks": "",
+      "schemas": ""
+    },
     "state": "",
     "view": ""
   }

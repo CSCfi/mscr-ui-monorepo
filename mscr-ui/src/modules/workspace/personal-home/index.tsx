@@ -5,7 +5,6 @@ import {
   Description,
   TitleDescriptionWrapper,
 } from 'yti-common-ui/components/title/title.styles';
-import Separator from 'yti-common-ui/components/separator';
 import { useBreakpoints } from 'yti-common-ui/components/media-query';
 import { ButtonBlock } from '@app/modules/workspace/workspace.styles';
 import Pagination from '@app/common/components/pagination';
@@ -32,8 +31,8 @@ export default function PersonalWorkspace({
   const router = useRouter();
   const lang = router.locale ?? '';
   const { isSmall } = useBreakpoints();
-  const { urlState } = useUrlState();
   const pageSize = 20;
+  const { urlState } = useUrlState();
   const [registerCrosswalkModalVisible, setRegisterCrosswalkModalVisible] =
     useState(false);
   const [createCrosswalkModalVisible, setCreateCrosswalkModalVisible] =
@@ -42,10 +41,12 @@ export default function PersonalWorkspace({
     useState(false);
   const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
   const [content, setContent] = useState(new Array<ContentRow>());
+  const [searchParameter, setSearchParameter] = useState('');
   const { data, isLoading } = useGetPersonalContentQuery({
     type: contentType,
     pageSize,
     urlState,
+    query: searchParameter,
   });
   const lastPage = data?.hits.total?.value
     ? Math.ceil(data?.hits.total.value / pageSize)
@@ -152,16 +153,13 @@ export default function PersonalWorkspace({
             </>
           )}
         </ButtonBlock>
-        {data?.hits.hits && data?.hits.hits.length < 1 ? (
-          <div>
-            {contentType == 'SCHEMA'
-              ? t('workspace.no-schemas')
-              : t('workspace.no-crosswalks')}
-          </div>
-        ) : (
-          <WorkspaceTable content={content} contentType={contentType} />
-        )}
-        {lastPage > 1 && <Pagination lastPage={lastPage} />}
+        <WorkspaceTable
+          content={content}
+          contentType={contentType}
+          searchParameter={searchParameter}
+          setSearchParameter={setSearchParameter}
+        />
+        {lastPage > 1 && <Pagination lastPage={lastPage}/>}
       </main>
     );
   }

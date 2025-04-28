@@ -33,7 +33,11 @@ export default function SchemaTabmenu({
 }: TabMenuProps) {
   const { t } = useTranslation('common');
   const dispatch = useStoreDispatch();
-  const selectedTab = useSelector(selectSelectedTab());
+  let selectedTab = useSelector(selectSelectedTab());
+  if (selectedTab > 2) {
+    selectedTab = 0;
+    setSelectedTab(0);
+  }
   const translations = {
     'SCHEMA.metadata-and-files-tab': t('tabs.metadata-and-files'),
     'CROSSWALK.metadata-and-files-tab': t('tabs.metadata-and-files'),
