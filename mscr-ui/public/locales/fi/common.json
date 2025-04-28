@@ -38,9 +38,20 @@
   "and": "",
   "association": "",
   "attribute": "",
+  "automated-decision": {
+    "description": {
+      "1": "",
+      "2": ""
+    },
+    "title": ""
+  },
   "breadcrumb": "",
   "cancel": "",
   "card-organizations": "",
+  "change-in-policy": {
+    "description": "",
+    "title": ""
+  },
   "change-language-selected-language": "",
   "choose-language": "",
   "class": "",
@@ -86,6 +97,17 @@
     "unset-root-selection": ""
   },
   "confirm-page-leave": "",
+  "contact": {
+    "description": {
+      "1": "",
+      "2": ""
+    },
+    "label": ""
+  },
+  "contact-person": {
+    "description": "",
+    "title": ""
+  },
   "content-form": {
     "button": {
       "crosswalk-create": "",
@@ -115,6 +137,19 @@
     },
     "version-label": ""
   },
+  "controller": {
+    "description": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "6": "",
+      "7": "",
+      "8": ""
+    },
+    "label": ""
+  },
   "crosswalk-editor": {
     "search-from-source-schema": "",
     "search-from-target-schema": "",
@@ -135,6 +170,37 @@
     "source-schema-workspace": "",
     "supported-file-formats": "",
     "target-schema-workspace": ""
+  },
+  "data-disclose": {
+    "description": "",
+    "title": ""
+  },
+  "data-persistense": {
+    "description": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "6": ""
+    },
+    "title": ""
+  },
+  "data-source": {
+    "description": "",
+    "title": ""
+  },
+  "data-subject-right": {
+    "description": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "6": "",
+      "7": ""
+    },
+    "title": ""
   },
   "datamodel-title": "",
   "datamodels-all": "",
@@ -170,6 +236,10 @@
   "filter-with-current_one": "",
   "filter-with-current_other": "",
   "go-to": "",
+  "ground": {
+    "description": "",
+    "title": ""
+  },
   "impersonate-user": "",
   "interoperability-logo-title": "",
   "items-to-be-unscribed-from_one": "",
@@ -310,6 +380,10 @@
   },
   "organization": "",
   "organizations-and-roles": "",
+  "outside-eea": {
+    "description": "",
+    "title": ""
+  },
   "own-information": "",
   "page-indicator-text": "",
   "page-number": "",
@@ -323,7 +397,28 @@
     "page": ""
   },
   "previous-page": "",
+  "privacy-link": "",
+  "privacy-text": {
+    "1": "",
+    "2": ""
+  },
   "profile": "",
+  "protect-data": {
+    "description": {
+      "1": "",
+      "2": ""
+    },
+    "title": ""
+  },
+  "purpose": {
+    "description": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": ""
+    },
+    "title": ""
+  },
   "recommended-term": "",
   "remove": "",
   "remove-all-subscriptions": "",
@@ -464,6 +559,15 @@
   "vocabulary-info-fi": "",
   "vocabulary-info-sv": "",
   "vocabulary-results-more": "",
+  "what-we-process": {
+    "description": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": ""
+    },
+    "title": ""
+  },
   "word-class": {
     "adjective": "",
     "verb": ""

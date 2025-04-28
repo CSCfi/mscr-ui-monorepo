@@ -18,6 +18,7 @@ import Tooltip from '@mui/material/Tooltip';
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
 import {Format} from "@app/common/interfaces/format.interface";
 import _ from "lodash";
+import MappingsAccordion2 from "@app/modules/crosswalk-editor/mappings-accordion2";
 
 export default function CrosswalkEditor({
                                           crosswalkData, hasEditPermission,
@@ -96,9 +97,9 @@ export default function CrosswalkEditor({
   }, [crosswalkData]);
 
   useEffect( () => {
-    setFilteredSourceNodeMappings(nodeMappings);
-    setFilteredTargetNodeMappings(nodeMappings);
-    setFilteredCombinedNodeMappings(nodeMappings);
+    setFilteredSourceNodeMappings([]);
+    setFilteredTargetNodeMappings([]);
+    setFilteredCombinedNodeMappings([]);
   }, [nodeMappings]);
 
   function addMappingButtonClick() {
@@ -203,30 +204,37 @@ export default function CrosswalkEditor({
       foundNodeMappings = filterMappingsWithId(nodeMappings, ids, isSourceTree);
       if (isSourceTree) {
         setFilteredSourceNodeMappings(foundNodeMappings);
-        let result = foundNodeMappings.filter(sourceNodeMapping =>
-          filteredTargetNodeMappings.some(targetNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
-        setFilteredCombinedNodeMappings(result);
-      } else {
-        setFilteredTargetNodeMappings(foundNodeMappings);
-        let result = foundNodeMappings.filter(targetNodeMapping =>
-          filteredSourceNodeMappings.some(sourceNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
-        setFilteredCombinedNodeMappings(result);
-      }
-
-    } else {
-      if (isSourceTree) {
-        setFilteredSourceNodeMappings(nodeMappings);
-        if (_.isEqual(nodeMappings, filteredTargetNodeMappings)) {
-          setFilteredCombinedNodeMappings(nodeMappings);
+        if (filteredTargetNodeMappings && filteredTargetNodeMappings.length > 0) {
+          let result = foundNodeMappings.filter(sourceNodeMapping =>
+            filteredTargetNodeMappings.some(targetNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
+          setFilteredCombinedNodeMappings(result);
         } else {
-          setFilteredCombinedNodeMappings(filteredTargetNodeMappings);
+          setFilteredCombinedNodeMappings(foundNodeMappings);
         }
       } else {
-        setFilteredTargetNodeMappings(nodeMappings);
-        if (_.isEqual(nodeMappings, filteredSourceNodeMappings)) {
-          setFilteredCombinedNodeMappings(nodeMappings);
+        setFilteredTargetNodeMappings(foundNodeMappings);
+        if (filteredSourceNodeMappings && filteredSourceNodeMappings.length > 0) {
+          let result = foundNodeMappings.filter(targetNodeMapping =>
+            filteredSourceNodeMappings.some(sourceNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
+          setFilteredCombinedNodeMappings(result);
         } else {
+          setFilteredCombinedNodeMappings(foundNodeMappings);
+        }
+      }
+    } else {
+      if (isSourceTree) {
+        setFilteredSourceNodeMappings([]);
+        if (filteredTargetNodeMappings != null && filteredTargetNodeMappings.length > 0) {
+          setFilteredCombinedNodeMappings(filteredTargetNodeMappings);
+        } else {
+          setFilteredCombinedNodeMappings([]);
+        }
+      } else {
+        setFilteredTargetNodeMappings([]);
+        if (filteredSourceNodeMappings != null && filteredSourceNodeMappings.length > 0) {
           setFilteredCombinedNodeMappings(filteredSourceNodeMappings);
+        } else {
+          setFilteredCombinedNodeMappings([]);
         }
       }
     }
@@ -249,7 +257,7 @@ export default function CrosswalkEditor({
       <div className="col-12 mx-1">
         <div className="row gx-0">
           {/*  SOURCE TREE */}
-          <div className="col-5">
+          <div className="col-3">
             <SchemaInfo
               updateTreeNodeSelectionsOutput={performCallbackFromSchemaInfo}
               isSourceTree={true}
@@ -257,45 +265,34 @@ export default function CrosswalkEditor({
               caption={t('crosswalk-editor.search-from-source-schema')}
               schemaUrn={sourceSchemaUrn}
               scrollToSelectedNodeId={scrollToSelectedSourceNodeId}
+              nodeMappings={nodeMappings}
             />
           </div>
 
-          {/*  MID BUTTONS */}
-          <div className="col-2 px-4 mid-buttons">
-            {hasEditPermission && (
-              <Tooltip
-                title={
-                  selectedSourceNodes.length > 1 &&
-                  selectedTargetNodes.length > 1
-                    ? 'Many to many node mappings are not supported'
-                    : !isEditModeActive
-                      ? 'Activate edit mode to enable mappings'
-                      : 'Map selected nodes'
-                }
-                placement="bottom"
-              >
-                <Sbutton
-                  className="link-button"
-                  disabled={
-                    selectedSourceNodes.length < 1 ||
-                    selectedTargetNodes.length < 1 ||
-                    crosswalkData.state === State.Published ||
-                    (selectedSourceNodes.length > 1 &&
-                      selectedTargetNodes.length > 1) ||
-                    !isEditModeActive
-                  }
-                  onClick={() => {
-                    addMappingButtonClick();
-                  }}
-                >
-                  <LinkIcon></LinkIcon>
-                </Sbutton>
-              </Tooltip>
-            )}
+
+          <div className="col-6">
+            <MappingsAccordion2
+              nodeMappings={filteredCombinedNodeMappings}
+              viewOnlyMode={false}
+              isEditModeActive={
+                isEditModeActive && crosswalkData.state !== State.Published
+              }
+              showAttributeNames={showAttributeNames}
+              mappingFunctions={mappingFunctions}
+              performAccordionAction={performCallbackFromAccordionAction}
+              schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
+              schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
+              setNodeMappingsModalOpen={setNodeMappingsModalOpen}
+              selectedSourceNodes={selectedSourceNodes}
+              selectedTargetNodes={selectedTargetNodes}
+              addMappingButtonClick={addMappingButtonClick}
+              hasEditPermission={hasEditPermission}
+              crosswalkData={crosswalkData}
+            />
           </div>
 
           {/*  TARGET TREE */}
-          <div className="col-5 pe-2">
+          <div className="col-3">
             <SchemaInfo
               updateTreeNodeSelectionsOutput={performCallbackFromSchemaInfo}
               isSourceTree={false}
@@ -303,39 +300,9 @@ export default function CrosswalkEditor({
               caption={t('crosswalk-editor.search-from-target-schema')}
               schemaUrn={targetSchemaUrn}
               scrollToSelectedNodeId={scrollToSelectedTargetNodeId}
+              nodeMappings={nodeMappings}
             />
           </div>
-        </div>
-      </div>
-      <div className="col-12 mt-4">
-        <div className="d-flex justify-content-between">
-          <div className="align-self-end pe-1">
-            {/*TODO: Checkbox can be removed as deprecatmappingFunctionsed when all new style titles work*/}
-            <Checkbox
-              checked={showAttributeNames}
-              onClick={(newState) => {
-                setShowAttributeNames(newState.checkboxState);
-              }}
-            >
-              {t('crosswalk-editor.show-node-titles')}
-            </Checkbox>
-          </div>
-        </div>
-
-        <div className="joint-listing-accordion-wrap my-3">
-          <MappingsAccordion
-            nodeMappings={filteredCombinedNodeMappings}
-            viewOnlyMode={false}
-            isEditModeActive={
-              isEditModeActive && crosswalkData.state !== State.Published
-            }
-            showAttributeNames={showAttributeNames}
-            mappingFunctions={mappingFunctions}
-            performAccordionAction={performCallbackFromAccordionAction}
-            schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
-            schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
-            setNodeMappingsModalOpen={setNodeMappingsModalOpen}
-          />
         </div>
       </div>
       {mappingToBeEdited && (

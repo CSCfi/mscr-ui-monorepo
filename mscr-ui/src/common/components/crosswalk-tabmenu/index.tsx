@@ -6,17 +6,17 @@ import {
 } from '@app/common/components/content-view/content-view.slice';
 import { useTranslation } from 'next-i18next';
 import { Type } from '@app/common/interfaces/search.interface';
-import { TabIndex, TabText, MscrTabs } from '@app/common/interfaces/tabmenu';
+import { CrosswalkTabIndex, CrosswalkTabText, CrosswalkTabs } from '@app/common/interfaces/tabmenu';
 import { ReactNode } from 'react';
 import {
   StyledTab,
   StyledTabs,
-} from '@app/common/components/tabmenu/tabmenu.styles';
+} from '@app/common/components/crosswalk-tabmenu/tabmenu.styles';
 import { setQuery } from '@app/common/components/data-type-registry-search/data-type-registry-search.slice';
 
 interface TabPanel {
-  tabIndex: TabIndex;
-  tabText: TabText;
+  tabIndex: CrosswalkTabIndex;
+  tabText: CrosswalkTabText;
   content: ReactNode;
 }
 
@@ -26,7 +26,7 @@ interface TabMenuProps {
   tabPanels: TabPanel[];
 }
 
-export default function Tabmenu({
+export default function CrosswalkTabmenu({
   contentType,
   isRemoved,
   tabPanels,
@@ -47,8 +47,8 @@ export default function Tabmenu({
     'stub': t('tabs.stub-metadata'), // If the content is removed, there's only one tab with only metadata.
   };
 
-  function customTabProps(tab: TabText) {
-    const index = MscrTabs[tab];
+  function customTabProps(tab: CrosswalkTabText) {
+    const index = CrosswalkTabs[tab];
     return {
       id: `simple-tab-tab-${index}`,
       className: tab,
@@ -59,7 +59,7 @@ export default function Tabmenu({
     };
   }
 
-  const handleChange = (event: React.SyntheticEvent, newValue: TabIndex) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: CrosswalkTabIndex) => {
     dispatch(setSelectedTab(newValue));
     dispatch(setQuery(''));
   };

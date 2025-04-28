@@ -4,6 +4,7 @@ import {
   Format,
   formatsAvailableForCrosswalkCreation,
 } from '@app/common/interfaces/format.interface';
+import SchemaInfo2 from "@app/common/components/schema-info2";
 
 export default function SchemaVisualization({
   pid,
@@ -22,7 +23,7 @@ export default function SchemaVisualization({
     formatsAvailableForCrosswalkCreation.includes(format);
   if (visualizationAvailable) {
     return (
-      <SchemaInfo
+      <SchemaInfo2
         caption={filterLabel}
         schemaUrn={pid}
         isSingleTree={true}
