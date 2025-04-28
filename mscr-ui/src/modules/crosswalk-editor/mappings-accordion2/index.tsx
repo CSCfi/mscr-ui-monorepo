@@ -3,27 +3,19 @@ import {Dispatch, SetStateAction, useEffect} from 'react';
 import Collapse from '@mui/material/Collapse';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TableCell from '@mui/material/TableCell';
 import {Button as Sbutton, SearchInput} from 'suomifi-ui-components';
 import Tooltip from '@mui/material/Tooltip';
 
-import {NodeMapping} from '@app/common/interfaces/crosswalk-connection.interface';
-import {InfoIcon} from '@app/common/components/shared-icons';
+import {NodeMapping, RenderTree} from '@app/common/interfaces/crosswalk-connection.interface';
+import LinkIcon, {InfoIcon} from '@app/common/components/shared-icons';
 import {useTranslation} from 'next-i18next';
 import {
   AccordionContainer,
   EmptyBlock,
-  HorizontalLineMidEnd,
-  HorizontalLineMidStart,
   HorizontalLineStart,
-  HorizontalLineStartSecond,
-  HorizontalLineTarget,
-  HorizontalLineTargetEnd,
-  HorizontalLineTargetStart,
-  IconSpacer,
   SearchWrapper,
   StyledArrowRightIcon,
   StyledButton,
@@ -39,12 +31,8 @@ import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion
 import ConfirmModal from "@app/common/components/confirmation-modal";
 import {Format} from "@app/common/interfaces/format.interface";
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
-
-export interface highlightOperation {
-  operationId: string;
-  nodeId?: any;
-}
-
+import {CrosswalkWithVersionInfo} from "@app/common/interfaces/crosswalk.interface";
+import {State} from "@app/common/interfaces/state.interface";
 function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttributeNames, rowcount, mappingFunctions,
                schemaFormats, schemaDatas, setNodeMappingsModalOpen}: {
   row: NodeMapping;
@@ -85,91 +73,69 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
   return (
     <>
       <StyledTableRow className="accordion-row row">
-        <StyledTableCell className="col-4">
+        <StyledTableCell className="row">
+          <div className='d-flex justify-content-between'>
+            <div className='d-flex justify-content-center'>
+              <TableCellPadder>From</TableCellPadder></div>
+          </div>
+            {row.source.map((mapping, index) => {
+                return (<>
+                  <div className='d-flex justify-content-between'>
+                    <div className='d-flex justify-content-center'>
+                      <TableCellPadder>
+                        <StyledButton
+                          className="px-3 py-0"
+                          style={{textTransform: 'none'}}
+                          title={showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
+                          onClick={(e) => {
+                            selectFromTrees(row, mapping.id, true);
+                            e.stopPropagation();
+                          }}
+                        >{showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
+                          schemaFormats?.sourceSchemaFormat, schemaDatas?.sourceSchemaData)}</StyledButton>
 
-          {row.source.map((mapping, index) => {
-              return (<>
-                <div className='d-flex justify-content-between'>
-                  <div className='d-flex justify-content-center'>
-                    <TableCellPadder>
-                      <StyledButton
-                        className="px-3 py-0"
-                        style={{textTransform: 'none'}}
-                        title={showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
-                        onClick={(e) => {
-                          selectFromTrees(row, mapping.id, true);
-                          e.stopPropagation();
-                        }}
-                      >{showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
-                        schemaFormats?.sourceSchemaFormat, schemaDatas?.sourceSchemaData)}</StyledButton>
-
-                      <HorizontalLineStart>
-                        <div></div>
-                      </HorizontalLineStart>
-                    </TableCellPadder>
-                  </div>
-                  <StyledArrowRightIcon></StyledArrowRightIcon>
-                  <HorizontalLineStart>
-                    <div></div>
-                  </HorizontalLineStart>
-                  {mapping['processing']?.id &&
+                        <HorizontalLineStart>
+                          <div></div>
+                        </HorizontalLineStart>
+                      </TableCellPadder>
+                    </div>
+                    <StyledArrowRightIcon></StyledArrowRightIcon>
+                    {mapping['processing']?.id &&
                       <FunctionTooltipBox callBackFunction={callBackFunction}
                                           isEditModeActive={isEditModeActive}
                                           tooltipHeading={'source operation'} tooltipHoverText={'source operation'}
                                           processingId={mapping.id} functionName={'sourceOperation'}
                                           mappingFunctions={mappingFunctions}
                                           row={row}></FunctionTooltipBox>
-                  }
-                  <HorizontalLineStartSecond>
+                    }
+                    {/*<HorizontalLineStartSecond>
                     <div></div>
-                  </HorizontalLineStartSecond>
-                  <div className='d-flex flex-column'>
-                    {index === 0 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
-                    {row.source.length > 1 && <VerticalLine>
+                  </HorizontalLineStartSecond>*/}
+                    <div className='d-flex flex-column'>
+                      {index === 0 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                      {row.source.length > 1 && <VerticalLine>
                         <div></div>
-                    </VerticalLine>}
-                    {index === row.source.length - 1 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                      </VerticalLine>}
+                      {index === row.source.length - 1 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                    </div>
                   </div>
-                </div>
-              </>)
-            }
-          )}
+                </>)
+              }
+            )}
 
         </StyledTableCell>
 
-        <StyledTableCell className='col-2'>
-          <div className='d-flex justify-content-center'>
-            <HorizontalLineMidStart>
-              <div></div>
-            </HorizontalLineMidStart>
-            {row.processing &&
-                <FunctionTooltipBox callBackFunction={callBackFunction} isEditModeActive={isEditModeActive}
-                                    tooltipHeading={'mapping function'} tooltipHoverText={'mapping function'}
-                                    processingId={row.processing.id} functionName={'mappingFunction'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>
-            }
-            {!row.processing &&
-                <IconSpacer></IconSpacer>
-            }
-            {row.predicate &&
-                <FunctionTooltipBox alternateIconLetter={'P'} callBackFunction={callBackFunction}
-                                    isEditModeActive={isEditModeActive} tooltipHeading={'predicate'}
-                                    processingId={''} tooltipHoverText={'predicate'} functionName={'predicate'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>
-            }
-            {!row.predicate &&
-                <IconSpacer></IconSpacer>
-            }
-            <HorizontalLineMidEnd>
-              <div></div>
-            </HorizontalLineMidEnd>
+        <StyledTableCell className='row'>
+          <div className='d-flex justify-content-between'>
+            <div className='d-flex justify-content-center'>
+              <TableCellPadder>To</TableCellPadder></div>
           </div>
-        </StyledTableCell>
 
-        <StyledTableCell className="col-4">
+        </StyledTableCell>
+        <StyledTableCell className="row">
           <div className='d-flex flex-column'>
             {row.target.map((mapping, index) => {
-                return (<>
+              return (<>
                   <div className='d-flex justify-content-between'>
                     <div className='d-flex justify-content-center'>
                       <div className='d-flex flex-column'>
@@ -181,19 +147,16 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                             <EmptyBlock></EmptyBlock>}
                       </div>
                       {mapping['processing']?.id &&
-                          <><HorizontalLineTargetStart>
-                              <div></div>
-                          </HorizontalLineTargetStart><FunctionTooltipBox callBackFunction={callBackFunction}
+                          <><FunctionTooltipBox callBackFunction={callBackFunction}
                                                                           isEditModeActive={isEditModeActive}
                                                                           tooltipHeading={'target operation'}
                                                                           tooltipHoverText={'target operation'}
                                                                           processingId={mapping.id}
                                                                           functionName={'targetOperation'}
                                                                           mappingFunctions={mappingFunctions}
-                                                                          row={row}></FunctionTooltipBox><HorizontalLineTargetEnd>
-                              <div></div>
-                          </HorizontalLineTargetEnd></>
-                      }{!mapping['processing']?.id && <HorizontalLineTarget><div></div></HorizontalLineTarget>}
+                                                                          row={row}></FunctionTooltipBox>
+                          </>
+                      }{!mapping['processing']?.id && <></>}
                       <StyledArrowRightIcon></StyledArrowRightIcon>
                       <StyledButton
                         className="px-3 py-0"
@@ -214,7 +177,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
 
         </StyledTableCell>
 
-        <StyledTableButtonCell className="col-2 fw-bold">
+        <StyledTableButtonCell className="fw-bold row">
           <>
             <div className='d-flex flex-row flex-wrap align-content-center'>
               <>
@@ -266,7 +229,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
       </StyledTableRow>
 
       <StyledTableRow>
-        <TableCell className="accordion-fold-content">
+        <TableCell className="accordion-fold-content row">
           <Collapse
             in={open && !viewOnlyMode}
             timeout="auto"
@@ -291,7 +254,6 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                 </div>
                 <div className='col mt-4 d-flex flex-row gx-0 justify-content-end'>
                   <div className="d-flex flex-column action-buttons">
-
                   </div>
                 </div>
               </div>
@@ -427,8 +389,9 @@ function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAtt
   return results;
 }
 
-export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditModeActive, showAttributeNames,
-                                            mappingFunctions, performAccordionAction, schemaFormats, schemaDatas, setNodeMappingsModalOpen}
+export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditModeActive, showAttributeNames,
+                                            mappingFunctions, performAccordionAction, schemaFormats, schemaDatas, setNodeMappingsModalOpen,
+                                           selectedSourceNodes, selectedTargetNodes, addMappingButtonClick, hasEditPermission, crosswalkData}
                                             :
 {nodeMappings: NodeMapping[];
   viewOnlyMode: boolean;
@@ -439,6 +402,11 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
   schemaFormats: {sourceSchemaFormat: Format | undefined; targetSchemaFormat: Format | undefined};
   schemaDatas: {sourceSchemaData: SchemaWithContent | undefined; targetSchemaData: SchemaWithContent | undefined; };
   setNodeMappingsModalOpen:  Dispatch<SetStateAction<boolean>>;
+  selectedSourceNodes: RenderTree[];
+  selectedTargetNodes: RenderTree[];
+  addMappingButtonClick: Function;
+  hasEditPermission: boolean;
+  crosswalkData: CrosswalkWithVersionInfo;
 }) {
   const {t} = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
@@ -446,11 +414,16 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
   useEffect(() => {
     setMappingData(nodeMappings);
   }, [nodeMappings]);
-  const nodeMappingsInput = nodeMappings;
+
+  useEffect(() => {
+    setMappingData([]);
+  }, []);
+
+  const nodeMappingsInput = mappingData;
   return (
     <>
 
-  <div className='d-flex justify-content-between ps-1'>
+  <div className='d-flex justify-content-between ps-1' style={{maxHeight: "600px"}}>
         <h2 className="mb-0">Mappings</h2>
         <SearchWrapper>
           <SearchInput
@@ -472,31 +445,8 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
           />
         </SearchWrapper>
       </div>
-      <AccordionContainer component={Paper} className="gx-0">
-        <Table aria-label="collapsible table w-100">
-          <TableHead>
-            <TableRow className="accordion-row row">
-              <StyledTableCell className="col-4">
-                <TableCellPadder>
-                  <span className="fw-bold ps-3">Source</span>
-                </TableCellPadder>
-              </StyledTableCell>
-              <StyledTableCell className="col-2">
-                <TableCellPadder>
-                  <span className="fw-bold">Mapping operations</span>
-                </TableCellPadder>
-              </StyledTableCell>
-              <StyledTableTargetCell className="col-4">
-                <span className="fw-bold">Target</span>
-              </StyledTableTargetCell>
-              <StyledTableActionsCell className="col-2 d-flex flex-row justify-content-end">
-                <TableCellPadder>
-                  <span className="fw-bold">Actions</span>
-                </TableCellPadder>
-              </StyledTableActionsCell>
-            </TableRow>
-          </TableHead>
-
+      <AccordionContainer component={Paper} className="gx-0" style={{maxHeight: "860px", overflowY: "auto"}}>
+        <Table aria-label="collapsible table w-100" >
           {mappingData?.length > 0 && (
             <TableBody>
               {mappingData.map((row: NodeMapping) => {
@@ -516,6 +466,43 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
                   />
                 );
               })}
+              <TableRow className="">
+                <td>
+                    <div style={{display: "flex", alignItems: "center", justifyContent: "right"}}>
+                      {hasEditPermission && (
+                        <Tooltip
+                          title={
+                            selectedSourceNodes.length > 1 &&
+                            selectedTargetNodes.length > 1
+                              ? 'Many to many node mappings are not supported'
+                              : !isEditModeActive
+                                ? 'Activate edit mode to enable mappings'
+                                : 'Map selected nodes'
+                          }
+                          placement="bottom"
+                        >
+                          <Sbutton
+                            className="link-button"
+                            disabled={
+                              selectedSourceNodes.length < 1 ||
+                              selectedTargetNodes.length < 1 ||
+                              crosswalkData.state === State.Published ||
+                              (selectedSourceNodes.length > 1 &&
+                                selectedTargetNodes.length > 1) ||
+                              !isEditModeActive
+                            }
+                            onClick={() => {
+                              addMappingButtonClick();
+                            }}
+                            style={{width: "200px", height: "60px"}}
+                          >
+                            <div><LinkIcon></LinkIcon> Create Mapping</div>
+                          </Sbutton>
+                        </Tooltip>
+                      )}
+                    </div>
+                </td>
+              </TableRow>
             </TableBody>
           )}
           {nodeMappingsInput?.length < 1 && (
@@ -526,9 +513,44 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
                     <div className="info-icon">
                       <InfoIcon></InfoIcon>
                     </div>
-                    <div>
+                    <div style={{alignItems: "center"}}>
                       No elements have been mapped yet. Mappings will appear in
                       this table.
+                      <br/>
+                      <br/>
+                      <br/>
+                      <br/>
+                      {hasEditPermission && (
+                        <Tooltip
+                          title={
+                            selectedSourceNodes.length > 1 &&
+                            selectedTargetNodes.length > 1
+                              ? 'Many to many node mappings are not supported'
+                              : !isEditModeActive
+                                ? 'Activate edit mode to enable mappings'
+                                : 'Map selected nodes'
+                          }
+                          placement="bottom"
+                        >
+                          <Sbutton
+                            className="link-button"
+                            disabled={
+                              selectedSourceNodes.length < 1 ||
+                              selectedTargetNodes.length < 1 ||
+                              crosswalkData.state === State.Published ||
+                              (selectedSourceNodes.length > 1 &&
+                                selectedTargetNodes.length > 1) ||
+                              !isEditModeActive
+                            }
+                            onClick={() => {
+                              addMappingButtonClick();
+                            }}
+                            style={{width: "200px", height: "60px"}}
+                          >
+                            <div><LinkIcon></LinkIcon> Create Mapping</div>
+                          </Sbutton>
+                        </Tooltip>
+                      )}
                     </div>
                   </div>
                 </td>
