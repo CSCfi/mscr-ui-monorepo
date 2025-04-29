@@ -170,7 +170,7 @@ export default function MetadataForm({
         if (typeof newValue !== 'undefined') { // Index and value -> replace value at index
           attribute[index] = newValue?.toString() ?? '';
         } else { // Index but no value -> remove index from array
-          attribute.splice(index, 1);
+          attribute = attribute.filter((_, i) => i !== index);
         }
       } else { // No index -> add new to array
         attribute = attribute.concat(['']);

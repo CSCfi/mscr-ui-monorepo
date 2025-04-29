@@ -130,6 +130,7 @@ export const schemaApi = createApi({
         url: createSearchUrl(query.formatRestrictions, query.includePersonalDrafts),
         method: 'GET',
       }),
+      providesTags: ['FrontendSchema'],
     }),
     getFrontendSchema: builder.query<SchemaWithContent, string>({
       query: (pid) => ({
