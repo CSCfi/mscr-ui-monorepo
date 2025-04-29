@@ -578,12 +578,16 @@
     "group": "Group workspaces",
     "label": "Name",
     "navigation": "Workspaces",
-    "no-crosswalks": "There are no crosswalks to show yet",
-    "no-schemas": "There are no schemas to show yet",
+    "no-crosswalks": "No crosswalks to show",
+    "no-schemas": "No schemas to show",
     "numberOfRevisions": "Revisions",
     "personal": "Personal workspace",
     "pid": "PID",
     "schemas": "Schemas",
+    "search": {
+      "crosswalks": "Search from crosswalks",
+      "schemas": "Search from schemas"
+    },
     "state": "State",
     "view": "View"
   }
