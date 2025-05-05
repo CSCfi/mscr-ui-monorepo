@@ -1,11 +1,10 @@
-European Union Public Licence 
-V. 1.1 
+European Union Public Licence V. 1.1 
  
  
 EUPL Â© the European Community 2007 
  
  
-This European Union Public Licence (the â€œEUPLâ€) applies to the Work or Software 
+This European Union Public Licence (the "EUPL") applies to the Work or Software 
 (as defined below) which is provided under the terms of this Licence. Any use of the 
 Work, other than as authorised under this Licence is prohibited (to the extent such use 
 is covered by a right of the copyright holder of the Work). 
@@ -48,7 +47,7 @@ Work under the Licence.
 - Contributor(s): any natural or legal person who modifies the Work under the 
 Licence, or otherwise contributes to the creation of a Derivative Work. 
  
-- The Licensee or â€œYouâ€: any natural or legal person who makes any usage of the 
+- The Licensee or "You": any natural or legal person who makes any usage of the 
 Software under the terms of the Licence. 
  
 - Distribution and/or Communication: any act of selling, giving, lending, renting, 
@@ -272,7 +271,7 @@ Appendix
  
  
  
-â€œCompatible Licencesâ€ according to article 5 EUPL are: 
+"Compatible Licences" according to article 5 EUPL are: 
  
  
 - GNU General Public License (GNU GPL) v. 2 
