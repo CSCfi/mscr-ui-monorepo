@@ -475,7 +475,7 @@
   "site-information": "",
   "site-login": "Sign in",
   "site-login-info-1": "You must be signed in to register and edit content",
-  "site-login-info-2": "Pressing Sign in will redirect you to EOSC Portal AAI demo to choose a login method. ",
+  "site-login-info-2": "Pressing Sign in will redirect you to External AAI Service to choose a login method. ",
   "site-login-title": "Sign in to MSCR",
   "site-logout": "Log out",
   "site-open-link-new-window": "",
