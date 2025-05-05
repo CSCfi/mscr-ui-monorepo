@@ -300,6 +300,7 @@
     },
     "format": "Format",
     "identifier": "Identifier",
+    "internal-identifier": "Internal identifier",
     "language": "Language",
     "license": "License",
     "modified": "Modified",

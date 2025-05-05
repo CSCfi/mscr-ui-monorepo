@@ -72,6 +72,18 @@ export default function MetadataForm({
   const [formData, setFormData] =
     useState<MetadataFormType>(initialMetadataForm);
 
+  const isCrosswalk = useCallback((
+    metadata: unknown
+  ): metadata is CrosswalkWithVersionInfo => {
+    return (
+      type === Type.Crosswalk &&
+      typeof metadata === 'object' &&
+      metadata !== null &&
+      'sourceSchemaInfo' in metadata &&
+      'targetSchemaInfo' in metadata
+    );
+  }, [type]);
+
   const updateMetadata = () => {
     dispatch(setIsEditMetadataActive(false));
     const payload = generatePayload();
@@ -150,13 +162,12 @@ export default function MetadataForm({
       dctIdentifiers: metadata.dctIdentifiers ?? [],
     };
     setFormData(formValuesFromData);
-  }, [metadata, lang]);
+  }, [metadata, lang, isCrosswalk]);
 
   useEffect(() => {
     setFormValuesFromData();
   }, [setFormValuesFromData]);
 
-  // Todo: Make a confirm modal for if you try to cancel with unsaved changes
   function updateFormData(
     attributeName: keyof MetadataFormType,
     newValue?: string | number | undefined,
@@ -179,19 +190,12 @@ export default function MetadataForm({
     setFormData({ ...formData, [attributeName]: attribute });
   }
 
-  const isCrosswalk = (
-    metadata: unknown
-  ): metadata is CrosswalkWithVersionInfo => {
-    return (
-      type === Type.Crosswalk &&
-      typeof metadata === 'object' &&
-      metadata !== null &&
-      'sourceSchemaInfo' in metadata &&
-      'targetSchemaInfo' in metadata
-    );
-  };
-
-  function renderUneditableStringRow(label: string, value?: string | string[]) {
+  function renderMetadataRow(
+    label: string,
+    value?: string | string[],
+    formDataAttribute?: keyof MetadataFormType,
+    renderAsEditable?: Function
+  ) {
     if (value === undefined || value === null) return <></>;
     const dataList = Array.isArray(value) ? value : [value];
     return (
@@ -200,40 +204,32 @@ export default function MetadataForm({
           <MetadataLabel>{label}:</MetadataLabel>
         </Grid>
         <Grid item xs={8}>
-          <MetadataAttribute>
-            {dataList.filter((item) => item.trim().length !== 0).join(', ')}
-          </MetadataAttribute>
+          {renderAsEditable && isEditModeActive && renderAsEditable(label, value, formDataAttribute)}
+          {(!isEditModeActive || !renderAsEditable) &&
+            dataList.filter((item) => item.trim().length !== 0).map((item) => (
+              <MetadataAttribute key={self.crypto.randomUUID()}>
+                {item}
+              </MetadataAttribute>
+            ))}
         </Grid>
       </MetadataRow>
     );
   }
 
-  function renderEditableStringRow(
+  function renderEditableString(
     label: string,
     value: string,
     formDataAttribute: keyof MetadataFormType
   ) {
     return (
-      <MetadataRow container>
-        <Grid item xs={4}>
-          <MetadataLabel>{label}:</MetadataLabel>
-        </Grid>
-        <Grid item xs={8}>
-          {isEditModeActive && (
-            <TextInput
-              labelText={label}
-              labelMode={'hidden'}
-              onChange={(newValue) =>
-                updateFormData(formDataAttribute, newValue)
-              }
-              value={value}
-            />
-          )}
-          {!isEditModeActive && (
-            <MetadataAttribute>{value ?? ''}</MetadataAttribute>
-          )}
-        </Grid>
-      </MetadataRow>
+      <TextInput
+        labelText={label}
+        labelMode={'hidden'}
+        onChange={(newValue) =>
+          updateFormData(formDataAttribute, newValue)
+        }
+        value={value}
+      />
     );
   }
 
@@ -263,39 +259,24 @@ export default function MetadataForm({
     );
   }
 
-  function renderEditableListRow(
+  function renderEditableList(
     label: string,
     valueArray: string[],
     formDataAttribute: keyof MetadataFormType
   ) {
-    const values = Array.isArray(valueArray) ? valueArray : [valueArray]; // May be simplified when backend only returns array of strings
     return (
-      <MetadataRow container>
-        <Grid item xs={4}>
-          <MetadataLabel>{label}:</MetadataLabel>
-        </Grid>
-        <Grid item xs={8}>
-          {isEditModeActive && (
-            <>
-              {values.map((item, index) =>
-                renderDeletableInput(item, formDataAttribute, index)
-              )}
-              <Button onClick={() => updateFormData(formDataAttribute)}>
-                {formDataAttribute == 'dctCreators'
-                  ? t('metadata.add-creator')
-                  : formDataAttribute == 'dctIdentifiers'
-                    ? t('metadata.add-identifier')
-                    : ''}
-              </Button>
-            </>
-          )}
-          {!isEditModeActive && (
-            <MetadataAttribute>
-              {values.join(', ')}
-            </MetadataAttribute>
-          )}
-        </Grid>
-      </MetadataRow>
+      <>
+        {valueArray.map((item, index) =>
+          renderDeletableInput(item, formDataAttribute, index)
+        )}
+        <Button onClick={() => updateFormData(formDataAttribute)}>
+          {formDataAttribute == 'dctCreators'
+            ? t('metadata.add-creator')
+            : formDataAttribute == 'dctIdentifiers'
+              ? t('metadata.add-identifier')
+              : ''}
+        </Button>
+      </>
     );
   }
 
@@ -316,55 +297,60 @@ export default function MetadataForm({
       </Grid>
       <MetadataFormContainer container>
         <Grid item xs={12} md={7}>
-          {renderEditableStringRow(t('metadata.name'), formData.label, 'label')}
-          {renderUneditableStringRow(
-            t('metadata.pid'),
-            metadata.handle ?? t('metadata.not-available')
-          )}
-          {renderEditableListRow(
+          {renderMetadataRow(t('metadata.name'), formData.label, 'label', renderEditableString)}
+          {renderMetadataRow(t('metadata.pid'), metadata.handle ?? t('metadata.not-available'))}
+          {renderMetadataRow(
             t('metadata.identifier'),
             formData.dctIdentifiers,
-            'dctIdentifiers'
+            'dctIdentifiers',
+            renderEditableList
           )}
-          {renderEditableStringRow(
+          {renderMetadataRow(
             t('metadata.version-label'),
             formData.versionLabel,
-            'versionLabel'
+            'versionLabel',
+            renderEditableString
           )}
-          {!isCrosswalk(metadata) && renderEditableStringRow(
+          {!isCrosswalk(metadata) && renderMetadataRow(
             t('metadata.name-space-label'),
             formData.namespace,
-            'namespace'
+            'namespace',
+            renderEditableString
           )}
 
-          {renderEditableListRow(
+          {renderMetadataRow(
             t('metadata.creator'),
             formData.dctCreators,
-            'dctCreators'
+            'dctCreators',
+            renderEditableList
           )}
-          {renderEditableStringRow(
+          {renderMetadataRow(
             t('metadata.contact'),
             formData.contact,
-            'contact'
+            'contact',
+            renderEditableString
           )}
-          {renderEditableStringRow(
+          {renderMetadataRow(
             t('metadata.domain'),
             formData.domain,
-            'domain'
+            'domain',
+            renderEditableString
           )}
-          {renderUneditableStringRow(
+          {renderMetadataRow(
             t('metadata.language'),
             metadata.languages
           )}
-          {renderEditableStringRow(
+          {renderMetadataRow(
             t('metadata.license'),
             formData.dctLicense,
-            'dctLicense'
+            'dctLicense',
+            renderEditableString
           )}
-          {renderEditableStringRow(
+          {renderMetadataRow(
             t('metadata.publisher'),
             formData.dctPublisher,
-            'dctPublisher'
+            'dctPublisher',
+            renderEditableString
           )}
         </Grid>
 
@@ -389,38 +375,38 @@ export default function MetadataForm({
             </Grid>
           </MetadataRow>
 
-          {/*TODO: wrapping*/}
-          {renderUneditableStringRow(
+          {renderMetadataRow(
             t('metadata.source-url'),
             metadata.sourceURL
           )}
 
           {isCrosswalk(metadata) && (
             <>
-              {renderUneditableStringRow(
+              {renderMetadataRow(
                 t('metadata.source-schema'),
                 metadata.sourceSchemaInfo.name
               )}
-              {renderUneditableStringRow(
+              {renderMetadataRow(
                 t('metadata.source-schema-id'),
                 metadata.sourceSchemaInfo.handle ?? metadata.sourceSchemaInfo.id
               )}
-              {renderUneditableStringRow(
+              {renderMetadataRow(
                 t('metadata.target-schema'),
                 metadata.targetSchemaInfo.name
               )}
-              {renderUneditableStringRow(
+              {renderMetadataRow(
                 t('metadata.target-schema-id'),
                 metadata.targetSchemaInfo.handle ?? metadata.targetSchemaInfo.id
               )}
             </>
           )}
 
-          {renderUneditableStringRow(
+          {renderMetadataRow(
             t('metadata.mscr-owner'),
             metadata.ownerMetadata.map((o) => o.name ?? o.id)
           )}
-          {renderUneditableStringRow(t('metadata.format'), metadata.format)}
+          {renderMetadataRow(t('metadata.format'), metadata.format)}
+          {renderMetadataRow(t('metadata.internal-identifier'), metadata.id)}
 
           <MetadataRow container>
             <Grid item xs={4}>
@@ -444,7 +430,7 @@ export default function MetadataForm({
             </Grid>
           </MetadataRow>
 
-          {renderUneditableStringRow(
+          {renderMetadataRow(
             t('metadata.mscr-state'),
             metadata.state?.toString()
           )}
