@@ -1,7 +1,7 @@
 European Union Public Licence V. 1.1 
  
  
-EUPL Â© the European Community 2007 
+EUPL the European Community 2007 
  
  
 This European Union Public Licence (the "EUPL") applies to the Work or Software 
