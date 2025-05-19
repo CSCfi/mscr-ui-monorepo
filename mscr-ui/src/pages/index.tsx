@@ -26,6 +26,8 @@ import SiteInformationModule from '@app/modules/site-information';
 import SearchBar from 'src/modules/search/search-bar';
 import styled from 'styled-components';
 import PrivacyGuide from '@app/modules/privacy-guide';
+import { FooterContainer } from '@app/common/components/layout/layout.styles';
+import Footer from '@app/common/components/footer';
 
 interface IndexPageProps extends CommonContextState {
   _netI18Next: SSRConfig;
@@ -39,7 +41,7 @@ const LandingWrapper = styled.div`
   height: calc(100vh - 64px);
   gap: 30px;
   padding-top: 30px;
-  
+
   @media screen and (min-width: 768px) {
     flex-direction: row;
     justify-content: center;
@@ -47,12 +49,12 @@ const LandingWrapper = styled.div`
     max-height: 660px;
     padding-top: 0;
   }
-`
+`;
 
 const LandingItem = styled.div`
   width: 100%;
   max-width: 520px;
-`
+`;
 
 export default function IndexPage(props: IndexPageProps) {
   const { t } = useTranslation('common');
@@ -76,6 +78,7 @@ export default function IndexPage(props: IndexPageProps) {
             <SearchBar placeholder={t('landing.search-placeholder')} />
           </LandingItem>
         </LandingWrapper>
+        
       </Layout>
     </CommonContextProvider>
   );
