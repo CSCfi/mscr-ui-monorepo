@@ -24,7 +24,7 @@ export default function SearchResult({ hit }: { hit: MscrSearchResult }) {
   const displayResult: Partial<Schema> = {
     label: result.label,
     namespace: result.namespace,
-    pid: result.id,
+    id: result.id,
     state: result.state,
     versionLabel: result.versionLabel,
     description: result.comment,
@@ -42,9 +42,9 @@ export default function SearchResult({ hit }: { hit: MscrSearchResult }) {
   });
   let url;
   if (result.type == 'SCHEMA') {
-    url = `/schema/${displayResult.pid}`;
+    url = `/schema/${displayResult.id}`;
   } else {
-    url = `/crosswalk/${displayResult.pid}`;
+    url = `/crosswalk/${displayResult.id}`;
   }
   let chips: string[] = [result.state];
   if (result.format) {

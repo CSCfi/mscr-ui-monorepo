@@ -117,7 +117,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   const setSchemaRootSelection = () => {
     if (schemaData) {
       patchSchemaRootSelection({
-        schemaId: schemaData?.pid,
+        schemaId: schemaData?.id,
         value: nodeSelection ? nodeSelection.properties['@id'] : '',
       })
         .unwrap()
@@ -139,7 +139,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     notificationKey: NotificationKeys
   ) => {
     if (!schemaData) return;
-    patchSchema({ payload: payload, pid: schemaData.pid })
+    patchSchema({ payload: payload, pid: schemaData.id })
       .unwrap()
       .then(() => {
         dispatch(
@@ -155,7 +155,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
 
   const deleteSchemaDraft = () => {
     if (!schemaData) return;
-    deleteSchema(schemaData.pid)
+    deleteSchema(schemaData.id)
       .unwrap()
       .then(() => {
         dispatch(

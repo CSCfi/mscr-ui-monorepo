@@ -51,7 +51,7 @@ export function updateActionMenu(
   const revisions = contentData.revisions;
   if (revisions.length > 0) {
     const latestVersion = revisions[revisions.length - 1].pid;
-    if (contentData.pid === latestVersion) {
+    if (contentData.id === latestVersion) {
       dispatch(setMenuList(['version']));
     }
   }
