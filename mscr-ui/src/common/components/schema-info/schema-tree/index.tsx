@@ -6,7 +6,10 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useTranslation } from 'next-i18next';
 import {NodeMapping, RenderTree} from '@app/common/interfaces/crosswalk-connection.interface';
-import Tooltip from "@mui/material/Tooltip";
+import Tooltip from '@mui/material/Tooltip';
+import { TreeType } from '@app/common/interfaces/node.interface';
+import { useSelector } from 'react-redux';
+import { selectSelectedNodes } from '@app/common/components/crosswalk/crosswalk.slice';
 
 function returnIconForMappedNode(nodeMappings: NodeMapping[], node: any, isSourceTree: boolean) {
   let foundMappings = null;
@@ -21,7 +24,7 @@ function returnIconForMappedNode(nodeMappings: NodeMapping[], node: any, isSourc
   }
   if (foundMappings != null) {
     return <Tooltip title={'Schema tree node is used on Crosswalk mapping.'} placement="bottom">
-      <CircleIcon style={{color: "#1976d2", maxHeight: "25%", maxWidth: "25%"}}/>
+      <CircleIcon style={{color: '#1976d2', maxHeight: '25%', maxWidth: '25%'}}/>
     </Tooltip>;
   } else {
     return <></>;
@@ -68,18 +71,21 @@ export default function SchemaTree({
   treeExpanded,
   performTreeAction,
   showQname,
+  treeType,
   isSourceTree,
   nodeMappings,
 }: {
   nodes: RenderTree[];
-  treeSelectedArray: string[];
+  treeSelectedArray: RenderTree[];
   treeExpanded: string[];
   performTreeAction: (action: string, nodeIds: string[]) => void;
   showQname: boolean;
+  treeType: TreeType;
   isSourceTree: boolean | undefined;
   nodeMappings?: NodeMapping[];
 }) {
   const { t } = useTranslation('common');
+  const currentSelectedNodes = useSelector(selectSelectedNodes())[treeType] ?? [];
 
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     performTreeAction('handleSelect', nodeIds);
@@ -95,7 +101,7 @@ export default function SchemaTree({
       id={isSourceTree ? 'source' : 'target'}
       aria-label={t('schema-tree.tree-label')}
       expanded={treeExpanded}
-      selected={treeSelectedArray}
+      selected={currentSelectedNodes.map((node) => node.id)}
       onNodeSelect={handleSelect}
       onNodeToggle={handleToggle}
       defaultCollapseIcon={<ExpandMoreIcon />}

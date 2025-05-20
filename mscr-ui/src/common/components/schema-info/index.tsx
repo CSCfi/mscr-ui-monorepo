@@ -1,12 +1,15 @@
-import {useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {Button, Checkbox, ModalFooter, ModalTitle, SearchInput} from 'suomifi-ui-components';
+import { Checkbox, SearchInput } from 'suomifi-ui-components';
 import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
 import SchemaTree from '@app/common/components/schema-info/schema-tree';
 import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
-import {NodeMapping, RenderTree} from '@app/common/interfaces/crosswalk-connection.interface';
+import {
+  NodeMapping,
+  RenderTree,
+} from '@app/common/interfaces/crosswalk-connection.interface';
 import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
 import { useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
@@ -23,13 +26,17 @@ import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
-import {StyledPanel} from "@app/common/components/action-panel/action-panel.styles";
+import { StyledPanel } from '@app/common/components/action-panel/action-panel.styles';
+import { useSelector } from 'react-redux';
+import {
+  SelectedNodes,
+  selectSelectedNodes,
+  setSelectedNodes,
+} from '@app/common/components/crosswalk/crosswalk.slice';
+import { useStoreDispatch } from '@app/store';
+import { TreeType } from '@app/common/interfaces/node.interface';
 
 export default function SchemaInfo(props: {
-  updateTreeNodeSelectionsOutput?: (
-    nodeIds: RenderTree[],
-    isSourceSchema: boolean
-  ) => void;
   isSourceTree?: boolean;
   treeSelection?: string[];
   caption: string;
@@ -46,15 +53,26 @@ export default function SchemaInfo(props: {
   const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
     useGetFrontendSchemaQuery(props.schemaUrn);
 
+  const dispatch = useStoreDispatch();
+  const treeType: TreeType = props.isSingleTree
+    ? TreeType.Single
+    : props.isSourceTree
+      ? TreeType.Source
+      : TreeType.Target;
+  const selectNodes = (nodes: RenderTree[]) => {
+    const nodePayload: SelectedNodes = {};
+    nodePayload[treeType] = nodes;
+    dispatch(setSelectedNodes(nodePayload));
+  };
+  const currentSelectedNodes =
+    useSelector(selectSelectedNodes())[treeType] ?? [];
+
   const [treeData, setTreeData] = useState<RenderTree[]>([]);
   const [nodeIdToNodeDictionary, setNodeIdToNodeDictionary] = useState<{
     [key: string]: RenderTree[];
   }>({});
   // These are used by tree visualization
-  const [treeSelectedArray, setTreeSelectedArray] = useState<string[]>([]);
   const [treeExpandedArray, setTreeExpandedArray] = useState<string[]>([]);
-  // These are used by datamodel
-  const [selectedTreeNodes, setSelectedTreeNodes] = useState<RenderTree[]>([]);
   const [currentlySelectedNodeId, setCurrentlySelectedNodeId] = useState<
     string | undefined
   >(undefined);
@@ -89,20 +107,6 @@ export default function SchemaInfo(props: {
     }
   }, [props.treeSelection, props.scrollToSelectedNodeId]);
 
-  useEffect(() => {
-    // Update selections for node info and parent component for mappings
-    const selectedNodes = treeSelectedArray
-      .map((nodeId) => nodeIdToNodeDictionary[nodeId])
-      .flat();
-    if (
-      props.updateTreeNodeSelectionsOutput &&
-      props.isSourceTree !== undefined
-    ) {
-      props.updateTreeNodeSelectionsOutput(selectedNodes, props.isSourceTree);
-    }
-    setSelectedTreeNodes(selectedNodes);
-  }, [treeSelectedArray, nodeIdToNodeDictionary]);
-
   const modalRef = useRef(null);
 
   const setFullyExpanded = () => {
@@ -114,8 +118,7 @@ export default function SchemaInfo(props: {
   };
 
   function clearTreeSearch() {
-    setTreeSelectedArray([]);
-    setSelectedTreeNodes([]);
+    selectNodes([]);
   }
 
   // Used by tree select and filtering
@@ -150,7 +153,10 @@ export default function SchemaInfo(props: {
     if (nodeIds.length > 0) {
       const nodeIdsToExpand = getAllNodeIdsOnPathToLeaf(nodeIds);
       setTreeExpandedArray(nodeIdsToExpand);
-      setTreeSelectedArray(nodeIds);
+      const nodes = nodeIds
+        .map((nodeId) => nodeIdToNodeDictionary[nodeId])
+        .flat();
+      selectNodes(nodes);
       // Get element by id sometimes returns a null reference. Added artificial delay to mitigate the problem.
       if (props?.scrollToSelectedNodeId) {
         setCurrentlySelectedNodeId(props?.scrollToSelectedNodeId);
@@ -184,7 +190,10 @@ export default function SchemaInfo(props: {
   }
 
   function handleTreeClick(nodeIds: string[]) {
-    setTreeSelectedArray(nodeIds);
+    const nodes = nodeIds
+      .map((nodeId) => nodeIdToNodeDictionary[nodeId])
+      .flat();
+    selectNodes(nodes);
     // If there's several nodes with the same id, expand paths to all
     const isMultiple = nodeIds
       .map(
@@ -315,10 +324,11 @@ export default function SchemaInfo(props: {
               {isTreeDataFetched && (
                 <SchemaTree
                   nodes={treeData}
-                  treeSelectedArray={treeSelectedArray}
+                  treeSelectedArray={currentSelectedNodes}
                   treeExpanded={treeExpandedArray}
                   performTreeAction={performCallbackFromTreeAction}
                   showQname={!showAttributeNames}
+                  treeType={treeType}
                   isSourceTree={props.isSourceTree}
                   nodeMappings={props.nodeMappings}
                 />
@@ -337,17 +347,16 @@ export default function SchemaInfo(props: {
           </Checkbox>
         </CheckboxWrapper>
         <StyledPanel>
-        <NodeInfoWrapper ref={modalRef}>
-          <NodeInfo
-            treeData={selectedTreeNodes}
-            currentlySelectedNodeId={currentlySelectedNodeId}
-            dataIsLoaded={isTreeDataFetched}
-            isNodeEditable={props.isNodeEditable}
-            hasCustomRoot={props.hasCustomRoot}
-          />
-        </NodeInfoWrapper>
+          <NodeInfoWrapper ref={modalRef}>
+            <NodeInfo
+              treeData={currentSelectedNodes}
+              currentlySelectedNodeId={currentlySelectedNodeId}
+              dataIsLoaded={isTreeDataFetched}
+              isNodeEditable={props.isNodeEditable}
+              hasCustomRoot={props.hasCustomRoot}
+            />
+          </NodeInfoWrapper>
         </StyledPanel>
-
       </TreeviewWrapper>
     </>
   );

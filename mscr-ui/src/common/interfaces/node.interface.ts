@@ -2,3 +2,9 @@ export interface ConstantAttribute {
   name: string;
   value: string | Array<string | number | boolean> | undefined;
 }
+
+export enum TreeType {
+  Single = 'single',
+  Source = 'source',
+  Target = 'target'
+}

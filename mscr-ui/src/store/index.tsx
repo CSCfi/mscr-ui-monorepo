@@ -19,7 +19,7 @@ import { activeSlice } from '@app/common/components/active/active.slice';
 import { importApi } from '@app/common/components/import/import.slice';
 import { schemaApi } from '@app/common/components/schema/schema.slice';
 import {
-  crosswalkApi,
+  crosswalkApi, crosswalkSlice
 } from '@app/common/components/crosswalk/crosswalk.slice';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
 import { crosswalkMappingFunctionsApi } from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
@@ -60,6 +60,7 @@ export function makeStore(ctx: NextIronContext) {
       [contentViewSlice.name]: contentViewSlice.reducer,
       [navigationSlice.name]: navigationSlice.reducer,
       [dataTypeSlice.name]: dataTypeSlice.reducer,
+      [crosswalkSlice.name]: crosswalkSlice.reducer,
     },
 
     middleware: (getDefaultMiddleware) =>

@@ -23,12 +23,12 @@ import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
+import { TreeType } from '@app/common/interfaces/node.interface';
+import { useStoreDispatch } from '@app/store';
+import { SelectedNodes, selectSelectedNodes, setSelectedNodes } from '@app/common/components/crosswalk/crosswalk.slice';
+import { useSelector } from 'react-redux';
 
 export default function SchemaInfo2(props: {
-  updateTreeNodeSelectionsOutput?: (
-    nodeIds: RenderTree[],
-    isSourceSchema: boolean
-  ) => void;
   isSourceTree?: boolean;
   treeSelection?: string[];
   caption: string;
@@ -44,15 +44,26 @@ export default function SchemaInfo2(props: {
   const { data: getSchemaData, isSuccess: getSchemaDataIsSuccess } =
     useGetFrontendSchemaQuery(props.schemaUrn);
 
+  const dispatch = useStoreDispatch();
+  const treeType: TreeType = props.isSingleTree
+    ? TreeType.Single
+    : props.isSourceTree
+      ? TreeType.Source
+      : TreeType.Target;
+  const selectNodes = (nodes: RenderTree[]) => {
+    const nodePayload: SelectedNodes = {};
+    nodePayload[treeType] = nodes;
+    dispatch(setSelectedNodes(nodePayload));
+  };
+  const currentSelectedNodes =
+    useSelector(selectSelectedNodes())[treeType] ?? [];
+
   const [treeData, setTreeData] = useState<RenderTree[]>([]);
   const [nodeIdToNodeDictionary, setNodeIdToNodeDictionary] = useState<{
     [key: string]: RenderTree[];
   }>({});
   // These are used by tree visualization
-  const [treeSelectedArray, setTreeSelectedArray] = useState<string[]>([]);
   const [treeExpandedArray, setTreeExpandedArray] = useState<string[]>([]);
-  // These are used by datamodel
-  const [selectedTreeNodes, setSelectedTreeNodes] = useState<RenderTree[]>([]);
   const [currentlySelectedNodeId, setCurrentlySelectedNodeId] = useState<
     string | undefined
   >(undefined);
@@ -87,20 +98,6 @@ export default function SchemaInfo2(props: {
     }
   }, [props.treeSelection]);
 
-  useEffect(() => {
-    // Update selections for node info and parent component for mappings
-    const selectedNodes = treeSelectedArray
-      .map((nodeId) => nodeIdToNodeDictionary[nodeId])
-      .flat();
-    if (
-      props.updateTreeNodeSelectionsOutput &&
-      props.isSourceTree !== undefined
-    ) {
-      props.updateTreeNodeSelectionsOutput(selectedNodes, props.isSourceTree);
-    }
-    setSelectedTreeNodes(selectedNodes);
-  }, [treeSelectedArray, nodeIdToNodeDictionary]);
-
   const setFullyExpanded = () => {
     const nodeIdsToExpand: string[] = [];
     Object.entries(nodeIdToNodeDictionary).map(([nodeId, node]) => {
@@ -110,8 +107,7 @@ export default function SchemaInfo2(props: {
   };
 
   function clearTreeSearch() {
-    setTreeSelectedArray([]);
-    setSelectedTreeNodes([]);
+    selectNodes([]);
   }
 
   // Used by tree select and filtering
@@ -144,7 +140,10 @@ export default function SchemaInfo2(props: {
     if (nodeIds.length > 0) {
       const nodeIdsToExpand = getAllNodeIdsOnPathToLeaf(nodeIds);
       setTreeExpandedArray(nodeIdsToExpand);
-      setTreeSelectedArray(nodeIds);
+      const nodes = nodeIds
+        .map((nodeId) => nodeIdToNodeDictionary[nodeId])
+        .flat();
+      selectNodes(nodes);
       // Get element by id sometimes returns a null reference. Added artificial delay to mitigate the problem.
       if (props?.scrollToSelectedNodeId) {
         setCurrentlySelectedNodeId(props?.scrollToSelectedNodeId);
@@ -178,7 +177,10 @@ export default function SchemaInfo2(props: {
   }
 
   function handleTreeClick(nodeIds: string[]) {
-    setTreeSelectedArray(nodeIds);
+    const nodes = nodeIds
+      .map((nodeId) => nodeIdToNodeDictionary[nodeId])
+      .flat();
+    selectNodes(nodes);
     // If there's several nodes with the same id, expand paths to all
     const isMultiple = nodeIds
       .map(
@@ -234,9 +236,9 @@ export default function SchemaInfo2(props: {
             title={
               getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                  data: getSchemaData.metadata.label,
-                  lang,
-                })
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
                 : t('schema-tree.no-label')
             }
             placement="bottom-start"
@@ -244,9 +246,9 @@ export default function SchemaInfo2(props: {
             <SchemaHeading variant="h2">
               {getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                  data: getSchemaData.metadata.label,
-                  lang,
-                })
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
                 : t('schema-tree.no-label')}
             </SchemaHeading>
           </Tooltip>
@@ -308,10 +310,11 @@ export default function SchemaInfo2(props: {
               {isTreeDataFetched && (
                 <SchemaTree
                   nodes={treeData}
-                  treeSelectedArray={treeSelectedArray}
+                  treeSelectedArray={currentSelectedNodes}
                   treeExpanded={treeExpandedArray}
                   performTreeAction={performCallbackFromTreeAction}
                   showQname={!showAttributeNames}
+                  treeType={TreeType.Single}
                   isSourceTree={props.isSourceTree}
                 />
               )}
@@ -320,7 +323,7 @@ export default function SchemaInfo2(props: {
         </TreeWrapper>
         <NodeInfoWrapper className="col-5 px-0">
           <NodeInfo
-            treeData={selectedTreeNodes}
+            treeData={currentSelectedNodes}
             currentlySelectedNodeId={currentlySelectedNodeId}
             dataIsLoaded={isTreeDataFetched}
             isNodeEditable={props.isNodeEditable}

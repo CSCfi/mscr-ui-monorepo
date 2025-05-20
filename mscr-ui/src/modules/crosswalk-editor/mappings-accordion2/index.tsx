@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Dispatch, SetStateAction, useEffect} from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 import Collapse from '@mui/material/Collapse';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -33,6 +33,8 @@ import {Format} from "@app/common/interfaces/format.interface";
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
 import {CrosswalkWithVersionInfo} from "@app/common/interfaces/crosswalk.interface";
 import {State} from "@app/common/interfaces/state.interface";
+import { useSelector } from 'react-redux';
+import { selectSelectedNodes } from '@app/common/components/crosswalk/crosswalk.slice';
 function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttributeNames, rowcount, mappingFunctions,
                schemaFormats, schemaDatas, setNodeMappingsModalOpen}: {
   row: NodeMapping;
@@ -391,7 +393,7 @@ function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAtt
 
 export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditModeActive, showAttributeNames,
                                             mappingFunctions, performAccordionAction, schemaFormats, schemaDatas, setNodeMappingsModalOpen,
-                                           selectedSourceNodes, selectedTargetNodes, addMappingButtonClick, hasEditPermission, crosswalkData}
+                                           addMappingButtonClick, hasEditPermission, crosswalkData}
                                             :
 {nodeMappings: NodeMapping[];
   viewOnlyMode: boolean;
@@ -402,24 +404,60 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
   schemaFormats: {sourceSchemaFormat: Format | undefined; targetSchemaFormat: Format | undefined};
   schemaDatas: {sourceSchemaData: SchemaWithContent | undefined; targetSchemaData: SchemaWithContent | undefined; };
   setNodeMappingsModalOpen:  Dispatch<SetStateAction<boolean>>;
-  selectedSourceNodes: RenderTree[];
-  selectedTargetNodes: RenderTree[];
   addMappingButtonClick: Function;
   hasEditPermission: boolean;
   crosswalkData: CrosswalkWithVersionInfo;
 }) {
   const {t} = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
+  const [selectedNodeMappings, setSelectedNodeMappings] = React.useState<NodeMapping[]>([]);
+  const selectedNodes = useSelector(selectSelectedNodes());
+  const selectedTargetNodes = useMemo((): RenderTree[] => selectedNodes.target ?? [], [selectedNodes.target]);
+  const selectedSourceNodes = useMemo((): RenderTree[] => selectedNodes.source ?? [], [selectedNodes.source]);
+
+  const filterMappingsWithId = useCallback((mappings: NodeMapping[], ids: string[], source: boolean) => {
+    const results: NodeMapping[] = [];
+    mappings.forEach(mapping => {
+        if (source) {
+          const foundItemsMatchingIds = ids.filter( id => mapping.source.some(sourceItem => sourceItem.id === id ));
+          if (foundItemsMatchingIds.length === ids.length) {
+            results.push(mapping);
+          }
+        } else {
+          const foundItemsMatchingIds = ids.filter( id => mapping.target.some(targetItem => targetItem.id === id ));
+          if (foundItemsMatchingIds.length === ids.length) {
+            results.push(mapping);
+          }
+        }
+      }
+    );
+    return results;
+  }, []);
 
   useEffect(() => {
-    setMappingData(nodeMappings);
-  }, [nodeMappings]);
+    if (!nodeMappings || (selectedSourceNodes.length == 0 && selectedTargetNodes.length == 0)) return;
+    let mappingsByNodeSelection: NodeMapping[] = [];
+    if (selectedTargetNodes.length == 0) {
+      const sourceNodeIds = selectedSourceNodes.map(node => node.id);
+      mappingsByNodeSelection = filterMappingsWithId(nodeMappings, sourceNodeIds, true);
+    } if (selectedSourceNodes.length == 0) {
+      const targetNodeIds = selectedTargetNodes.map(node => node.id);
+      mappingsByNodeSelection = filterMappingsWithId(nodeMappings, targetNodeIds, false);
+    } else {
+      const sourceNodeIds = selectedSourceNodes.map(node => node.id);
+      const targetNodeIds = selectedTargetNodes.map(node => node.id);
+      const sourceMatches = (filterMappingsWithId(nodeMappings, sourceNodeIds, true));
+      mappingsByNodeSelection = filterMappingsWithId(sourceMatches, targetNodeIds, false);
+    }
+    setSelectedNodeMappings(mappingsByNodeSelection);
+    setMappingData(mappingsByNodeSelection);
+  }, [filterMappingsWithId, nodeMappings, selectedSourceNodes, selectedTargetNodes]);
+
 
   useEffect(() => {
     setMappingData([]);
   }, []);
 
-  const nodeMappingsInput = mappingData;
   return (
     <>
 
@@ -434,12 +472,12 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
             visualPlaceholder={t('mappings-accordion.filter-from-mappings')}
             onSearch={(value) => {
               if (typeof value === 'string') {
-                setMappingData(filterMappings(nodeMappingsInput, value, showAttributeNames));
+                setMappingData(filterMappings(selectedNodeMappings, value, showAttributeNames));
               }
             }}
             onChange={(value) => {
               if (!value) {
-                setMappingData(nodeMappings);
+                setMappingData(selectedNodeMappings);
               }
             }}
           />
@@ -505,7 +543,7 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
               </TableRow>
             </TableBody>
           )}
-          {nodeMappingsInput?.length < 1 && (
+          {mappingData.length < 1 && (
             <TableBody>
               <TableRow className="">
                 <td>

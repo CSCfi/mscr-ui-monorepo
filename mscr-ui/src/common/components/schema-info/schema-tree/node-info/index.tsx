@@ -39,6 +39,7 @@ export default function NodeInfo(props: {
         setSelectedNode(props.treeData[0]);
       }
     } else {
+      setDropDownList([]);
       setSelectedNode(undefined);
     }
   }, [props.treeData, props.currentlySelectedNodeId]);
@@ -151,33 +152,35 @@ export default function NodeInfo(props: {
               {t('node-info.reset-custom-root-node')}
             </Button>
           )}
-          <div>
-            <div className="row">
-              {props.treeData.length > 1 && (
-                <>
-                  <div className="col-12">
-                    <div>{t('schema-tree.selected-node')}</div>
-                    <div className="attribute-font">{selectedNode?.name}</div>
-                  </div>
-                </>
-              )}
-
-              {nodeAttributes.map((attrib) => (
-                <RenderAttribute key={self.crypto.randomUUID()} attribute={attrib} />
-              ))}
-              {props.isNodeEditable &&
-                isLeafNode &&
-                nodeTypeAttribute !== '' && (
-                  <div className='col-12' key={self.crypto.randomUUID()}>
-                    <div>@type:</div>
-                    <div className="attribute-font">
-                      {processHtmlLinks(nodeTypeAttribute)}
+          {selectedNode && (
+            <div>
+              <div className="row">
+                {props.treeData.length > 1 && (
+                  <>
+                    <div className="col-12">
+                      <div>{t('schema-tree.selected-node')}</div>
+                      <div className="attribute-font">{selectedNode?.name}</div>
                     </div>
-                    <TypeSelector nodeId={selectedNode?.id} />
-                  </div>
+                  </>
                 )}
+
+                {nodeAttributes.map((attrib) => (
+                  <RenderAttribute key={self.crypto.randomUUID()} attribute={attrib} />
+                ))}
+                {props.isNodeEditable &&
+                  isLeafNode &&
+                  nodeTypeAttribute !== '' && (
+                    <div className='col-12' key={self.crypto.randomUUID()}>
+                      <div>@type:</div>
+                      <div className="attribute-font">
+                        {processHtmlLinks(nodeTypeAttribute)}
+                      </div>
+                      <TypeSelector nodeId={selectedNode?.id} />
+                    </div>
+                  )}
+              </div>
             </div>
-          </div>
+          )}
         </Box>
       </div>
     </div>

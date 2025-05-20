@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button as Sbutton, Checkbox } from 'suomifi-ui-components';
 import MappingsAccordion, {
   highlightOperation,
@@ -19,6 +19,9 @@ import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
 import {Format} from "@app/common/interfaces/format.interface";
 import _ from "lodash";
 import MappingsAccordion2 from "@app/modules/crosswalk-editor/mappings-accordion2";
+import { useSelector } from 'react-redux';
+import { selectSelectedNodes, setSelectedNodes } from '@app/common/components/crosswalk/crosswalk.slice';
+import { useStoreDispatch } from '@app/store';
 
 export default function CrosswalkEditor({
                                           crosswalkData, hasEditPermission,
@@ -74,18 +77,10 @@ export default function CrosswalkEditor({
   const [sourceSchemaUrn, setSourceSchemaUrn] = useState<string>('');
   const [targetSchemaUrn, setTargetSchemaUrn] = useState<string>('');
 
-  const [selectedSourceNodes, setSelectedSourceNodes] = useState<RenderTree[]>(
-    []
-  );
-  const [selectedTargetNodes, setSelectedTargetNodes] = useState<RenderTree[]>(
-    []
-  );
-
-  const [filteredSourceNodeMappings, setFilteredSourceNodeMappings] = useState<NodeMapping[]>([]);
-  const [filteredTargetNodeMappings, setFilteredTargetNodeMappings] = useState<NodeMapping[]>([]);
-  const [filteredCombinedNodeMappings, setFilteredCombinedNodeMappings] = useState<NodeMapping[]>([]);
-
-  const [linkingError] = useState<string>('');
+  const selectedNodes = useSelector(selectSelectedNodes());
+  const selectedTargetNodes = useMemo((): RenderTree[] => selectedNodes.target ?? [], [selectedNodes.target]);
+  const selectedSourceNodes = useMemo((): RenderTree[] => selectedNodes.source ?? [], [selectedNodes.source]);
+  const dispatch = useStoreDispatch();
 
   useEffect(() => {
     if (crosswalkData?.sourceSchema) {
@@ -94,13 +89,8 @@ export default function CrosswalkEditor({
     if (crosswalkData?.targetSchema) {
       setTargetSchemaUrn(crosswalkData.targetSchema);
     }
-  }, [crosswalkData]);
-
-  useEffect( () => {
-    setFilteredSourceNodeMappings([]);
-    setFilteredTargetNodeMappings([]);
-    setFilteredCombinedNodeMappings([]);
-  }, [nodeMappings]);
+    dispatch(setSelectedNodes({target: [], source: []}));
+  }, [crosswalkData, dispatch]);
 
   function addMappingButtonClick() {
     setIsMappingPatchOperation(false);
@@ -173,85 +163,6 @@ export default function CrosswalkEditor({
     return results;
   }
 
-  function filterMappingsWithId(nodeMappingsInput: NodeMapping[], ids: string[], source: boolean) {
-    let results: NodeMapping[] = [];
-
-    nodeMappingsInput.forEach(item => {
-        if (source) {
-          let foundItemsMatchingIds = ids.filter( id => item.source.some(sourceItem => sourceItem.id === id ));
-          if (foundItemsMatchingIds.length === ids.length) {
-            results.push(item);
-          }
-        } else {
-          let foundItemsMatchingIds = ids.filter( id => item.target.some(targetItem => targetItem.id === id ));
-          if (foundItemsMatchingIds.length === ids.length) {
-            results.push(item);
-          }
-        }
-
-      }
-    );
-    return results;
-  }
-
-  const performCallbackFromSchemaInfo = (
-    nodeIds: RenderTree[],
-    isSourceTree: boolean
-  ) => {
-    let foundNodeMappings = [];
-    if (nodeIds.length > 0 && nodeIds[0] != null) {
-      let ids = nodeIds.map(nodeId => nodeId.id);
-      foundNodeMappings = filterMappingsWithId(nodeMappings, ids, isSourceTree);
-      if (isSourceTree) {
-        setFilteredSourceNodeMappings(foundNodeMappings);
-        if (filteredTargetNodeMappings && filteredTargetNodeMappings.length > 0) {
-          let result = foundNodeMappings.filter(sourceNodeMapping =>
-            filteredTargetNodeMappings.some(targetNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
-          setFilteredCombinedNodeMappings(result);
-        } else {
-          setFilteredCombinedNodeMappings(foundNodeMappings);
-        }
-      } else {
-        setFilteredTargetNodeMappings(foundNodeMappings);
-        if (filteredSourceNodeMappings && filteredSourceNodeMappings.length > 0) {
-          let result = foundNodeMappings.filter(targetNodeMapping =>
-            filteredSourceNodeMappings.some(sourceNodeMapping => _.isEqual(sourceNodeMapping, targetNodeMapping)));
-          setFilteredCombinedNodeMappings(result);
-        } else {
-          setFilteredCombinedNodeMappings(foundNodeMappings);
-        }
-      }
-    } else {
-      if (isSourceTree) {
-        setFilteredSourceNodeMappings([]);
-        if (filteredTargetNodeMappings != null && filteredTargetNodeMappings.length > 0) {
-          setFilteredCombinedNodeMappings(filteredTargetNodeMappings);
-        } else {
-          setFilteredCombinedNodeMappings([]);
-        }
-      } else {
-        setFilteredTargetNodeMappings([]);
-        if (filteredSourceNodeMappings != null && filteredSourceNodeMappings.length > 0) {
-          setFilteredCombinedNodeMappings(filteredSourceNodeMappings);
-        } else {
-          setFilteredCombinedNodeMappings([]);
-        }
-      }
-    }
-
-    if (isSourceTree) {
-      setSelectedSourceNodes(nodeIds);
-      if (isPatchMappingOperation) {
-        setPatchSourceNodes(nodeIds);
-      }
-    } else {
-      setSelectedTargetNodes(nodeIds);
-      if (isPatchMappingOperation) {
-        setPatchTargetNodes(nodeIds);
-      }
-    }
-  }
-
   return (
     <div className="row d-flex justify-content-between crosswalk-editor">
       <div className="col-12 mx-1">
@@ -259,7 +170,6 @@ export default function CrosswalkEditor({
           {/*  SOURCE TREE */}
           <div className="col-3">
             <SchemaInfo
-              updateTreeNodeSelectionsOutput={performCallbackFromSchemaInfo}
               isSourceTree={true}
               treeSelection={sourceTreeSelection}
               caption={t('crosswalk-editor.search-from-source-schema')}
@@ -272,7 +182,7 @@ export default function CrosswalkEditor({
 
           <div className="col-6">
             <MappingsAccordion2
-              nodeMappings={filteredCombinedNodeMappings}
+              nodeMappings={nodeMappings}
               viewOnlyMode={false}
               isEditModeActive={
                 isEditModeActive && crosswalkData.state !== State.Published
@@ -283,8 +193,6 @@ export default function CrosswalkEditor({
               schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
               schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
               setNodeMappingsModalOpen={setNodeMappingsModalOpen}
-              selectedSourceNodes={selectedSourceNodes}
-              selectedTargetNodes={selectedTargetNodes}
               addMappingButtonClick={addMappingButtonClick}
               hasEditPermission={hasEditPermission}
               crosswalkData={crosswalkData}
@@ -294,7 +202,6 @@ export default function CrosswalkEditor({
           {/*  TARGET TREE */}
           <div className="col-3">
             <SchemaInfo
-              updateTreeNodeSelectionsOutput={performCallbackFromSchemaInfo}
               isSourceTree={false}
               treeSelection={targetTreeSelection}
               caption={t('crosswalk-editor.search-from-target-schema')}

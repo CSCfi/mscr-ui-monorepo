@@ -1,11 +1,13 @@
 import { HYDRATE } from 'next-redux-wrapper';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
+import { createSlice } from '@reduxjs/toolkit';
+import { AppState, AppThunk } from '@app/store';
 import {
   Crosswalk,
   CrosswalkWithVersionInfo,
 } from '@app/common/interfaces/crosswalk.interface';
-import { NodeMapping } from '@app/common/interfaces/crosswalk-connection.interface';
+import { NodeMapping, RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
 
 export const crosswalkApi = createApi({
@@ -140,6 +142,46 @@ export const crosswalkApi = createApi({
     }),
   }),
 });
+
+export interface SelectedNodes {
+  single?: RenderTree[];
+  source?: RenderTree[];
+  target?: RenderTree[];
+}
+
+const initialState : { selectedNodes: SelectedNodes } = {
+  selectedNodes: {
+    single: [],
+    source: [],
+    target: []
+  }
+};
+
+export const crosswalkSlice = createSlice({
+  name: 'crosswalk',
+  initialState: initialState,
+  reducers: {
+    setSelectedNodes(state, action) {
+      return {
+        ...state,
+        selectedNodes: {
+          single: action.payload.single ?? state.selectedNodes.single,
+          source: action.payload.source ?? state.selectedNodes.source,
+          target: action.payload.target ?? state.selectedNodes.target
+        }
+      };
+    },
+  },
+});
+
+export function  selectSelectedNodes() {
+  return (state: AppState) => state.crosswalk.selectedNodes;
+}
+
+export function  setSelectedNodes({ single, source, target } : SelectedNodes ): AppThunk {
+  return (dispatch) =>
+    dispatch(crosswalkSlice.actions.setSelectedNodes({ single, source, target }));
+}
 
 export const {
   usePutCrosswalkMutation,
