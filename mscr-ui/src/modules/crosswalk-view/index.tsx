@@ -24,7 +24,7 @@ import { NotificationKeys } from '@app/common/interfaces/notifications.interface
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
 import { setNotification } from '@app/common/components/notifications/notifications.slice';
 import { Text } from 'suomifi-ui-components';
-import Tabmenu from '@app/common/components/tabmenu';
+import CrosswalkTabmenu from 'src/common/components/crosswalk-tabmenu';
 import MetadataStub from '@app/modules/form/metadata-form/metadata-stub';
 import MetadataAndFiles from '@app/modules/crosswalk-editor/tabs/metadata-and-files';
 import VersionHistory from '@app/common/components/version-history';
@@ -243,7 +243,7 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
 
   const changeCrosswalkState = (payload: StatePayload, notificationKey: NotificationKeys) => {
     if (!crosswalkData) return;
-    patchCrosswalk({ payload: payload, pid: crosswalkData.pid })
+    patchCrosswalk({ payload: payload, pid: crosswalkData.id })
       .unwrap()
       .then(() => {
         dispatch(
@@ -259,7 +259,7 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
 
   const deleteCrosswalkDraft = () => {
     if (!crosswalkData) return;
-    deleteCrosswalk(crosswalkData.pid)
+    deleteCrosswalk(crosswalkData.id)
       .unwrap()
       .then(() => {
         dispatch(
@@ -517,7 +517,7 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
     return (
       <ThemeProvider theme={theme}>
         {crosswalkData.state === State.Removed ? ( // Return stub if crosswalk is removed
-          <Tabmenu
+          <CrosswalkTabmenu
             contentType={Type.Crosswalk}
             isRemoved={true}
             tabPanels={[
@@ -531,7 +531,7 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
             ]}
           />
         ) : (
-          <Tabmenu
+          <CrosswalkTabmenu
             contentType={Type.Crosswalk}
             tabPanels={[
               {

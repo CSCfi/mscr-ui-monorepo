@@ -281,10 +281,14 @@
     "select-linked-nodes": ""
   },
   "metadata": {
+    "add-creator": "",
+    "add-identifier": "",
     "contact": "",
     "created": "",
+    "creator": "",
     "crosswalk-details": "",
     "description": "",
+    "domain": "",
     "file": {
       "download": "",
       "download-file": "",
@@ -294,12 +298,20 @@
       "size": ""
     },
     "format": "",
+    "identifier": "",
+    "internal-identifier": "",
+    "language": "",
+    "license": "",
     "modified": "",
+    "mscr-owner": "",
+    "mscr-state": "",
+    "mscr-visibility": "",
     "name": "",
     "name-space-label": "",
     "not-available": "",
     "owner": "",
     "pid": "",
+    "publisher": "",
     "schema-details": "",
     "source-schema": "",
     "source-schema-id": "",
@@ -312,8 +324,7 @@
     "version-label": "",
     "versions": "",
     "view": "",
-    "viewing": "",
-    "visibility": ""
+    "viewing": ""
   },
   "mscr-title": "",
   "name": "",
@@ -573,6 +584,10 @@
     "personal": "",
     "pid": "",
     "schemas": "",
+    "search": {
+      "crosswalks": "",
+      "schemas": ""
+    },
     "state": "",
     "view": ""
   }

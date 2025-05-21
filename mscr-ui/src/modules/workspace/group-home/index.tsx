@@ -53,6 +53,7 @@ export default function GroupWorkspace({
     useState(false);
   const [loadingSpinnerVisible, setLoadingSpinnerVisible] = useState(false);
   const [content, setContent] = useState(new Array<ContentRow>());
+  const [searchParameter, setSearchParameter] = useState('');
   const { data, isLoading } = useGetOrgContentQuery({
     type: contentType,
     pageSize,
@@ -175,15 +176,12 @@ export default function GroupWorkspace({
             <Separator isLarge />
           </div>
         }
-        {data?.hits.hits && data?.hits.hits.length < 1 ? (
-          <div>
-            {contentType == 'SCHEMA'
-              ? t('workspace.no-schemas')
-              : t('workspace.no-crosswalks')}
-          </div>
-        ) : (
-          <WorkspaceTable content={content} contentType={contentType} />
-        )}
+        <WorkspaceTable
+          content={content}
+          contentType={contentType}
+          searchParameter={searchParameter}
+          setSearchParameter={setSearchParameter}
+        />
         {lastPage > 1 && <Pagination lastPage={lastPage} />}
       </main>
     );

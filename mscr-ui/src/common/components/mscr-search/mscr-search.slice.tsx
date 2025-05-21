@@ -9,16 +9,16 @@ import { UrlState } from '@app/common/utils/hooks/use-url-state';
 
 function createUrl(
   scope: string,
-  { type, pageSize, urlState, ownerOrg }: PaginatedQuery
+  { type, pageSize, urlState, ownerOrg, query }: PaginatedQuery
 ) {
   const pageFrom = (urlState.page - 1) * pageSize;
-  return `/frontend/mscrSearch${scope}Content?query=&type=${type}${
+  return `/mscrSearch${scope}Content?query=${query}&type=${type}${
     scope === 'Org' ? `&ownerOrg=${ownerOrg}` : ''
   }&pageSize=${pageSize}&pageFrom=${pageFrom}`;
 }
 
 function createSearchUrl(urlState: UrlState) {
-  let baseQuery = '/frontend/mscrSearch?';
+  let baseQuery = '/mscrSearch?';
 
   baseQuery = baseQuery.concat(`query=${urlState.q}`);
 

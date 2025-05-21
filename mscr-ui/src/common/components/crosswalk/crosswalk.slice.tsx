@@ -1,9 +1,6 @@
 import { HYDRATE } from 'next-redux-wrapper';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
-import { createSlice } from '@reduxjs/toolkit';
-import { AppThunk } from '@app/store';
-import isHydrate from '@app/store/isHydrate';
 import {
   Crosswalk,
   CrosswalkWithVersionInfo,
