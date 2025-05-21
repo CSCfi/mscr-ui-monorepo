@@ -15,7 +15,7 @@ export const organizationsApi = createApi({
   endpoints: (builder) => ({
     getOrganizations: builder.query<Organization[], string>({
       query: (value) => ({
-        url: `/frontend/organizations?sortLang=${value}`,
+        url: `/organizations?sortLang=${value}`,
         method: 'GET',
       }),
     }),

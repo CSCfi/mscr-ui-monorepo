@@ -281,11 +281,16 @@
     "select-linked-nodes": ""
   },
   "metadata": {
+    "add-creator": "",
+    "add-identifier": "",
     "contact": "",
     "created": "",
+    "creator": "",
     "crosswalk-details": "",
     "description": "",
+    "domain": "",
     "file": {
+      "download": "",
       "download-file": "",
       "format": "",
       "label": "",
@@ -293,24 +298,33 @@
       "size": ""
     },
     "format": "",
+    "identifier": "",
+    "internal-identifier": "",
+    "language": "",
+    "license": "",
     "modified": "",
+    "mscr-owner": "",
+    "mscr-state": "",
+    "mscr-visibility": "",
     "name": "",
     "name-space-label": "",
     "not-available": "",
     "owner": "",
     "pid": "",
+    "publisher": "",
     "schema-details": "",
     "source-schema": "",
+    "source-schema-id": "",
     "source-url": "",
     "state": "",
     "stub-crosswalk-details": "",
     "stub-schema-details": "",
     "target-schema": "",
+    "target-schema-id": "",
     "version-label": "",
     "versions": "",
     "view": "",
-    "viewing": "",
-    "visibility": ""
+    "viewing": ""
   },
   "mscr-title": "",
   "name": "",
@@ -501,6 +515,7 @@
     },
     "history-tab": "",
     "label": "",
+    "mapping-accordion-tab": "",
     "metadata-and-files": "",
     "schema": {
       "content-and-editor-tab": ""
@@ -569,6 +584,10 @@
     "personal": "",
     "pid": "",
     "schemas": "",
+    "search": {
+      "crosswalks": "",
+      "schemas": ""
+    },
     "state": "",
     "view": ""
   }

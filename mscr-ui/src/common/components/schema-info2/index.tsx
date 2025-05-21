@@ -1,12 +1,12 @@
-import {useEffect, useRef, useState} from 'react';
+import { useEffect, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {Button, Checkbox, ModalFooter, ModalTitle, SearchInput} from 'suomifi-ui-components';
+import { Checkbox, SearchInput } from 'suomifi-ui-components';
 import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
 import SchemaTree from '@app/common/components/schema-info/schema-tree';
 import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
-import {NodeMapping, RenderTree} from '@app/common/interfaces/crosswalk-connection.interface';
+import { RenderTree } from '@app/common/interfaces/crosswalk-connection.interface';
 import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
 import { useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
@@ -23,9 +23,8 @@ import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
-import {StyledPanel} from "@app/common/components/action-panel/action-panel.styles";
 
-export default function SchemaInfo(props: {
+export default function SchemaInfo2(props: {
   updateTreeNodeSelectionsOutput?: (
     nodeIds: RenderTree[],
     isSourceSchema: boolean
@@ -38,7 +37,6 @@ export default function SchemaInfo(props: {
   isNodeEditable?: boolean;
   hasCustomRoot?: boolean;
   scrollToSelectedNodeId?: string;
-  nodeMappings?: NodeMapping[];
 }) {
   const { t } = useTranslation('common');
   const lang = useRouter().locale ?? '';
@@ -87,7 +85,7 @@ export default function SchemaInfo(props: {
     if (props.treeSelection) {
       expandAndSelectNodes(props.treeSelection);
     }
-  }, [props.treeSelection, props.scrollToSelectedNodeId]);
+  }, [props.treeSelection]);
 
   useEffect(() => {
     // Update selections for node info and parent component for mappings
@@ -102,8 +100,6 @@ export default function SchemaInfo(props: {
     }
     setSelectedTreeNodes(selectedNodes);
   }, [treeSelectedArray, nodeIdToNodeDictionary]);
-
-  const modalRef = useRef(null);
 
   const setFullyExpanded = () => {
     const nodeIdsToExpand: string[] = [];
@@ -123,11 +119,9 @@ export default function SchemaInfo(props: {
     let idsOnPath: string[] = [];
     nodeIds.forEach((nodeId) => {
       const nodes = nodeIdToNodeDictionary[nodeId];
-      if (nodes) {
-        nodes.map((node) => {
-          idsOnPath = idsOnPath.concat(node.rootPathIds);
-        });
-      }
+      nodes.map((node) => {
+        idsOnPath = idsOnPath.concat(node.rootPathIds);
+      });
     });
 
     const nodesToSelect: Set<string> = new Set();
@@ -232,7 +226,6 @@ export default function SchemaInfo(props: {
     }
   }
 
-  // @ts-ignore
   return (
     <>
       <div className="row d-flex mb-2">
@@ -241,9 +234,9 @@ export default function SchemaInfo(props: {
             title={
               getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                    data: getSchemaData.metadata.label,
-                    lang,
-                  })
+                  data: getSchemaData.metadata.label,
+                  lang,
+                })
                 : t('schema-tree.no-label')
             }
             placement="bottom-start"
@@ -251,9 +244,9 @@ export default function SchemaInfo(props: {
             <SchemaHeading variant="h2">
               {getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                    data: getSchemaData.metadata.label,
-                    lang,
-                  })
+                  data: getSchemaData.metadata.label,
+                  lang,
+                })
                 : t('schema-tree.no-label')}
             </SchemaHeading>
           </Tooltip>
@@ -261,7 +254,7 @@ export default function SchemaInfo(props: {
       </div>
 
       <TreeviewWrapper className="row gx-0">
-        <TreeWrapper className="col-12 px-0">
+        <TreeWrapper className="col-7 px-0">
           <SpinnerOverlay animationVisible={!isTreeDataFetched} />
           <div className="d-flex justify-content-between mb-2 ps-3 pe-2">
             {isTreeDataFetched && (
@@ -306,7 +299,7 @@ export default function SchemaInfo(props: {
             <Box
               className="px-3 d-flex"
               sx={{
-                height: 260,
+                height: 460,
                 flexGrow: 1,
                 maxWidth: 700,
                 overflowY: 'auto',
@@ -320,24 +313,12 @@ export default function SchemaInfo(props: {
                   performTreeAction={performCallbackFromTreeAction}
                   showQname={!showAttributeNames}
                   isSourceTree={props.isSourceTree}
-                  nodeMappings={props.nodeMappings}
                 />
               )}
             </Box>
           </div>
         </TreeWrapper>
-        <CheckboxWrapper>
-          <Checkbox
-            checked={showAttributeNames}
-            onClick={(newState) => {
-              setShowAttributeNames(newState.checkboxState);
-            }}
-          >
-            {t('schema-tree.show-titles')}
-          </Checkbox>
-        </CheckboxWrapper>
-        <StyledPanel>
-        <NodeInfoWrapper ref={modalRef}>
+        <NodeInfoWrapper className="col-5 px-0">
           <NodeInfo
             treeData={selectedTreeNodes}
             currentlySelectedNodeId={currentlySelectedNodeId}
@@ -345,9 +326,17 @@ export default function SchemaInfo(props: {
             isNodeEditable={props.isNodeEditable}
             hasCustomRoot={props.hasCustomRoot}
           />
+          <CheckboxWrapper>
+            <Checkbox
+              checked={showAttributeNames}
+              onClick={(newState) => {
+                setShowAttributeNames(newState.checkboxState);
+              }}
+            >
+              {t('schema-tree.show-titles')}
+            </Checkbox>
+          </CheckboxWrapper>
         </NodeInfoWrapper>
-        </StyledPanel>
-
       </TreeviewWrapper>
     </>
   );

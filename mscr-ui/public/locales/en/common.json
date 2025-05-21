@@ -281,11 +281,16 @@
     "select-linked-nodes": "Select linked nodes from schema trees"
   },
   "metadata": {
+    "add-creator": "Add creator",
+    "add-identifier": "Add identifier",
     "contact": "Contact",
     "created": "Created",
+    "creator": "Creator",
     "crosswalk-details": "Crosswalk details",
     "description": "Description",
+    "domain": "Domain",
     "file": {
+      "download": "Download",
       "download-file": "File",
       "format": "Format",
       "label": "Files",
@@ -293,24 +298,33 @@
       "size": "Size"
     },
     "format": "Format",
+    "identifier": "Identifier",
+    "internal-identifier": "Internal identifier",
+    "language": "Language",
+    "license": "License",
     "modified": "Modified",
+    "mscr-owner": "MSCR owner",
+    "mscr-state": "MSCR state",
+    "mscr-visibility": "MSCR visibility",
     "name": "Name",
-    "name-space-label": "Namespace",
+    "name-space-label": "MSCR namespace",
     "not-available": "Not available",
     "owner": "Owner",
     "pid": "PID",
+    "publisher": "Publisher",
     "schema-details": "Schema details",
     "source-schema": "Source schema",
+    "source-schema-id": "Source schema ID",
     "source-url": "Source URL",
     "state": "State",
     "stub-crosswalk-details": "Deleted crosswalk",
     "stub-schema-details": "Deleted schema",
     "target-schema": "Target schema",
+    "target-schema-id": "Target schema ID",
     "version-label": "Version label",
     "versions": "Versions",
     "view": "View",
-    "viewing": "Viewing",
-    "visibility": "Visibility"
+    "viewing": "Viewing"
   },
   "mscr-title": "Metadata Schema and Crosswalk Registry",
   "name": "",
@@ -501,6 +515,7 @@
     },
     "history-tab": "Version history",
     "label": "Content tabs",
+    "mapping-accordion-tab": "Mapping",
     "metadata-and-files": "Metadata & files",
     "schema": {
       "content-and-editor-tab": "Schema"
@@ -563,12 +578,16 @@
     "group": "Group workspaces",
     "label": "Name",
     "navigation": "Workspaces",
-    "no-crosswalks": "There are no crosswalks to show yet",
-    "no-schemas": "There are no schemas to show yet",
+    "no-crosswalks": "No crosswalks to show",
+    "no-schemas": "No schemas to show",
     "numberOfRevisions": "Revisions",
     "personal": "Personal workspace",
     "pid": "PID",
     "schemas": "Schemas",
+    "search": {
+      "crosswalks": "Search from crosswalks",
+      "schemas": "Search from schemas"
+    },
     "state": "State",
     "view": "View"
   }
