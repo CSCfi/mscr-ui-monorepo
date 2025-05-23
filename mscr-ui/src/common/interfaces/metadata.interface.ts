@@ -3,7 +3,7 @@ import { Visibility } from '@app/common/interfaces/search.interface';
 import { State } from '@app/common/interfaces/state.interface';
 
 export interface Metadata {
-  pid: string;
+  id: string;
   handle: string;
   label: {
     [key: string]: string;
@@ -11,7 +11,7 @@ export interface Metadata {
   description: {
     [key: string]: string;
   };
-  languages?: string[];
+  languages: string[];
   format: Format;
   visibility: Visibility;
   state: State;
@@ -25,12 +25,20 @@ export interface Metadata {
       name: string;
     }
   ];
-  sourceSchema?: string;
-  targetSchema?: string;
-  namespace?: string;
+  owner: string[];
   prefix?: string;
   fileMetadata?: FileData[];
   sourceURL?: string;
+  domain: string;
+  dctCreators: string[];
+  dctIdentifiers: string[];
+  dctLicense: string;
+  dctPublisher: string;
+  // Below fields are in the metadata model but not in use in UI yet
+  dctContributors?: string[];
+  dctIssued?: string;
+  dctRelations?: string[];
+  dcatKeywords?: string[];
 }
 
 export interface FileData {
@@ -47,14 +55,32 @@ export interface MetadataFormType {
   contact: string;
   versionLabel: string;
   visibility: string;
-  namespace: string;
+  domain: string;
+  dctCreators: string[];
+  dctIdentifiers: string[];
+  dctLicense: string;
+  dctPublisher: string;
+  namespace: string; // Schemas only
+  // Below properties are accepted by endpoint, but not present or not editable in UI metadata form
+  status?: string;
+  format?: string;
+  language?:string;
+  dctContributors?: string[];
+  dctIssued?: string;
+  dctRelations?: string[];
+  dcatKeywords?: string[];
 }
 
 export const initialMetadataForm: MetadataFormType = {
-  label: '',
-  description: '',
   contact: '',
+  dctCreators: [],
+  dctIdentifiers: [],
+  dctLicense: '',
+  dctPublisher: '',
+  description: '',
+  domain: '',
+  label: '',
   versionLabel: '',
   visibility: '',
-  namespace: '',
+  namespace: ''
 };
