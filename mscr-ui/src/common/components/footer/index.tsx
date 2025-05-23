@@ -28,17 +28,14 @@ export default function Footer({
       <FooterContentWrapper>
         <MarginContainer $breakpoint={breakpoint}>
           <Paragraph>
-            <Text>Metadata Schema and Crosswalk Registry Version 1.0.0</Text>
+            <Text >Metadata Schema and Crosswalk Registry Version 1.0.0</Text>
           </Paragraph>
 
-          <FooterLink href="privacy-guidline">{t('privacy-link')}</FooterLink>
-          <FooterLink href="terms-of-use">Terms of use</FooterLink>
-          <FooterLink href="service-level-agreement">Service Level Agreement</FooterLink>
+          <FooterLink href="https://cscfi.github.io/mscr-docs/privacy-guideline/" target="_blank">{t('privacy-link')}</FooterLink>
+          <FooterLink href="https://cscfi.github.io/mscr-docs/terms-of-use/" target="_blank">Terms of use</FooterLink>
+          <FooterLink href="https://cscfi.github.io/mscr-docs/acceptable-use-policy/" target="_blank">Acceptable Usuage Policy</FooterLink>      
           <FooterLink href="https://cscfi.github.io/mscr-docs/" target="_blank">Documentation</FooterLink>
-          <FooterLink href="https://github.com/orgs/CSCfi/teams/mscr/repositories" target="_blank">Github</FooterLink>
-
-          
-          
+          <FooterLink href="https://github.com/orgs/CSCfi/teams/mscr/repositories" target="_blank">Code Repository</FooterLink>
         </MarginContainer>
       </FooterContentWrapper>
          

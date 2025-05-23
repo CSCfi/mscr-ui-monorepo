@@ -56,5 +56,5 @@ export const ContentContainer = styled.div<{ $fullScreen?: boolean }>`
 `;
 
 export const FooterContainer = styled.footer`
-  background-color: ${(props) => props.theme.suomifi.colors.whiteBase};
+  background-color: ${(props) => props.theme.suomifi.colors.depthLight3};
 `;

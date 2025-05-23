@@ -79,16 +79,16 @@ export default function Layout({
                 <ActionPanel isActionMenu={isActionMenu} />
                 {showSearchScreen && <SearchScreen />}
                 {children}
-              </MarginContainer>
+                </MarginContainer>
+                
             </ContentContainer>
-            <FooterContainer>
-              <MarginContainer $breakpoint={breakpoint}>
-                <Footer t={t} />
-              </MarginContainer>
-            </FooterContainer>
+           
           </>
         )}
       </SiteContainer>
+       <FooterContainer>
+              <Footer t={t} />
+            </FooterContainer>
     </ThemeProvider>
   );
 }
