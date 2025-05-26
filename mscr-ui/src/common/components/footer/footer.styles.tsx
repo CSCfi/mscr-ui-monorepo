@@ -33,7 +33,7 @@ export  const FooterLink= styled.a`
   color: ${(props) => props.theme.suomifi.colors.brandBase};
   font-size: ${(props) => props.theme.suomifi.typography.bodyTextSmall};
   text-decoration: none;
-  margin-right: ${(props) => props.theme.suomifi.spacing.xs};
+  margin-right: ${(props) => props.theme.suomifi.spacing.l};
   &:hover {
     text-decoration: underline;
   }

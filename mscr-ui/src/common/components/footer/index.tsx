@@ -1,15 +1,13 @@
-import { ExternalLink, Link, Paragraph, Text } from 'suomifi-ui-components';
+import {  Paragraph, Text } from 'suomifi-ui-components';
 import {
   FooterContentWrapper,
   FooterLink,
-  FooterLinkWrapper,
-  VersionInfo,
 } from './footer.styles';
 import { useBreakpoints } from 'yti-common-ui/media-query';
 import { TFunction } from 'next-i18next';
 import Image from 'next/image';
 import { MarginContainer } from '../layout/layout.styles';
-import { Grid } from 'react-loader-spinner';
+import { Grid } from '@mui/material';
 
 export interface FooterProps {
   t: TFunction;
@@ -17,9 +15,7 @@ export interface FooterProps {
 }
 
 export default function Footer({
-  t,
-
-  versionInfo,
+  t,versionInfo,
 }: FooterProps) {
   const { breakpoint } = useBreakpoints();
 
@@ -27,7 +23,10 @@ export default function Footer({
     <>
       <FooterContentWrapper>
         <MarginContainer $breakpoint={breakpoint}>
-          <Paragraph>
+      
+          <Grid container rowSpacing={2} columnSpacing={4}>
+            <Grid item xs={11}>
+              <Paragraph>
             <Text >Metadata Schema and Crosswalk Registry Version 1.0.0</Text>
           </Paragraph>
 
@@ -36,7 +35,25 @@ export default function Footer({
           <FooterLink href="https://cscfi.github.io/mscr-docs/acceptable-use-policy/" target="_blank">Acceptable Usuage Policy</FooterLink>      
           <FooterLink href="https://cscfi.github.io/mscr-docs/" target="_blank">Documentation</FooterLink>
           <FooterLink href="https://github.com/orgs/CSCfi/teams/mscr/repositories" target="_blank">Code Repository</FooterLink>
+      
+          </Grid>
+          <Grid item xs={1} justify="flex-end" display="flex" alignItems="end">
+             <Image
+                    className="logo-image"
+                    src="/funded-by-EU.png"
+                    width="100"
+                    height="50"
+                    alt={'FAIRCORE4EOSC'}
+                  />
+            </Grid>
+          </Grid>
+           
+
+
+          
+          
         </MarginContainer>
+         
       </FooterContentWrapper>
          
     </>
