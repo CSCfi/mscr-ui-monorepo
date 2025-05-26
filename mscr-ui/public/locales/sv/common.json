@@ -152,8 +152,7 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "",
-    "search-from-target-schema": "",
-    "show-node-titles": ""
+    "search-from-target-schema": ""
   },
   "crosswalk-form": {
     "all": "",
@@ -235,6 +234,12 @@
   "filter-type-concepts_other": "",
   "filter-with-current_one": "",
   "filter-with-current_other": "",
+  "footer": {
+    "acceptable-use-policy": "",
+    "code-repository": "",
+    "documentation": "",
+    "terms-of-use": ""
+  },
   "go-to": "",
   "ground": {
     "description": "",
