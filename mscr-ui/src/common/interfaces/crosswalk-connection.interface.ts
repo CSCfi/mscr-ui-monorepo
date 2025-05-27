@@ -76,16 +76,26 @@ export interface CrosswalkConnectionsNew {
     description: string | undefined;
 }
 
+export interface MappingNodeSummary {
+  id: string;
+  label: string;
+  uri: string;
+  processing?: {
+    id: string;
+    params: any;
+  };
+}
+
 export interface NodeMapping {
     isPartOf?: string;
     id?: string;
     depends_on?: string[];
-    source: { processing?: { id: string; params: any }; id: string; label: string; uri: string }[];
+    source: MappingNodeSummary[];
     sourceType?: string;
     sourceDescription?: string;
     predicate: string;
     filter?: { path: string; distinctValues: boolean; value: {}; operator: string };
-    target: { processing?: { id: string; params: any }; id: string; label: string; uri: string }[];
+    target: MappingNodeSummary[];
     targetType?: string;
     targetDescription?: string;
     processing?: { id: string; params: any };

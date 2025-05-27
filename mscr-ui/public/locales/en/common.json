@@ -203,9 +203,11 @@
   },
   "datamodel-title": "",
   "datamodels-all": "",
+  "delete": "Delete",
   "download": "Download",
   "download-as-file": "Download as file",
   "download-as-file-description": "",
+  "edit": "Edit",
   "email-address": "",
   "email-subscriptions": "",
   "email-subscriptions-off": "",
@@ -278,8 +280,15 @@
   "mappings-accordion": {
     "clear": "Clear",
     "filter-from-mappings": "Filter from mappings",
+    "from": "From",
+    "function": "Function",
+    "mapping-function": "Mapping function",
+    "no-mappings": "No elements have been mapped yet. Mappings will appear in this table",
+    "params": "Parameters",
+    "predicate": "Predicate",
     "select-linked-nodes": "Select linked nodes from schema trees",
-    "title": "Mappings"
+    "title": "Mappings",
+    "to": "To"
   },
   "metadata": {
     "add-creator": "Add creator",
