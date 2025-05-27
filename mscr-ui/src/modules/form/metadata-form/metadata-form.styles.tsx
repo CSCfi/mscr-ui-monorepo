@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Grid } from '@mui/material';
-import { Heading } from 'suomifi-ui-components';
+import { Button, Heading } from 'suomifi-ui-components';
 
 export const MetadataContainer = styled.div`
   color: ${(props) => props.theme.suomifi.colors.blackBase};
@@ -22,8 +22,8 @@ export const MetadataFormContainer = styled(Grid)`
 
 export const MetadataRow = styled(Grid)`
   font-size: 0.9rem;
-  height: 60px;
   margin-top: 8px;
+  padding-right: 2rem;
 `;
 
 export const MetadataLabel = styled.p`
@@ -35,4 +35,18 @@ export const MetadataAttribute = styled.p`
   font-size: 16px;
   margin-left: 11px;
   margin-top: 8px;
+`;
+
+export const DeletableInputWrapper = styled.div`
+  display: flex;
+`;
+
+export const RemoveButton = styled(Button)`
+  margin-left: 10px;
+  height: 40px;
+  width: 40px;
+  padding: 0;
+  span.fi-button_icon > svg.fi-icon {
+    margin-right: 0;
+  }
 `;

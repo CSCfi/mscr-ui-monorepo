@@ -1,7 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getDatamodelApiBaseQuery } from '@app/store/api-base-query';
 import { HYDRATE } from 'next-redux-wrapper';
-import { MscrSearchResults } from '@app/common/interfaces/search.interface';
 
 export const crosswalkMappingFunctionsApi = createApi({
     reducerPath: 'crosswalkMappingFunctionsApi',
@@ -15,7 +14,7 @@ export const crosswalkMappingFunctionsApi = createApi({
     endpoints: (builder) => ({
         getCrosswalkMappingFunctions: builder.query<any, string>({
             query: (type) => ({
-                url: type === 'FILTERS' ? '/frontend/filters' : '/frontend/functions',
+                url: type === 'FILTERS' ? '/filters' : '/functions',
                 method: 'GET',
             }),
         }),

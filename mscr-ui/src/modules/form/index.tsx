@@ -171,7 +171,7 @@ export default function FormModal({
 
   const getNewPidFromApi = useCallback(
     (contentType: Type, modalType: ModalType) => {
-      let pid;
+      let id;
       switch (modalType) {
         case ModalType.RegisterNewMscr:
           if (
@@ -179,7 +179,7 @@ export default function FormModal({
             resultCrosswalk.isSuccess &&
             resultCrosswalk.data
           ) {
-            pid = resultCrosswalk.data.pid;
+            id = resultCrosswalk.data.id;
           }
           break;
         case ModalType.RegisterNewFull:
@@ -188,13 +188,13 @@ export default function FormModal({
             resultCrosswalkFull.isSuccess &&
             resultCrosswalkFull.data
           ) {
-            pid = resultCrosswalkFull.data.pid;
+            id = resultCrosswalkFull.data.id;
           } else if (
             contentType == Type.Schema &&
             resultSchemaFull.isSuccess &&
             resultSchemaFull.data
           ) {
-            pid = resultSchemaFull.data.pid;
+            id = resultSchemaFull.data.id;
           }
           break;
         case ModalType.RevisionMscr:
@@ -203,13 +203,13 @@ export default function FormModal({
             resultCrosswalkRevision.isSuccess &&
             resultCrosswalkRevision.data
           ) {
-            pid = resultCrosswalkRevision.data.pid;
+            id = resultCrosswalkRevision.data.id;
           } else if (
             contentType == Type.Schema &&
             resultMscrSchemaRevision.isSuccess &&
             resultMscrSchemaRevision.data
           ) {
-            pid = resultMscrSchemaRevision.data.pid;
+            id = resultMscrSchemaRevision.data.id;
           }
           break;
         case ModalType.RevisionFull:
@@ -218,13 +218,13 @@ export default function FormModal({
             resultCrosswalkFullRevision.isSuccess &&
             resultCrosswalkFullRevision.data
           ) {
-            pid = resultCrosswalkFullRevision.data.pid;
+            id = resultCrosswalkFullRevision.data.id;
           } else if (
             contentType == Type.Schema &&
             resultSchemaRevision.isSuccess &&
             resultSchemaRevision.data
           ) {
-            pid = resultSchemaRevision.data.pid;
+            id = resultSchemaRevision.data.id;
           }
           break;
         case ModalType.MscrCopy:
@@ -233,12 +233,12 @@ export default function FormModal({
             resultSchemaMscrCopy.isSuccess &&
             resultSchemaMscrCopy.data
           ) {
-            pid = resultSchemaMscrCopy.data.pid;
+            id = resultSchemaMscrCopy.data.id;
           }
           break;
         // TODO: MscrCopy API slice and then pid retrieval for crosswalk here
       }
-      return pid;
+      return id;
     },
     [
       resultCrosswalk.data,
@@ -386,7 +386,7 @@ export default function FormModal({
             : putCrosswalkFullRevision;
         Promise.all([
           spinnerDelay(),
-          makeApiCall({ pid: initialData.pid, data: newFormData }),
+          makeApiCall({ pid: initialData.id, data: newFormData }),
         ]).then((_values) => {
           setSubmitAnimationVisible(false);
         });
@@ -397,7 +397,7 @@ export default function FormModal({
       ) {
         Promise.all([
           spinnerDelay(),
-          putSchemaMscrCopy({ pid: initialData.pid, data: payload }),
+          putSchemaMscrCopy({ pid: initialData.id, data: payload }),
         ]).then((_values) => {
           setSubmitAnimationVisible(false);
         });
@@ -408,7 +408,7 @@ export default function FormModal({
       ) {
         Promise.all([
           spinnerDelay(),
-          putCrosswalkRevision({ pid: initialData.pid, data: payload }),
+          putCrosswalkRevision({ pid: initialData.id, data: payload }),
         ]).then((_values) => {
           setSubmitAnimationVisible(false);
         });
@@ -420,7 +420,7 @@ export default function FormModal({
       ) {
         Promise.all([
           spinnerDelay(),
-          putMscrSchemaRevision({ pid: initialData.pid, data: payload }),
+          putMscrSchemaRevision({ pid: initialData.id, data: payload }),
         ]).then((_values) => {
           setSubmitAnimationVisible(false);
         });

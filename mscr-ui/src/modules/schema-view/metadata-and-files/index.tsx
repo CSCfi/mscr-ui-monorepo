@@ -27,7 +27,7 @@ export default function MetadataAndFiles({
       />
       <MetadataFilesTable
         filesRowInput={schemaFiles}
-        pid={schemaDetails?.pid}
+        pid={schemaDetails?.id}
         canEdit={false}
       />
     </>
