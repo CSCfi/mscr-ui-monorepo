@@ -273,7 +273,6 @@ Appendix
  
 "Compatible Licences" according to article 5 EUPL are: 
  
- 
 - GNU General Public License (GNU GPL) v. 2 
  
 - Open Software License (OSL) v. 2.1, v. 3.0 
