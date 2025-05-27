@@ -152,8 +152,7 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "",
-    "search-from-target-schema": "",
-    "show-node-titles": ""
+    "search-from-target-schema": ""
   },
   "crosswalk-form": {
     "all": "",
@@ -279,7 +278,8 @@
   "mappings-accordion": {
     "clear": "",
     "filter-from-mappings": "",
-    "select-linked-nodes": ""
+    "select-linked-nodes": "",
+    "title": ""
   },
   "metadata": {
     "add-creator": "",

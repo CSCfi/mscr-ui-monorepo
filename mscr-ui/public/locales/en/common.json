@@ -152,8 +152,7 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "Search from source schema",
-    "search-from-target-schema": "Search from target schema",
-    "show-node-titles": "Show simple node titles"
+    "search-from-target-schema": "Search from target schema"
   },
   "crosswalk-form": {
     "all": "All",
@@ -279,7 +278,8 @@
   "mappings-accordion": {
     "clear": "Clear",
     "filter-from-mappings": "Filter from mappings",
-    "select-linked-nodes": "Select linked nodes from schema trees"
+    "select-linked-nodes": "Select linked nodes from schema trees",
+    "title": "Mappings"
   },
   "metadata": {
     "add-creator": "Add creator",

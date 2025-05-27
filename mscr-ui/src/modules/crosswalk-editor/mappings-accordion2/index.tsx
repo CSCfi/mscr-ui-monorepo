@@ -33,6 +33,7 @@ import {Format} from "@app/common/interfaces/format.interface";
 import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
 import {CrosswalkWithVersionInfo} from "@app/common/interfaces/crosswalk.interface";
 import {State} from "@app/common/interfaces/state.interface";
+import { MappingsHeading } from '@app/modules/crosswalk-editor/mappings-accordion2/mappings-accordion2.styles';
 function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttributeNames, rowcount, mappingFunctions,
                schemaFormats, schemaDatas, setNodeMappingsModalOpen}: {
   row: NodeMapping;
@@ -422,31 +423,37 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
   const nodeMappingsInput = mappingData;
   return (
     <>
-
-  <div className='d-flex justify-content-between ps-1' style={{maxHeight: "600px"}}>
-        <h2 className="mb-0">Mappings</h2>
-        <SearchWrapper>
-          <SearchInput
-            labelText={''}
-            labelMode='hidden'
-            searchButtonLabel={t('mappings-accordion.filter-from-mappings')}
-            clearButtonLabel={t('mappings-accordion.clear')}
-            visualPlaceholder={t('mappings-accordion.filter-from-mappings')}
-            onSearch={(value) => {
-              if (typeof value === 'string') {
-                setMappingData(filterMappings(nodeMappingsInput, value, showAttributeNames));
-              }
-            }}
-            onChange={(value) => {
-              if (!value) {
-                setMappingData(nodeMappings);
-              }
-            }}
-          />
-        </SearchWrapper>
+      <div
+        className="d-flex justify-content-between ps-1"
+        style={{ maxHeight: '600px' }}
+      >
+        <MappingsHeading variant="h2">{t('mappings-accordion.title')}</MappingsHeading>
+        <SearchInput
+          labelText={''}
+          labelMode="hidden"
+          searchButtonLabel={t('mappings-accordion.filter-from-mappings')}
+          clearButtonLabel={t('mappings-accordion.clear')}
+          visualPlaceholder={t('mappings-accordion.filter-from-mappings')}
+          onSearch={(value) => {
+            if (typeof value === 'string') {
+              setMappingData(
+                filterMappings(nodeMappingsInput, value, showAttributeNames)
+              );
+            }
+          }}
+          onChange={(value) => {
+            if (!value) {
+              setMappingData(nodeMappings);
+            }
+          }}
+        />
       </div>
-      <AccordionContainer component={Paper} className="gx-0" style={{maxHeight: "860px", overflowY: "auto"}}>
-        <Table aria-label="collapsible table w-100" >
+      <AccordionContainer
+        component={Paper}
+        className="gx-0"
+        style={{ maxHeight: '860px', overflowY: 'auto' }}
+      >
+        <Table aria-label="collapsible table w-100">
           {mappingData?.length > 0 && (
             <TableBody>
               {mappingData.map((row: NodeMapping) => {
@@ -468,39 +475,47 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
               })}
               <TableRow className="">
                 <td>
-                    <div style={{display: "flex", alignItems: "center", justifyContent: "right"}}>
-                      {hasEditPermission && (
-                        <Tooltip
-                          title={
-                            selectedSourceNodes.length > 1 &&
-                            selectedTargetNodes.length > 1
-                              ? 'Many to many node mappings are not supported'
-                              : !isEditModeActive
-                                ? 'Activate edit mode to enable mappings'
-                                : 'Map selected nodes'
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'right',
+                    }}
+                  >
+                    {hasEditPermission && (
+                      <Tooltip
+                        title={
+                          selectedSourceNodes.length > 1 &&
+                          selectedTargetNodes.length > 1
+                            ? 'Many to many node mappings are not supported'
+                            : !isEditModeActive
+                            ? 'Activate edit mode to enable mappings'
+                            : 'Map selected nodes'
+                        }
+                        placement="bottom"
+                      >
+                        <Sbutton
+                          className="link-button"
+                          disabled={
+                            selectedSourceNodes.length < 1 ||
+                            selectedTargetNodes.length < 1 ||
+                            crosswalkData.state === State.Published ||
+                            (selectedSourceNodes.length > 1 &&
+                              selectedTargetNodes.length > 1) ||
+                            !isEditModeActive
                           }
-                          placement="bottom"
+                          onClick={() => {
+                            addMappingButtonClick();
+                          }}
+                          style={{ width: '200px', height: '60px' }}
                         >
-                          <Sbutton
-                            className="link-button"
-                            disabled={
-                              selectedSourceNodes.length < 1 ||
-                              selectedTargetNodes.length < 1 ||
-                              crosswalkData.state === State.Published ||
-                              (selectedSourceNodes.length > 1 &&
-                                selectedTargetNodes.length > 1) ||
-                              !isEditModeActive
-                            }
-                            onClick={() => {
-                              addMappingButtonClick();
-                            }}
-                            style={{width: "200px", height: "60px"}}
-                          >
-                            <div><LinkIcon></LinkIcon> Create Mapping</div>
-                          </Sbutton>
-                        </Tooltip>
-                      )}
-                    </div>
+                          <div>
+                            <LinkIcon></LinkIcon> Create Mapping
+                          </div>
+                        </Sbutton>
+                      </Tooltip>
+                    )}
+                  </div>
                 </td>
               </TableRow>
             </TableBody>
@@ -513,13 +528,13 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
                     <div className="info-icon">
                       <InfoIcon></InfoIcon>
                     </div>
-                    <div style={{alignItems: "center"}}>
+                    <div style={{ alignItems: 'center' }}>
                       No elements have been mapped yet. Mappings will appear in
                       this table.
-                      <br/>
-                      <br/>
-                      <br/>
-                      <br/>
+                      <br />
+                      <br />
+                      <br />
+                      <br />
                       {hasEditPermission && (
                         <Tooltip
                           title={
@@ -545,9 +560,11 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
                             onClick={() => {
                               addMappingButtonClick();
                             }}
-                            style={{width: "200px", height: "60px"}}
+                            style={{ width: '200px', height: '60px' }}
                           >
-                            <div><LinkIcon></LinkIcon> Create Mapping</div>
+                            <div>
+                              <LinkIcon></LinkIcon> Create Mapping
+                            </div>
                           </Sbutton>
                         </Tooltip>
                       )}
