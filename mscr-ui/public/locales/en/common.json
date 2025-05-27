@@ -152,8 +152,7 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "Search from source schema",
-    "search-from-target-schema": "Search from target schema",
-    "show-node-titles": "Show simple node titles"
+    "search-from-target-schema": "Search from target schema"
   },
   "crosswalk-form": {
     "all": "All",
@@ -235,6 +234,12 @@
   "filter-type-concepts_other": "",
   "filter-with-current_one": "",
   "filter-with-current_other": "",
+  "footer": {
+    "acceptable-use-policy": "Acceptable Usage Policy",
+    "code-repository": "Code Repository",
+    "documentation": "Documentation",
+    "terms-of-use": "Terms of use"
+  },
   "go-to": "",
   "ground": {
     "description": "The data subjects for this processing activity are the users of the Metadata Schema and Crosswalk Registry Service. Processing of personal data is based on a Contract.  ",
