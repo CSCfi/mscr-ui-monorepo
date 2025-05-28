@@ -61,7 +61,7 @@ function returnFullPath(id: string) : string {
 
 function returnPath(id: string, label: string, schemaFormat: Format | undefined, schemaData: SchemaWithContent | undefined) : string {
   let returnString = '';
-  if (schemaFormat === Format.Xsd || schemaFormat === Format.Csv || schemaFormat === Format.Jsonschema
+  if (schemaFormat === Format.Xsd || schemaFormat === Format.Jsonschema
   || schemaFormat === Format.Enum || schemaFormat === Format.Mscr) {
     returnString = id.substring(id?.indexOf('#root-Root-') + '#root-Root-'.length);
     let strings;
