@@ -203,9 +203,11 @@
   },
   "datamodel-title": "",
   "datamodels-all": "",
+  "delete": "",
   "download": "",
   "download-as-file": "",
   "download-as-file-description": "",
+  "edit": "",
   "email-address": "",
   "email-subscriptions": "",
   "email-subscriptions-off": "",
@@ -284,7 +286,15 @@
   "mappings-accordion": {
     "clear": "",
     "filter-from-mappings": "",
-    "select-linked-nodes": ""
+    "from": "",
+    "function": "",
+    "mapping-function": "",
+    "no-mappings": "",
+    "params": "",
+    "predicate": "",
+    "select-linked-nodes": "",
+    "title": "",
+    "to": ""
   },
   "metadata": {
     "add-creator": "",
