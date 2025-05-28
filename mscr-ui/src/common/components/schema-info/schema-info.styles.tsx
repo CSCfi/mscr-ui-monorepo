@@ -5,6 +5,7 @@ export const SchemaHeading = styled(Heading)`
   && {
     font-size: 1.2rem;
   }
+  padding-left: 8px;
   color: ${(props) => props.theme.suomifi.colors.depthDark2};
   white-space: nowrap;
   overflow: hidden;
@@ -102,6 +103,7 @@ export const NodeInfoWrapper = styled.div`
     max-width: 100%;
   }
 `;
+
 styled(Modal)`
   background-color: ${(props) => props.theme.suomifi.colors.whiteBase};
   && {
@@ -123,6 +125,7 @@ styled(Modal)`
     cursor: pointer;
   }
 `;
+
 styled(ModalContent)`
   font-size: 0.9rem;
   && {
