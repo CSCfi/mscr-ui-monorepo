@@ -1,22 +1,29 @@
-import { MultiSelectData } from 'suomifi-ui-components';
 import { LanguageBlockType } from 'yti-common-ui/form/language-selector';
 import { State } from '@app/common/interfaces/state.interface';
 import { ContentRevision } from '@app/common/interfaces/content-revision.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
 import { Format } from '@app/common/interfaces/format.interface';
-import { Visibility } from '@app/common/interfaces/search.interface';
-import { Organization } from './organizations.interface';
 
 export interface Crosswalk extends Metadata {
-  status?: string | undefined;
-  organizations?: string[];
   sourceSchema: string;
+  sourceSchemaInfo: SchemaSummary;
   targetSchema: string;
-  owner?: string[]; // Added owner for checking permission
+  targetSchemaInfo: SchemaSummary;
+  generatedFileMetadata: GeneratedFile[];
+  subType: SubType;
 }
 
 export interface CrosswalkWithVersionInfo extends Crosswalk {
   revisions: ContentRevision[];
+}
+
+interface SchemaSummary {
+  id: string;
+  handle: string;
+  name: string;
+  versionLabel: string;
+  versionIndex: number;
+  format: Format;
 }
 
 export interface CrosswalkFormType {
@@ -43,9 +50,21 @@ export interface CrosswalkFormMockupType {
   versionLabel?: string;
 }
 
+export interface GeneratedFile {
+  name: string;
+  format: string;
+  url: string;
+}
+
 export interface FilesRow {
   name: any;
   added: any;
   format: any;
   file: any;
+}
+
+export enum SubType {
+  SemanticMapping = 'SEMANTIC_MAPPING',
+  SemanticAnnotation = 'SEMANTIC_ANNOTATION',
+  DataCrosswalk = 'DATA_CROSSWALK'
 }

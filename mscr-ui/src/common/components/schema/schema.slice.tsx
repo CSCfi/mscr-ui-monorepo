@@ -11,11 +11,14 @@ import { Format } from '@app/common/interfaces/format.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
 import { DataTypeResults } from '@app/common/interfaces/data-type.interface';
 
-function createSearchUrl(formatRestrictions: Array<Format>) {
+function createSearchUrl(formatRestrictions: Array<Format>, includePersonalDraft?: boolean) {
   const formatString = formatRestrictions.reduce((filterString, fr) => {
     return `${filterString}&format=${fr}`;
   }, '');
-  return `/frontend/mscrSearch?type=SCHEMA${formatString}&pageSize=100`;
+  if (includePersonalDraft) {
+    return `/mscrSearch?type=SCHEMA${formatString}&includePersonalPrivate=true&pageSize=1000`;
+  }
+  return `/mscrSearch?type=SCHEMA${formatString}&pageSize=1000`;
 }
 
 function createDataTypeUrl({schemaId, target, dataType}: {schemaId: string; target: string; dataType: string}) {
@@ -122,15 +125,16 @@ export const schemaApi = createApi({
         method: 'GET',
       }),
     }),
-    getPublicSchemas: builder.query<MscrSearchResults, Array<Format>>({
-      query: (formatRestrictions) => ({
-        url: createSearchUrl(formatRestrictions),
+    getPublicSchemas: builder.query<MscrSearchResults, { formatRestrictions: Array<Format>; includePersonalDrafts?: boolean }>({
+      query: (query) => ({
+        url: createSearchUrl(query.formatRestrictions, query.includePersonalDrafts),
         method: 'GET',
       }),
+      providesTags: ['FrontendSchema'],
     }),
     getFrontendSchema: builder.query<SchemaWithContent, string>({
       query: (pid) => ({
-        url: `/frontend/schema/${pid}`,
+        url: `/schema/${pid}/content`,
         method: 'GET',
       }),
       providesTags: ['FrontendSchema'],

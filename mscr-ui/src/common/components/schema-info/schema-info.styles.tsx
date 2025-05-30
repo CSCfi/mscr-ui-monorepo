@@ -1,10 +1,11 @@
 import styled from 'styled-components';
-import { Heading } from 'suomifi-ui-components';
+import {Heading, Modal, ModalContent} from 'suomifi-ui-components';
 
 export const SchemaHeading = styled(Heading)`
   && {
     font-size: 1.2rem;
   }
+  padding-left: 8px;
   color: ${(props) => props.theme.suomifi.colors.depthDark2};
   white-space: nowrap;
   overflow: hidden;
@@ -100,5 +101,37 @@ export const NodeInfoWrapper = styled.div`
     padding: 15px;
     min-height: 377px;
     max-width: 100%;
+  }
+`;
+
+styled(Modal)`
+  background-color: ${(props) => props.theme.suomifi.colors.whiteBase};
+  && {
+    margin: auto;
+    max-width: 350px;
+    max-height: 550px;
+    width: auto;
+    height: auto;
+  }
+
+  .schema-modal-header {
+    display: flex;
+    justify-content: end;
+    font-size: 2rem;
+    height: 4rem;
+  }
+  ;
+  .close {
+    cursor: pointer;
+  }
+`;
+
+styled(ModalContent)`
+  font-size: 0.9rem;
+  && {
+    padding: 5px 5px 5px 5px;
+  }
+  th {
+    background-color: ${(props) => props.theme.suomifi.colors.highlightLight2};
   }
 `;

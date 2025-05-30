@@ -33,7 +33,7 @@ import { setNotification } from '@app/common/components/notifications/notificati
 import { NotificationKeys } from '@app/common/interfaces/notifications.interface';
 import ConfirmModal from '@app/common/components/confirmation-modal';
 import FormModal, { ModalType } from '@app/modules/form';
-import Tabmenu from '@app/common/components/tabmenu';
+import SchemaTabmenu from 'src/common/components/schema-tabmenu';
 import MetadataStub from '@app/modules/form/metadata-form/metadata-stub';
 import { selectIsEditContentActive } from '@app/common/components/content-view/content-view.slice';
 import { useRouter } from 'next/router';
@@ -117,7 +117,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
   const setSchemaRootSelection = () => {
     if (schemaData) {
       patchSchemaRootSelection({
-        schemaId: schemaData?.pid,
+        schemaId: schemaData?.id,
         value: nodeSelection ? nodeSelection.properties['@id'] : '',
       })
         .unwrap()
@@ -139,7 +139,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     notificationKey: NotificationKeys
   ) => {
     if (!schemaData) return;
-    patchSchema({ payload: payload, pid: schemaData.pid })
+    patchSchema({ payload: payload, pid: schemaData.id })
       .unwrap()
       .then(() => {
         dispatch(
@@ -155,7 +155,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
 
   const deleteSchemaDraft = () => {
     if (!schemaData) return;
-    deleteSchema(schemaData.pid)
+    deleteSchema(schemaData.id)
       .unwrap()
       .then(() => {
         dispatch(
@@ -196,7 +196,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     return (
       <ThemeProvider theme={theme}>
         {schemaData.state === State.Removed ? ( // Stub view if state is REMOVED
-          <Tabmenu
+          <SchemaTabmenu
             contentType={Type.Schema}
             isRemoved={true}
             tabPanels={[
@@ -210,7 +210,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
             ]}
           />
         ) : (
-          <Tabmenu
+          <SchemaTabmenu
             contentType={Type.Schema}
             tabPanels={[
               {

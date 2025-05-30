@@ -18,10 +18,10 @@ export default function Logo() {
       <StyledSuomiLink aria-label={t('navigate-to-homepage')}>
         <Image
           className="logo-image"
-          src="/supporting_eosc.png"
+          src="/header.png"
           width="256"
           height="61"
-          alt={'Supporting EOSC'}
+          alt={'FAIRCORE4EOSC'}
         />
       </StyledSuomiLink>
     </Link>

@@ -5,6 +5,7 @@ import {
   SiteContainer,
   MarginContainer,
   FlexContainer,
+  FooterContainer,
 } from './layout.styles';
 import { useTranslation } from 'next-i18next';
 import SmartHeader from '../smart-header';
@@ -21,6 +22,7 @@ import useUrlState, {
 } from '@app/common/utils/hooks/use-url-state';
 import { ReactNode } from 'react';
 import SpinnerRouterListener from '@app/common/components/spinner-router-listener';
+import Footer from '@app/common/components/footer';
 
 export default function Layout({
   children,
@@ -77,11 +79,16 @@ export default function Layout({
                 <ActionPanel isActionMenu={isActionMenu} />
                 {showSearchScreen && <SearchScreen />}
                 {children}
-              </MarginContainer>
+                </MarginContainer>
+                
             </ContentContainer>
+           
           </>
         )}
       </SiteContainer>
+       <FooterContainer>
+              <Footer t={t} />
+            </FooterContainer>
     </ThemeProvider>
   );
 }

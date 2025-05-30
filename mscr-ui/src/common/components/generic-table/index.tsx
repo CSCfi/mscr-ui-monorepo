@@ -12,7 +12,9 @@ export default function GenericTable(props: {
   items: unknown[];
   headings: string[];
   caption: string;
+  noResultsInfo?: string;
   staticHighlight?: boolean;
+  searchInput?: () => React.ReactElement;
 }) {
   function createColumnHeadings(items: { [s: string]: unknown }[]) {
     const head: JSX.Element[] = [];
@@ -77,9 +79,11 @@ export default function GenericTable(props: {
   return (
     <>
       <Grid container direction="row">
-        {props.caption.length > 0 && (<Grid container>
-          <h2>{props.caption}</h2>
-        </Grid>
+        {props.caption.length > 0 && (
+          <Grid container direction="row" justifyContent="space-between">
+            <h2>{props.caption}</h2>
+            {props.searchInput && props.searchInput()}
+          </Grid>
         )}
         <StyledTableContainer>
           <Table aria-label={props.caption}>
@@ -87,6 +91,7 @@ export default function GenericTable(props: {
             {createColumns(props.items as { [s: string]: unknown }[])}
           </Table>
         </StyledTableContainer>
+        {props.items.length == 0 && props.noResultsInfo}
       </Grid>
     </>
   );

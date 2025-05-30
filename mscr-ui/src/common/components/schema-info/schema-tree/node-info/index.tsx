@@ -44,7 +44,7 @@ export default function NodeInfo(props: {
   }, [props.treeData, props.currentlySelectedNodeId]);
 
   const handleDropDownSelect = (nodeId: string) => {
-    const newSelectedNode = props.treeData.find((item) => item.id === nodeId);
+    const newSelectedNode = props.treeData.find((item) => item?.id === nodeId);
     setSelectedNode(newSelectedNode ?? selectedNode);
   };
 
@@ -85,13 +85,13 @@ export default function NodeInfo(props: {
     <div className="row d-flex justify-content-between node-info-box">
       <h3>{t('node-info.selected-node-info')}</h3>
       <div className="col flex-column d-flex justify-content-between side-bar-wrap">
-        <div className="mb-2"></div>
+        <div></div>
         <Box
           className="bg-wrap"
           sx={{
-            height: 440,
+            height: 150,
             flexGrow: 1,
-            maxWidth: 400,
+            maxWidth: 300,
             overflowY: 'auto',
           }}
         >
@@ -123,8 +123,8 @@ export default function NodeInfo(props: {
                 onChange={(newValue) => handleDropDownSelect(newValue)}
               >
                 {dropDownList.map((rt) => (
-                  <DropdownItem key={rt.visualTreeId} value={rt.id}>
-                    {rt.name}
+                  <DropdownItem key={rt?.visualTreeId} value={rt?.id}>
+                    {rt?.name}
                   </DropdownItem>
                 ))}
               </Dropdown>

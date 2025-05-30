@@ -48,7 +48,7 @@ export default function generatePayload(
       .filter((l: { title: string }) => l.title !== '')
       .map((l: { uniqueItemId: string }) => l.uniqueItemId),
     organizations: organizations.map((o: { id: string }) => o.id),
-    status: 'DRAFT',
+    // status: 'DRAFT',
     format: data.format,
     state: data.state,
     versionLabel: data.versionLabel,

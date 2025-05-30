@@ -152,8 +152,7 @@
   },
   "crosswalk-editor": {
     "search-from-source-schema": "",
-    "search-from-target-schema": "",
-    "show-node-titles": ""
+    "search-from-target-schema": ""
   },
   "crosswalk-form": {
     "all": "",
@@ -203,9 +202,11 @@
   },
   "datamodel-title": "",
   "datamodels-all": "",
+  "delete": "",
   "download": "",
   "download-as-file": "",
   "download-as-file-description": "",
+  "edit": "",
   "email-address": "",
   "email-subscriptions": "",
   "email-subscriptions-off": "",
@@ -234,6 +235,12 @@
   "filter-type-concepts_other": "",
   "filter-with-current_one": "",
   "filter-with-current_other": "",
+  "footer": {
+    "acceptable-use-policy": "",
+    "code-repository": "",
+    "documentation": "",
+    "terms-of-use": ""
+  },
   "go-to": "",
   "ground": {
     "description": "",
@@ -278,14 +285,27 @@
   "mappings-accordion": {
     "clear": "",
     "filter-from-mappings": "",
-    "select-linked-nodes": ""
+    "from": "",
+    "function": "",
+    "mapping-function": "",
+    "no-mappings": "",
+    "params": "",
+    "predicate": "",
+    "select-linked-nodes": "",
+    "title": "",
+    "to": ""
   },
   "metadata": {
+    "add-creator": "",
+    "add-identifier": "",
     "contact": "",
     "created": "",
+    "creator": "",
     "crosswalk-details": "",
     "description": "",
+    "domain": "",
     "file": {
+      "download": "",
       "download-file": "",
       "format": "",
       "label": "",
@@ -293,24 +313,33 @@
       "size": ""
     },
     "format": "",
+    "identifier": "",
+    "internal-identifier": "",
+    "language": "",
+    "license": "",
     "modified": "",
+    "mscr-owner": "",
+    "mscr-state": "",
+    "mscr-visibility": "",
     "name": "",
     "name-space-label": "",
     "not-available": "",
     "owner": "",
     "pid": "",
+    "publisher": "",
     "schema-details": "",
     "source-schema": "",
+    "source-schema-id": "",
     "source-url": "",
     "state": "",
     "stub-crosswalk-details": "",
     "stub-schema-details": "",
     "target-schema": "",
+    "target-schema-id": "",
     "version-label": "",
     "versions": "",
     "view": "",
-    "viewing": "",
-    "visibility": ""
+    "viewing": ""
   },
   "mscr-title": "",
   "name": "",
@@ -501,6 +530,7 @@
     },
     "history-tab": "",
     "label": "",
+    "mapping-accordion-tab": "",
     "metadata-and-files": "",
     "schema": {
       "content-and-editor-tab": ""
@@ -569,6 +599,10 @@
     "personal": "",
     "pid": "",
     "schemas": "",
+    "search": {
+      "crosswalks": "",
+      "schemas": ""
+    },
     "state": "",
     "view": ""
   }

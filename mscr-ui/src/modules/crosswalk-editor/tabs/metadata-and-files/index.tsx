@@ -30,7 +30,7 @@ export default function MetadataAndFiles(props: {
       <MetadataFilesTable
         filesRowInput={props.crosswalkData.fileMetadata}
         crosswalkData={props.crosswalkData}
-        pid={props.crosswalkData.pid}
+        pid={props.crosswalkData.id}
         canEdit={hasFileRights}
       />
     </>
