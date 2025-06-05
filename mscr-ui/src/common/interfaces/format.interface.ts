@@ -10,7 +10,8 @@ export enum Format {
   Mscr = 'MSCR',
   Rdfs = 'RDFS',
   Enum = 'ENUM',
-  Sssom = 'SSSOM'
+  Sssom = 'SSSOM',
+  empty = '',
 }
 
 export enum FileExtensions {
