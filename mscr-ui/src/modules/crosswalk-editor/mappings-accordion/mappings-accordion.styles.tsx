@@ -244,7 +244,7 @@ export const HorizontalLineTargetStart = styled.div`
     margin-left: -5px;
     margin-right: 5px;
   }
-  min-width: 50px;
+  min-width: 40px;
   margin-right: -13px;
 `;
 
