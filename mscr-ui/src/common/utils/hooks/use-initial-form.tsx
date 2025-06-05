@@ -15,25 +15,11 @@ export interface FormType {
 
 export function useInitialForm(type: Type): FormType {
   const { t } = useTranslation('admin');
+  // Initial form data for creating a new schema or crosswalk, for schema it shold be empty
   const initialForm : FormType = {
-    format: type == Type.Crosswalk ? Format.Mscr : Format.Csv,
+    format: type == Type.Crosswalk ? Format.Mscr : Format.empty,
     state: State.Draft,
     languages: [
-      // Hiding Swedish and Finnish for now
-      // {
-      //   labelText: t('language-finnish-with-suffix'),
-      //   uniqueItemId: 'fi',
-      //   title: '',
-      //   description: '',
-      //   selected: false,
-      // },
-      // {
-      //   labelText: t('language-swedish-with-suffix'),
-      //   uniqueItemId: 'sv',
-      //   title: '',
-      //   description: '',
-      //   selected: false,
-      // },
       {
         labelText: t('language-english-with-suffix'),
         uniqueItemId: 'en',
