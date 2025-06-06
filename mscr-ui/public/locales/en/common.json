@@ -526,11 +526,11 @@
   "synonym": "",
   "tabs": {
     "crosswalk": {
-      "content-and-editor-tab": "Crosswalk"
+      "content-and-editor-tab": "Crosswalk Editor"
     },
     "history-tab": "Version history",
     "label": "Content tabs",
-    "mapping-accordion-tab": "Mapping",
+    "mapping-accordion-tab": "Mappings",
     "metadata-and-files": "Metadata & files",
     "schema": {
       "content-and-editor-tab": "Schema"
