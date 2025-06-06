@@ -5,44 +5,30 @@ import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {styled} from '@mui/material';
-import TableCell, {tableCellClasses} from '@mui/material/TableCell';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
+import TableCell from '@mui/material/TableCell';
 import {
-  Button as Sbutton,
   Dropdown,
   DropdownItem,
-  SearchInput,
-  Textarea,
   TextInput,
 } from 'suomifi-ui-components';
-import Button from '@mui/material/Button';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import CheckIcon from '@mui/icons-material/Check';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ArrowCircleUp from '@mui/icons-material/ArrowCircleUp';
 import ArrowCircleDown from '@mui/icons-material/ArrowCircleDown';
 import Tooltip from '@mui/material/Tooltip';
 
 import {
   CrosswalkConnectionNew,
-  NodeListingRow,
-  NodeMapping
-} from '@app/common/interfaces/crosswalk-connection.interface';
-import {InfoIcon} from '@app/common/components/shared-icons';
-import {useCallback, useEffect, useRef, useState} from 'react';
+  NodeListingRow} from '@app/common/interfaces/crosswalk-connection.interface';
+import {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'next-i18next';
 import {
   Button as SButton,
 } from 'suomifi-ui-components';
 import {highlightOperation} from "@app/modules/crosswalk-editor/mappings-accordion";
 
-import validateMapping from "@app/modules/crosswalk-editor/mapping-validator";
 
 const StyledCollapse = styled(Collapse)({
   maxWidth: '277px'

@@ -7,9 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TableCell from '@mui/material/TableCell';
-import {Button as Sbutton, SearchInput} from 'suomifi-ui-components';
-import Tooltip from '@mui/material/Tooltip';
-
+import {SearchInput} from 'suomifi-ui-components';
 import {NodeMapping} from '@app/common/interfaces/crosswalk-connection.interface';
 import {InfoIcon} from '@app/common/components/shared-icons';
 import {useTranslation} from 'next-i18next';
@@ -28,7 +26,6 @@ import {
   StyledArrowRightIcon,
   StyledButton,
   StyledTableActionsCell,
-  StyledTableButtonCell,
   StyledTableCell,
   StyledTableRow,
   StyledTableTargetCell,
@@ -36,9 +33,14 @@ import {
   VerticalLine
 } from '@app/modules/crosswalk-editor/mappings-accordion/mappings-accordion.styles';
 import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion/function-tooltip-box";
-import ConfirmModal from "@app/common/components/confirmation-modal";
 import {Format} from "@app/common/interfaces/format.interface";
-import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
+import { SchemaWithContent } from "@app/common/interfaces/schema.interface";
+
+/*
+This file contains the MappingsAccordion component which displays a list of node mappings in an accordion format.
+It allows users to view, filter, and interact with mappings between source and target nodes.Currently only used in mappings tab. 
+The main crosswalk editor use the new mapping accordion.
+*/
 
 export interface highlightOperation {
   operationId: string;
@@ -85,7 +87,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
   return (
     <>
       <StyledTableRow className="accordion-row row">
-        <StyledTableCell className="col-4">
+        <StyledTableCell className="col-5">
 
           {row.source.map((mapping, index) => {
               return (<>
@@ -166,7 +168,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
           </div>
         </StyledTableCell>
 
-        <StyledTableCell className="col-4">
+        <StyledTableCell className="col-5">
           <div className='d-flex flex-column'>
             {row.target.map((mapping, index) => {
                 return (<>
@@ -214,7 +216,8 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
 
         </StyledTableCell>
 
-        <StyledTableButtonCell className="col-2 fw-bold">
+       {/* //Hiding the action buttons for now, as they are not used in the current UI  
+       <StyledTableButtonCell className="col-2 fw-bold">
           <>
             <div className='d-flex flex-row flex-wrap align-content-center'>
               <>
@@ -262,10 +265,10 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
               </>
             </div>
           </>
-        </StyledTableButtonCell>
+        </StyledTableButtonCell> */}
       </StyledTableRow>
 
-      <StyledTableRow>
+      {/* <StyledTableRow>
         <TableCell className="accordion-fold-content">
           <Collapse
             in={open && !viewOnlyMode}
@@ -298,7 +301,7 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
             </div>
           </Collapse>
         </TableCell>
-      </StyledTableRow>
+      </StyledTableRow> */}
     </>
   );
 }
@@ -476,7 +479,7 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
         <Table aria-label="collapsible table w-100">
           <TableHead>
             <TableRow className="accordion-row row">
-              <StyledTableCell className="col-4">
+              <StyledTableCell className="col-5">
                 <TableCellPadder>
                   <span className="fw-bold ps-3">Source</span>
                 </TableCellPadder>
@@ -486,14 +489,14 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
                   <span className="fw-bold">Mapping operations</span>
                 </TableCellPadder>
               </StyledTableCell>
-              <StyledTableTargetCell className="col-4">
+              <StyledTableTargetCell className="col-5">
                 <span className="fw-bold">Target</span>
               </StyledTableTargetCell>
-              <StyledTableActionsCell className="col-2 d-flex flex-row justify-content-end">
+             {/*  <StyledTableActionsCell className="col-2 d-flex flex-row justify-content-end">
                 <TableCellPadder>
                   <span className="fw-bold">Actions</span>
                 </TableCellPadder>
-              </StyledTableActionsCell>
+              </StyledTableActionsCell> */}
             </TableRow>
           </TableHead>
 
