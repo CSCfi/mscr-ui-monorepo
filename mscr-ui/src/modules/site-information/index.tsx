@@ -1,16 +1,15 @@
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { Heading, Link, Text } from 'suomifi-ui-components';
-import YouTube, { YouTubeProps } from 'react-youtube';
-import Separator from 'yti-common-ui/separator';
+
 
 const StyledHeading = styled(Heading)`
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 `;
 
 const StyledText = styled(Text)`
   display: block;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 `;
 
 const StyledList = styled.ul`
@@ -21,20 +20,12 @@ const StyledList = styled.ul`
 export default function SiteInformationModule() {
   const { t } = useTranslation('common');
 
-  function Example() {
-    return (
-      <iframe
-        src="https://www.youtube.com/embed/RS41HavJcnw?si=L-4UTfqkTF7It_Hr"
-        allowFullScreen
-      />
-    );
-  }
 
   return (
     <>
-      <StyledHeading variant="h1">{t('landing.title')}</StyledHeading>
+      <StyledHeading variant="h2" >{t('landing.title')}</StyledHeading>
       <StyledText variant="lead">{t('landing.description')}</StyledText>
-      <Heading variant="h2">{t('landing.what-can-do')}</Heading>
+      <Heading variant="h3">{t('landing.what-can-do')}</Heading>
       <StyledList>
         <li>
           <Text>{t('landing.bullet-1')}</Text>
@@ -51,29 +42,29 @@ export default function SiteInformationModule() {
           <Text>{t('landing.bullet-6')}</Text>
         </li>
       </StyledList>
+      
+      <Heading variant="h3" style={{ marginTop: '10px' }}>MSCR Demo Video</Heading>
       <Text>
+        Take a look at this short demo video to see how MSCR works.
+      </Text>
+    
+      {/* privacy-enhanced embed (no external script load) */}
+      <div style={{ marginTop: '10px' }}>
+        <iframe
+          width="100%"
+          height="200"
+          src="https://www.youtube-nocookie.com/embed/RS41HavJcnw?si=3-TAbWHydmr-szaK"
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        ></iframe>
+      </div>
+      <Text style={{ marginTop: '20px' }}>
         {t('privacy-text.1')}{' '}
         <Link href="privacy-guideline">{t('privacy-link')}</Link>{' '}
         {t('privacy-text.2')}
       </Text>
-      <h1>MSCR Demo Video</h1>
-      <Text>
-        Take a look at this short demo video to see how MSCR works in practice.
-      </Text>
-
-      {/* privacy-enhanced embed (no external script load) */}
-      <div style={{ maxWidth: 640, marginTop: '20px' }}>
-        <iframe
-          title="MSCR Demo Video"
-          width="100%"
-          height="240"
-          src="https://www.youtube-nocookie.com/embed/RS41HavJcnw"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          loading="lazy"
-        />
-      </div>
     </>
   );
 }
