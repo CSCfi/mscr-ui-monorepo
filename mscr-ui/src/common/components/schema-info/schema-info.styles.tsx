@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {Heading, Modal, ModalContent} from 'suomifi-ui-components';
+import { Heading, Modal, ModalContent } from 'suomifi-ui-components';
 
 export const SchemaHeading = styled(Heading)`
   && {
@@ -120,7 +120,6 @@ styled(Modal)`
     font-size: 2rem;
     height: 4rem;
   }
-  ;
   .close {
     cursor: pointer;
   }

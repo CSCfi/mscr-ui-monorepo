@@ -17,7 +17,6 @@ export function updateActionMenu(
   hasEditPermission: boolean,
   isMscrCopyAvailable?: boolean
 ) {
-
   dispatch(resetMenuList());
   if (!contentData || contentData.state === State.Removed) {
     return;

@@ -1,5 +1,5 @@
-export interface MSCRError{
-    status?: string;
-    message?: string;
-    detail?: string;
+export interface MSCRError {
+  status?: string;
+  message?: string;
+  detail?: string;
 }

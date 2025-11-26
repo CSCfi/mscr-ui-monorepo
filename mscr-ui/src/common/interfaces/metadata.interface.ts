@@ -64,7 +64,7 @@ export interface MetadataFormType {
   // Below properties are accepted by endpoint, but not present or not editable in UI metadata form
   status?: string;
   format?: string;
-  language?:string;
+  language?: string;
   dctContributors?: string[];
   dctIssued?: string;
   dctRelations?: string[];
@@ -82,5 +82,5 @@ export const initialMetadataForm: MetadataFormType = {
   label: '',
   versionLabel: '',
   visibility: '',
-  namespace: ''
+  namespace: '',
 };

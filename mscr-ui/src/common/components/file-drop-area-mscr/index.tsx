@@ -1,24 +1,29 @@
-import {TFunction, useTranslation} from 'next-i18next';
-import {ChangeEvent, useEffect, useRef, useState} from 'react';
+import { TFunction, useTranslation } from 'next-i18next';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import {
   Block,
   Button,
   IconRemove,
   InlineAlert,
   Paragraph,
-  Text
+  Text,
 } from 'suomifi-ui-components';
 import {
   CaptionText,
-  FileBlock, FileBlockWrapper,
+  FileBlock,
+  FileBlockWrapper,
   FileInfo,
   FileInfoBlock,
   FileInfoStaticIcon,
   FileRemoveButton,
-  FileWrapper, WideTextInput,
+  FileWrapper,
+  WideTextInput,
 } from './file-drop-area-mscr.styles';
 import * as React from 'react';
-import {CircleIcon, UploadIcon} from 'mscr-ui/src/common/components/shared-icons';
+import {
+  CircleIcon,
+  UploadIcon,
+} from 'mscr-ui/src/common/components/shared-icons';
 
 interface FileDropAreaProps {
   setIsValid: (valid: boolean) => void;
@@ -27,11 +32,11 @@ interface FileDropAreaProps {
   translateFileUploadError: (
     error: 'none' | 'upload-error' | 'incorrect-file-type',
     fileTypes: string[],
-    t: TFunction,
+    t: TFunction
   ) => string | undefined;
   setFileUri?: (uri: string | null) => void;
   isSchemaUpload?: boolean;
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 export default function FileDropAreaMscr({
@@ -43,10 +48,12 @@ export default function FileDropAreaMscr({
   isSchemaUpload,
   disabled,
 }: FileDropAreaProps) {
-  const {t} = useTranslation('admin');
+  const { t } = useTranslation('admin');
   const input = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [alert, setAlert] = useState<'none' | 'upload-error' | 'incorrect-file-type'>('none');
+  const [alert, setAlert] = useState<
+    'none' | 'upload-error' | 'incorrect-file-type'
+  >('none');
   const [fileUriField, setFileUriField] = useState<string>('');
 
   useEffect(() => {
@@ -128,23 +135,23 @@ export default function FileDropAreaMscr({
     >
       <div>
         <FileBlockWrapper>
-
-            <>
-              <Block>
-                <WideTextInput
-                  labelText={isSchemaUpload ? t('register-schema-file-uri-reference') : t('register-crosswalk-file-uri-reference')}
-                  onChange={(value) => setFileUriField(value?.toString() ?? '')}
-                  value={fileUriField}
-                  disabled={disabled}
-                />
-              </Block>
-              <Text smallScreen>
-                {'OR'}
-              </Text>
-              <br/>
-              <CaptionText>{t('upload-documents')}</CaptionText>
-            </>
-
+          <>
+            <Block>
+              <WideTextInput
+                labelText={
+                  isSchemaUpload
+                    ? t('register-schema-file-uri-reference')
+                    : t('register-crosswalk-file-uri-reference')
+                }
+                onChange={(value) => setFileUriField(value?.toString() ?? '')}
+                value={fileUriField}
+                disabled={disabled}
+              />
+            </Block>
+            <Text smallScreen>{'OR'}</Text>
+            <br />
+            <CaptionText>{t('upload-documents')}</CaptionText>
+          </>
 
           <FileBlock padding="m" id="file-drop-block">
             {file === null ? (
@@ -160,15 +167,13 @@ export default function FileDropAreaMscr({
                   type="file"
                   ref={input}
                   accept={validFileTypes.map((type) => `.${type}`).join(',')}
-                  style={{display: 'none'}}
+                  style={{ display: 'none' }}
                   disabled={disabled}
                   onChange={(e) => {
                     handleUpload(e);
                   }}
                 />
-                <Text smallScreen>
-                  {'OR'}
-                </Text>
+                <Text smallScreen>{'OR'}</Text>
 
                 <Button
                   className={'mt-2'}
@@ -185,7 +190,7 @@ export default function FileDropAreaMscr({
             ) : (
               <FileInfoBlock>
                 <FileInfo>
-                  <FileInfoStaticIcon/>
+                  <FileInfoStaticIcon />
                   <div>
                     <Paragraph>
                       <Text color={'highlightBase'} variant={'bold'}>
@@ -204,7 +209,7 @@ export default function FileDropAreaMscr({
                 </FileInfo>
                 <FileRemoveButton
                   variant="secondaryNoBorder"
-                  icon={<IconRemove/>}
+                  icon={<IconRemove />}
                   onClick={() => setFile(null)}
                   id="remove-file-button"
                   disabled={disabled}

@@ -21,12 +21,14 @@ const StyledList = styled.ul`
 export default function SiteInformationModule() {
   const { t } = useTranslation('common');
 
-
   function Example() {
-   return (
-    <iframe src="https://www.youtube.com/embed/RS41HavJcnw?si=L-4UTfqkTF7It_Hr" allowFullScreen />
-  )
-}
+    return (
+      <iframe
+        src="https://www.youtube.com/embed/RS41HavJcnw?si=L-4UTfqkTF7It_Hr"
+        allowFullScreen
+      />
+    );
+  }
 
   return (
     <>
@@ -58,8 +60,7 @@ export default function SiteInformationModule() {
       <Text>
         Take a look at this short demo video to see how MSCR works in practice.
       </Text>
-      
-      
+
       {/* privacy-enhanced embed (no external script load) */}
       <div style={{ maxWidth: 640, marginTop: '20px' }}>
         <iframe
@@ -73,10 +74,6 @@ export default function SiteInformationModule() {
           loading="lazy"
         />
       </div>
-      
     </>
   );
 }
-
-
-

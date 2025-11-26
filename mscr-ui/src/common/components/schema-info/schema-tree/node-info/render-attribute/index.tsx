@@ -1,7 +1,11 @@
 import { ConstantAttribute } from '@app/common/interfaces/node.interface';
 import processHtmlLinks from '@app/common/utils/process-html-links';
 
-export default function RenderAttribute({ attribute }: { attribute: ConstantAttribute }) {
+export default function RenderAttribute({
+  attribute,
+}: {
+  attribute: ConstantAttribute;
+}) {
   const valueWithLinks = processHtmlLinks(attribute.value);
   let valueList;
   // Add line breaks between values if multiple
@@ -19,10 +23,7 @@ export default function RenderAttribute({ attribute }: { attribute: ConstantAttr
     valueList = valueWithLinks;
   }
   return (
-    <div
-      className="col-12"
-      hidden={attribute.name === '@id'}
-    >
+    <div className="col-12" hidden={attribute.name === '@id'}>
       <div>{processHtmlLinks(attribute.name)}:</div>
       <div className="attribute-font">{valueList}</div>
     </div>

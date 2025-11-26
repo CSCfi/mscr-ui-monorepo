@@ -18,9 +18,7 @@ import { visualizationApi } from '@app/common/components/visualization/visualiza
 import { activeSlice } from '@app/common/components/active/active.slice';
 import { importApi } from '@app/common/components/import/import.slice';
 import { schemaApi } from '@app/common/components/schema/schema.slice';
-import {
-  crosswalkApi,
-} from '@app/common/components/crosswalk/crosswalk.slice';
+import { crosswalkApi } from '@app/common/components/crosswalk/crosswalk.slice';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
 import { crosswalkMappingFunctionsApi } from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
 import { notificationsSlice } from '@app/common/components/notifications/notifications.slice';

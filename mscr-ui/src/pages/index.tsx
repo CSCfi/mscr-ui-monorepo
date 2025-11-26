@@ -26,7 +26,10 @@ import SiteInformationModule from '@app/modules/site-information';
 import SearchBar from 'src/modules/search/search-bar';
 import styled from 'styled-components';
 import PrivacyGuide from '@app/modules/privacy-guide';
-import { FooterContainer, MarginContainer } from '@app/common/components/layout/layout.styles';
+import {
+  FooterContainer,
+  MarginContainer,
+} from '@app/common/components/layout/layout.styles';
 import Footer from '@app/common/components/footer';
 
 interface IndexPageProps extends CommonContextState {

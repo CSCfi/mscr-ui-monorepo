@@ -68,7 +68,7 @@ export default function PersonalWorkspace({
         const linkLabel = `${t('workspace.view')} ${label}`;
         return {
           label: label,
-         /*  // ...(contentType == Type.Schema && { namespace: info.namespace }), */
+          /*  // ...(contentType == Type.Schema && { namespace: info.namespace }), */
           state: info.state,
           numberOfRevisions: info.numberOfRevisions.toString(),
           pid: info.handle ?? t('metadata.not-available'),
@@ -159,7 +159,7 @@ export default function PersonalWorkspace({
           searchParameter={searchParameter}
           setSearchParameter={setSearchParameter}
         />
-        {lastPage > 1 && <Pagination lastPage={lastPage}/>}
+        {lastPage > 1 && <Pagination lastPage={lastPage} />}
       </main>
     );
   }

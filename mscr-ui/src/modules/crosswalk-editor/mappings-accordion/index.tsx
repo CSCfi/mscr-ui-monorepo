@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Dispatch, SetStateAction, useEffect} from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import Collapse from '@mui/material/Collapse';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,10 +7,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TableCell from '@mui/material/TableCell';
-import {SearchInput} from 'suomifi-ui-components';
-import {NodeMapping} from '@app/common/interfaces/crosswalk-connection.interface';
-import {InfoIcon} from '@app/common/components/shared-icons';
-import {useTranslation} from 'next-i18next';
+import { SearchInput } from 'suomifi-ui-components';
+import { NodeMapping } from '@app/common/interfaces/crosswalk-connection.interface';
+import { InfoIcon } from '@app/common/components/shared-icons';
+import { useTranslation } from 'next-i18next';
 import {
   AccordionContainer,
   EmptyBlock,
@@ -30,11 +30,11 @@ import {
   StyledTableRow,
   StyledTableTargetCell,
   TableCellPadder,
-  VerticalLine
+  VerticalLine,
 } from '@app/modules/crosswalk-editor/mappings-accordion/mappings-accordion.styles';
-import FunctionTooltipBox from "@app/modules/crosswalk-editor/mappings-accordion/function-tooltip-box";
-import {Format} from "@app/common/interfaces/format.interface";
-import { SchemaWithContent } from "@app/common/interfaces/schema.interface";
+import FunctionTooltipBox from '@app/modules/crosswalk-editor/mappings-accordion/function-tooltip-box';
+import { Format } from '@app/common/interfaces/format.interface';
+import { SchemaWithContent } from '@app/common/interfaces/schema.interface';
 
 /*
 This file contains the MappingsAccordion component which displays a list of node mappings in an accordion format.
@@ -47,8 +47,18 @@ export interface highlightOperation {
   nodeId?: any;
 }
 
-function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttributeNames, rowcount, mappingFunctions,
-               schemaFormats, schemaDatas, setNodeMappingsModalOpen}: {
+function Row({
+  row,
+  viewOnlyMode,
+  isEditModeActive,
+  callBackFunction,
+  showAttributeNames,
+  rowcount,
+  mappingFunctions,
+  schemaFormats,
+  schemaDatas,
+  setNodeMappingsModalOpen,
+}: {
   row: NodeMapping;
   viewOnlyMode: boolean;
   isEditModeActive: boolean;
@@ -56,8 +66,14 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
   showAttributeNames: boolean;
   rowcount: number;
   mappingFunctions: any;
-  schemaFormats: {sourceSchemaFormat: Format | undefined, targetSchemaFormat: Format | undefined};
-  schemaDatas: {sourceSchemaData: SchemaWithContent | undefined, targetSchemaData: SchemaWithContent | undefined};
+  schemaFormats: {
+    sourceSchemaFormat: Format | undefined;
+    targetSchemaFormat: Format | undefined;
+  };
+  schemaDatas: {
+    sourceSchemaData: SchemaWithContent | undefined;
+    targetSchemaData: SchemaWithContent | undefined;
+  };
   setNodeMappingsModalOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const { t } = useTranslation('common');
@@ -74,36 +90,45 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
       '',
       isSourceTree
     );
-  };
+  }
 
   function performDeleteMappingAction() {
     setIsDeleteMappingConfirmModalOpen(false);
-    callBackFunction(
-      row,
-      'removeMapping'
-    );
+    callBackFunction(row, 'removeMapping');
   }
 
   return (
     <>
       <StyledTableRow className="accordion-row row">
         <StyledTableCell className="col-5">
-
           {row.source.map((mapping, index) => {
-              return (<>
-                <div className='d-flex justify-content-between'>
-                  <div className='d-flex justify-content-center'>
+            return (
+              <>
+                <div className="d-flex justify-content-between">
+                  <div className="d-flex justify-content-center">
                     <TableCellPadder>
                       <StyledButton
                         className="px-3 py-0"
-                        style={{textTransform: 'none'}}
-                        title={showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
+                        style={{ textTransform: 'none' }}
+                        title={
+                          showAttributeNames
+                            ? t('mappings-accordion.select-linked-nodes')
+                            : returnFullPath(mapping.id)
+                        }
                         onClick={(e) => {
                           selectFromTrees(row, mapping.id, true);
                           e.stopPropagation();
                         }}
-                      >{showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
-                        schemaFormats?.sourceSchemaFormat, schemaDatas?.sourceSchemaData)}</StyledButton>
+                      >
+                        {showAttributeNames
+                          ? mapping.label
+                          : returnPath(
+                              mapping.id,
+                              mapping.label,
+                              schemaFormats?.sourceSchemaFormat,
+                              schemaDatas?.sourceSchemaData
+                            )}
+                      </StyledButton>
 
                       <HorizontalLineStart>
                         <div></div>
@@ -114,54 +139,71 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
                   <HorizontalLineStart>
                     <div></div>
                   </HorizontalLineStart>
-                  {mapping['processing']?.id &&
-                      <FunctionTooltipBox callBackFunction={callBackFunction}
-                                          isEditModeActive={isEditModeActive}
-                                          tooltipHeading={'source operation'} tooltipHoverText={'source operation'}
-                                          processingId={mapping.id} functionName={'sourceOperation'}
-                                          mappingFunctions={mappingFunctions}
-                                          row={row}></FunctionTooltipBox>
-                  }
+                  {mapping['processing']?.id && (
+                    <FunctionTooltipBox
+                      callBackFunction={callBackFunction}
+                      isEditModeActive={isEditModeActive}
+                      tooltipHeading={'source operation'}
+                      tooltipHoverText={'source operation'}
+                      processingId={mapping.id}
+                      functionName={'sourceOperation'}
+                      mappingFunctions={mappingFunctions}
+                      row={row}
+                    ></FunctionTooltipBox>
+                  )}
                   <HorizontalLineStartSecond>
                     <div></div>
                   </HorizontalLineStartSecond>
-                  <div className='d-flex flex-column'>
-                    {index === 0 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
-                    {row.source.length > 1 && <VerticalLine>
+                  <div className="d-flex flex-column">
+                    {index === 0 && row.source.length > 1 && (
+                      <EmptyBlock></EmptyBlock>
+                    )}
+                    {row.source.length > 1 && (
+                      <VerticalLine>
                         <div></div>
-                    </VerticalLine>}
-                    {index === row.source.length - 1 && row.source.length > 1 && <EmptyBlock></EmptyBlock>}
+                      </VerticalLine>
+                    )}
+                    {index === row.source.length - 1 &&
+                      row.source.length > 1 && <EmptyBlock></EmptyBlock>}
                   </div>
                 </div>
-              </>)
-            }
-          )}
-
+              </>
+            );
+          })}
         </StyledTableCell>
 
-        <StyledTableCell className='col-2'>
-          <div className='d-flex justify-content-center'>
+        <StyledTableCell className="col-2">
+          <div className="d-flex justify-content-center">
             <HorizontalLineMidStart>
               <div></div>
             </HorizontalLineMidStart>
-            {row.processing &&
-                <FunctionTooltipBox callBackFunction={callBackFunction} isEditModeActive={isEditModeActive}
-                                    tooltipHeading={'mapping function'} tooltipHoverText={'mapping function'}
-                                    processingId={row.processing.id} functionName={'mappingFunction'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>
-            }
-            {!row.processing &&
-                <IconSpacer></IconSpacer>
-            }
-            {row.predicate &&
-                <FunctionTooltipBox alternateIconLetter={'P'} callBackFunction={callBackFunction}
-                                    isEditModeActive={isEditModeActive} tooltipHeading={'predicate'}
-                                    processingId={''} tooltipHoverText={'predicate'} functionName={'predicate'}
-                                    mappingFunctions={mappingFunctions} row={row}></FunctionTooltipBox>
-            }
-            {!row.predicate &&
-                <IconSpacer></IconSpacer>
-            }
+            {row.processing && (
+              <FunctionTooltipBox
+                callBackFunction={callBackFunction}
+                isEditModeActive={isEditModeActive}
+                tooltipHeading={'mapping function'}
+                tooltipHoverText={'mapping function'}
+                processingId={row.processing.id}
+                functionName={'mappingFunction'}
+                mappingFunctions={mappingFunctions}
+                row={row}
+              ></FunctionTooltipBox>
+            )}
+            {!row.processing && <IconSpacer></IconSpacer>}
+            {row.predicate && (
+              <FunctionTooltipBox
+                alternateIconLetter={'P'}
+                callBackFunction={callBackFunction}
+                isEditModeActive={isEditModeActive}
+                tooltipHeading={'predicate'}
+                processingId={''}
+                tooltipHoverText={'predicate'}
+                functionName={'predicate'}
+                mappingFunctions={mappingFunctions}
+                row={row}
+              ></FunctionTooltipBox>
+            )}
+            {!row.predicate && <IconSpacer></IconSpacer>}
             <HorizontalLineMidEnd>
               <div></div>
             </HorizontalLineMidEnd>
@@ -169,54 +211,81 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
         </StyledTableCell>
 
         <StyledTableCell className="col-5">
-          <div className='d-flex flex-column'>
+          <div className="d-flex flex-column">
             {row.target.map((mapping, index) => {
-                return (<>
-                  <div className='d-flex justify-content-between'>
-                    <div className='d-flex justify-content-center'>
-                      <div className='d-flex flex-column'>
-                        {index === 0 && row.target.length > 1 && <EmptyBlock></EmptyBlock>}
-                        {row.target.length > 1 && <VerticalLine>
+              return (
+                <>
+                  <div className="d-flex justify-content-between">
+                    <div className="d-flex justify-content-center">
+                      <div className="d-flex flex-column">
+                        {index === 0 && row.target.length > 1 && (
+                          <EmptyBlock></EmptyBlock>
+                        )}
+                        {row.target.length > 1 && (
+                          <VerticalLine>
                             <div></div>
-                        </VerticalLine>}
-                        {index === row.target.length - 1 && row.target.length > 1 &&
-                            <EmptyBlock></EmptyBlock>}
+                          </VerticalLine>
+                        )}
+                        {index === row.target.length - 1 &&
+                          row.target.length > 1 && <EmptyBlock></EmptyBlock>}
                       </div>
-                      {mapping['processing']?.id &&
-                          <><HorizontalLineTargetStart>
-                              <div></div>
-                          </HorizontalLineTargetStart><FunctionTooltipBox callBackFunction={callBackFunction}
-                                                                          isEditModeActive={isEditModeActive}
-                                                                          tooltipHeading={'target operation'}
-                                                                          tooltipHoverText={'target operation'}
-                                                                          processingId={mapping.id}
-                                                                          functionName={'targetOperation'}
-                                                                          mappingFunctions={mappingFunctions}
-                                                                          row={row}></FunctionTooltipBox><HorizontalLineTargetEnd>
-                              <div></div>
-                          </HorizontalLineTargetEnd></>
-                      }{!mapping['processing']?.id && <HorizontalLineTarget><div></div></HorizontalLineTarget>}
+                      {mapping['processing']?.id && (
+                        <>
+                          <HorizontalLineTargetStart>
+                            <div></div>
+                          </HorizontalLineTargetStart>
+                          <FunctionTooltipBox
+                            callBackFunction={callBackFunction}
+                            isEditModeActive={isEditModeActive}
+                            tooltipHeading={'target operation'}
+                            tooltipHoverText={'target operation'}
+                            processingId={mapping.id}
+                            functionName={'targetOperation'}
+                            mappingFunctions={mappingFunctions}
+                            row={row}
+                          ></FunctionTooltipBox>
+                          <HorizontalLineTargetEnd>
+                            <div></div>
+                          </HorizontalLineTargetEnd>
+                        </>
+                      )}
+                      {!mapping['processing']?.id && (
+                        <HorizontalLineTarget>
+                          <div></div>
+                        </HorizontalLineTarget>
+                      )}
                       <StyledArrowRightIcon></StyledArrowRightIcon>
                       <StyledButton
                         className="px-3 py-0"
-                        style={{textTransform: 'none'}}
-                        title={showAttributeNames ? t('mappings-accordion.select-linked-nodes') : returnFullPath(mapping.id)}
+                        style={{ textTransform: 'none' }}
+                        title={
+                          showAttributeNames
+                            ? t('mappings-accordion.select-linked-nodes')
+                            : returnFullPath(mapping.id)
+                        }
                         onClick={(e) => {
                           selectFromTrees(row, mapping.id, false);
                           e.stopPropagation();
                         }}
-                      >{showAttributeNames ? mapping.label : returnPath(mapping.id, mapping.label,
-                        schemaFormats?.targetSchemaFormat, schemaDatas?.targetSchemaData)}</StyledButton>
+                      >
+                        {showAttributeNames
+                          ? mapping.label
+                          : returnPath(
+                              mapping.id,
+                              mapping.label,
+                              schemaFormats?.targetSchemaFormat,
+                              schemaDatas?.targetSchemaData
+                            )}
+                      </StyledButton>
                     </div>
                   </div>
-                </>)
-              }
-            )}
+                </>
+              );
+            })}
           </div>
-
         </StyledTableCell>
 
-       {/* //Hiding the action buttons for now, as they are not used in the current UI  
+        {/* //Hiding the action buttons for now, as they are not used in the current UI  
        <StyledTableButtonCell className="col-2 fw-bold">
           <>
             <div className='d-flex flex-row flex-wrap align-content-center'>
@@ -307,17 +376,20 @@ function Row({row, viewOnlyMode, isEditModeActive, callBackFunction, showAttribu
 }
 
 function extractPath(strings: string[]): string {
-  let returnString = "";
+  let returnString = '';
   for (let i = 0; i < strings.length; i++) {
     if (strings.length === i - 1) {
-      returnString = returnString + "/" + strings[i];
+      returnString = returnString + '/' + strings[i];
     } else {
-      let separator = "/";
+      let separator = '/';
       if (i === 0) {
-        separator = ""
+        separator = '';
       }
-      if (i === strings.length - 2 || i === strings.length - 3 && strings.length > 3) {
-        separator = "/ ";
+      if (
+        i === strings.length - 2 ||
+        (i === strings.length - 3 && strings.length > 3)
+      ) {
+        separator = '/ ';
       }
       if (i % 2 === 0) {
         returnString = returnString + separator + strings[i];
@@ -327,12 +399,14 @@ function extractPath(strings: string[]): string {
   return returnString;
 }
 
-function returnFullPath(id: string) : string {
-  let returnString = id.substring(id?.indexOf("#root-Root-") + "#root-Root-".length);
+function returnFullPath(id: string): string {
+  let returnString = id.substring(
+    id?.indexOf('#root-Root-') + '#root-Root-'.length
+  );
   let strings;
   if (returnString) {
-    strings = returnString.split("-");
-    returnString = "";
+    strings = returnString.split('-');
+    returnString = '';
     if (strings.length > 1) {
       returnString = extractPath(strings);
     } else {
@@ -342,17 +416,36 @@ function returnFullPath(id: string) : string {
   return returnString;
 }
 
-function returnPath(id: string, label: string, schemaFormat: Format | undefined, schemaData: SchemaWithContent | undefined) : string {
+function returnPath(
+  id: string,
+  label: string,
+  schemaFormat: Format | undefined,
+  schemaData: SchemaWithContent | undefined
+): string {
   let returnString = '';
-  if (schemaFormat === Format.Xsd || schemaFormat === Format.Csv || schemaFormat === Format.Jsonschema
-  || schemaFormat === Format.Enum || schemaFormat === Format.Mscr) {
-    returnString = id.substring(id?.indexOf("#root-Root-") + "#root-Root-".length);
+  if (
+    schemaFormat === Format.Xsd ||
+    schemaFormat === Format.Csv ||
+    schemaFormat === Format.Jsonschema ||
+    schemaFormat === Format.Enum ||
+    schemaFormat === Format.Mscr
+  ) {
+    returnString = id.substring(
+      id?.indexOf('#root-Root-') + '#root-Root-'.length
+    );
     let strings;
     if (returnString) {
-      strings = returnString.split("-");
-      returnString = "";
+      strings = returnString.split('-');
+      returnString = '';
       if (strings.length > 7) {
-        returnString = strings[0] + "/{" + (strings.length - 5) / 2 + "}/" + strings[strings.length - 2] + "/ " + strings[strings.length - 1];
+        returnString =
+          strings[0] +
+          '/{' +
+          (strings.length - 5) / 2 +
+          '}/' +
+          strings[strings.length - 2] +
+          '/ ' +
+          strings[strings.length - 1];
       } else if (strings.length > 1) {
         returnString = extractPath(strings);
       } else {
@@ -362,26 +455,25 @@ function returnPath(id: string, label: string, schemaFormat: Format | undefined,
     return returnString;
 
     let className = '';
-    } else if (schemaFormat === Format.Shacl) {
-      let definitions = schemaData?.content?.definitions;
-      let titleValue = undefined;
-      if (definitions) {
-        let keys = Object.keys(definitions);
-        if (keys && keys.length > 0) {
-          for (let i = 0; i < keys.length; i++) {
-            let value = definitions[keys[i]];
-            let secondLevelKeys = Object.keys(value);
-            for (let k = 0; k < secondLevelKeys.length; k += 1) {
-              if (secondLevelKeys[k] === 'properties') {
-                let secondLevelValue = value[secondLevelKeys[k]];
-                let thirdLevelKeys = Object.keys(secondLevelValue);
-                for (let j = 0; j < thirdLevelKeys.length; j += 1) {
-                  if (thirdLevelKeys[j] === id) {
-                    for (let l = 0; l < secondLevelKeys.length; l += 1) {
-                      if (secondLevelKeys[l] === 'title') {
-                        titleValue = value[secondLevelKeys[l]];
-                        returnString = titleValue + ':' + label;
-                      }
+  } else if (schemaFormat === Format.Shacl) {
+    let definitions = schemaData?.content?.definitions;
+    let titleValue = undefined;
+    if (definitions) {
+      let keys = Object.keys(definitions);
+      if (keys && keys.length > 0) {
+        for (let i = 0; i < keys.length; i++) {
+          let value = definitions[keys[i]];
+          let secondLevelKeys = Object.keys(value);
+          for (let k = 0; k < secondLevelKeys.length; k += 1) {
+            if (secondLevelKeys[k] === 'properties') {
+              let secondLevelValue = value[secondLevelKeys[k]];
+              let thirdLevelKeys = Object.keys(secondLevelValue);
+              for (let j = 0; j < thirdLevelKeys.length; j += 1) {
+                if (thirdLevelKeys[j] === id) {
+                  for (let l = 0; l < secondLevelKeys.length; l += 1) {
+                    if (secondLevelKeys[l] === 'title') {
+                      titleValue = value[secondLevelKeys[l]];
+                      returnString = titleValue + ':' + label;
                     }
                   }
                 }
@@ -390,60 +482,82 @@ function returnPath(id: string, label: string, schemaFormat: Format | undefined,
           }
         }
       }
-      if (!titleValue && label && label.toLowerCase() === 'root') {
-        return label;
-      } else if (!titleValue && label && label.toLowerCase() !== 'root') {
-        return 'ROOT:' + label;
-      }
-      return returnString;
-    } else {
-      return label;
     }
+    if (!titleValue && label && label.toLowerCase() === 'root') {
+      return label;
+    } else if (!titleValue && label && label.toLowerCase() !== 'root') {
+      return 'ROOT:' + label;
+    }
+    return returnString;
+  } else {
+    return label;
+  }
 }
-function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAttributeNames: boolean) {
+function filterMappings(
+  nodeMappingsInput: NodeMapping[],
+  value: string,
+  showAttributeNames: boolean
+) {
   let results: NodeMapping[] = [];
   const searchString = value.toLowerCase();
-  nodeMappingsInput.forEach(item => {
-      let itemFound = false
-      if (item?.notes && item.notes.toLowerCase().includes(searchString) && !itemFound) {
-        results.push(item);
-        itemFound = true;
-      }
-      if (!itemFound) {
-        item.source.forEach(src => {
-          if (src.label.toLowerCase().includes(searchString) && !itemFound) {
-            results.push(item);
-            itemFound = true;
-          }
-        });
-      }
-      if (!itemFound) {
-        item.target.forEach(src => {
-          if (src.label.toLowerCase().includes(searchString) && !itemFound) {
-            results.push(item);
-            itemFound = true;
-          }
-        });
-      }
+  nodeMappingsInput.forEach((item) => {
+    let itemFound = false;
+    if (
+      item?.notes &&
+      item.notes.toLowerCase().includes(searchString) &&
+      !itemFound
+    ) {
+      results.push(item);
+      itemFound = true;
     }
-  );
+    if (!itemFound) {
+      item.source.forEach((src) => {
+        if (src.label.toLowerCase().includes(searchString) && !itemFound) {
+          results.push(item);
+          itemFound = true;
+        }
+      });
+    }
+    if (!itemFound) {
+      item.target.forEach((src) => {
+        if (src.label.toLowerCase().includes(searchString) && !itemFound) {
+          results.push(item);
+          itemFound = true;
+        }
+      });
+    }
+  });
   return results;
 }
 
-export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditModeActive, showAttributeNames,
-                                            mappingFunctions, performAccordionAction, schemaFormats, schemaDatas, setNodeMappingsModalOpen}
-                                            :
-{nodeMappings: NodeMapping[];
+export default function MappingsAccordion({
+  nodeMappings,
+  viewOnlyMode,
+  isEditModeActive,
+  showAttributeNames,
+  mappingFunctions,
+  performAccordionAction,
+  schemaFormats,
+  schemaDatas,
+  setNodeMappingsModalOpen,
+}: {
+  nodeMappings: NodeMapping[];
   viewOnlyMode: boolean;
   isEditModeActive: boolean;
   showAttributeNames: boolean;
   mappingFunctions: any;
   performAccordionAction: Function;
-  schemaFormats: {sourceSchemaFormat: Format | undefined; targetSchemaFormat: Format | undefined};
-  schemaDatas: {sourceSchemaData: SchemaWithContent | undefined; targetSchemaData: SchemaWithContent | undefined; };
-  setNodeMappingsModalOpen:  Dispatch<SetStateAction<boolean>>;
+  schemaFormats: {
+    sourceSchemaFormat: Format | undefined;
+    targetSchemaFormat: Format | undefined;
+  };
+  schemaDatas: {
+    sourceSchemaData: SchemaWithContent | undefined;
+    targetSchemaData: SchemaWithContent | undefined;
+  };
+  setNodeMappingsModalOpen: Dispatch<SetStateAction<boolean>>;
 }) {
-  const {t} = useTranslation('common');
+  const { t } = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
 
   useEffect(() => {
@@ -452,19 +566,20 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
   const nodeMappingsInput = nodeMappings;
   return (
     <>
-
-  <div className='d-flex justify-content-between ps-1'>
+      <div className="d-flex justify-content-between ps-1">
         <h2 className="mb-0">Mappings</h2>
         <SearchWrapper>
           <SearchInput
             labelText={''}
-            labelMode='hidden'
+            labelMode="hidden"
             searchButtonLabel={t('mappings-accordion.filter-from-mappings')}
             clearButtonLabel={t('mappings-accordion.clear')}
             visualPlaceholder={t('mappings-accordion.filter-from-mappings')}
             onSearch={(value) => {
               if (typeof value === 'string') {
-                setMappingData(filterMappings(nodeMappingsInput, value, showAttributeNames));
+                setMappingData(
+                  filterMappings(nodeMappingsInput, value, showAttributeNames)
+                );
               }
             }}
             onChange={(value) => {
@@ -492,7 +607,7 @@ export default function MappingsAccordion({nodeMappings, viewOnlyMode, isEditMod
               <StyledTableTargetCell className="col-5">
                 <span className="fw-bold">Target</span>
               </StyledTableTargetCell>
-             {/*  <StyledTableActionsCell className="col-2 d-flex flex-row justify-content-end">
+              {/*  <StyledTableActionsCell className="col-2 d-flex flex-row justify-content-end">
                 <TableCellPadder>
                   <span className="fw-bold">Actions</span>
                 </TableCellPadder>

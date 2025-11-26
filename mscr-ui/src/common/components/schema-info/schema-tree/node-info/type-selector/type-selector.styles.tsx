@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Block, Button, Paragraph } from 'suomifi-ui-components';
 
 export const TypeSelectorWrapper = styled.div`
-    margin-top: ${(props) => props.theme.suomifi.spacing.xs};
+  margin-top: ${(props) => props.theme.suomifi.spacing.xs};
 `;
 
 export const HeadingAndCountWrapper = styled.div`

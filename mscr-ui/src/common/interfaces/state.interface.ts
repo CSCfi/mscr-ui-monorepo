@@ -7,5 +7,7 @@ export enum State {
 }
 
 export const possibleStatesAtRegistration: State[] = [
-  State.Draft, State.Published, State.Deprecated
+  State.Draft,
+  State.Published,
+  State.Deprecated,
 ];

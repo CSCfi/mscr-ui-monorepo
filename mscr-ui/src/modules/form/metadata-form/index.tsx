@@ -14,7 +14,7 @@ import {
   DropdownItem,
   IconRemove,
   Textarea,
-  TextInput
+  TextInput,
 } from 'suomifi-ui-components';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
@@ -36,7 +36,10 @@ import {
   RemoveButton,
 } from '@app/modules/form/metadata-form/metadata-form.styles';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
-import { Schema, SchemaWithVersionInfo } from '@app/common/interfaces/schema.interface';
+import {
+  Schema,
+  SchemaWithVersionInfo,
+} from '@app/common/interfaces/schema.interface';
 import { CrosswalkWithVersionInfo } from '@app/common/interfaces/crosswalk.interface';
 import {
   selectIsEditMetadataActive,
@@ -72,17 +75,18 @@ export default function MetadataForm({
   const [formData, setFormData] =
     useState<MetadataFormType>(initialMetadataForm);
 
-  const isCrosswalk = useCallback((
-    metadata: unknown
-  ): metadata is CrosswalkWithVersionInfo => {
-    return (
-      type === Type.Crosswalk &&
-      typeof metadata === 'object' &&
-      metadata !== null &&
-      'sourceSchemaInfo' in metadata &&
-      'targetSchemaInfo' in metadata
-    );
-  }, [type]);
+  const isCrosswalk = useCallback(
+    (metadata: unknown): metadata is CrosswalkWithVersionInfo => {
+      return (
+        type === Type.Crosswalk &&
+        typeof metadata === 'object' &&
+        metadata !== null &&
+        'sourceSchemaInfo' in metadata &&
+        'targetSchemaInfo' in metadata
+      );
+    },
+    [type]
+  );
 
   const updateMetadata = () => {
     dispatch(setIsEditMetadataActive(false));
@@ -131,7 +135,7 @@ export default function MetadataForm({
       dctLicense: formData.dctLicense,
       dctPublisher: formData.dctPublisher,
       dctIdentifiers: formData.dctIdentifiers.filter((item) => item !== ''),
-      dctCreators: formData.dctCreators.filter((item) => item !== '')
+      dctCreators: formData.dctCreators.filter((item) => item !== ''),
     };
   };
 
@@ -178,12 +182,15 @@ export default function MetadataForm({
       attribute = newValue?.toString() ?? '';
     } else if (Array.isArray(attribute)) {
       if (typeof index !== 'undefined') {
-        if (typeof newValue !== 'undefined') { // Index and value -> replace value at index
+        if (typeof newValue !== 'undefined') {
+          // Index and value -> replace value at index
           attribute[index] = newValue?.toString() ?? '';
-        } else { // Index but no value -> remove index from array
+        } else {
+          // Index but no value -> remove index from array
           attribute = attribute.filter((_, i) => i !== index);
         }
-      } else { // No index -> add new to array
+      } else {
+        // No index -> add new to array
         attribute = attribute.concat(['']);
       }
     }
@@ -204,13 +211,17 @@ export default function MetadataForm({
           <MetadataLabel>{label}:</MetadataLabel>
         </Grid>
         <Grid item xs={8}>
-          {renderAsEditable && isEditModeActive && renderAsEditable(label, value, formDataAttribute)}
+          {renderAsEditable &&
+            isEditModeActive &&
+            renderAsEditable(label, value, formDataAttribute)}
           {(!isEditModeActive || !renderAsEditable) &&
-            dataList.filter((item) => item.trim().length !== 0).map((item) => (
-              <MetadataAttribute key={self.crypto.randomUUID()}>
-                {item}
-              </MetadataAttribute>
-            ))}
+            dataList
+              .filter((item) => item.trim().length !== 0)
+              .map((item) => (
+                <MetadataAttribute key={self.crypto.randomUUID()}>
+                  {item}
+                </MetadataAttribute>
+              ))}
         </Grid>
       </MetadataRow>
     );
@@ -225,9 +236,7 @@ export default function MetadataForm({
       <TextInput
         labelText={label}
         labelMode={'hidden'}
-        onChange={(newValue) =>
-          updateFormData(formDataAttribute, newValue)
-        }
+        onChange={(newValue) => updateFormData(formDataAttribute, newValue)}
         value={value}
       />
     );
@@ -273,8 +282,8 @@ export default function MetadataForm({
           {formDataAttribute == 'dctCreators'
             ? t('metadata.add-creator')
             : formDataAttribute == 'dctIdentifiers'
-              ? t('metadata.add-identifier')
-              : ''}
+            ? t('metadata.add-identifier')
+            : ''}
         </Button>
       </>
     );
@@ -297,8 +306,16 @@ export default function MetadataForm({
       </Grid>
       <MetadataFormContainer container>
         <Grid item xs={12} md={7}>
-          {renderMetadataRow(t('metadata.name'), formData.label, 'label', renderEditableString)}
-          {renderMetadataRow(t('metadata.pid'), metadata.handle ?? t('metadata.not-available'))}
+          {renderMetadataRow(
+            t('metadata.name'),
+            formData.label,
+            'label',
+            renderEditableString
+          )}
+          {renderMetadataRow(
+            t('metadata.pid'),
+            metadata.handle ?? t('metadata.not-available')
+          )}
           {renderMetadataRow(
             t('metadata.identifier'),
             formData.dctIdentifiers,
@@ -311,12 +328,13 @@ export default function MetadataForm({
             'versionLabel',
             renderEditableString
           )}
-          {!isCrosswalk(metadata) && renderMetadataRow(
-            t('metadata.name-space-label'),
-            formData.namespace,
-            'namespace',
-            renderEditableString
-          )}
+          {!isCrosswalk(metadata) &&
+            renderMetadataRow(
+              t('metadata.name-space-label'),
+              formData.namespace,
+              'namespace',
+              renderEditableString
+            )}
 
           {renderMetadataRow(
             t('metadata.creator'),
@@ -336,10 +354,7 @@ export default function MetadataForm({
             'domain',
             renderEditableString
           )}
-          {renderMetadataRow(
-            t('metadata.language'),
-            metadata.languages
-          )}
+          {renderMetadataRow(t('metadata.language'), metadata.languages)}
           {renderMetadataRow(
             t('metadata.license'),
             formData.dctLicense,
@@ -375,10 +390,7 @@ export default function MetadataForm({
             </Grid>
           </MetadataRow>
 
-          {renderMetadataRow(
-            t('metadata.source-url'),
-            metadata.sourceURL
-          )}
+          {renderMetadataRow(t('metadata.source-url'), metadata.sourceURL)}
 
           {isCrosswalk(metadata) && (
             <>

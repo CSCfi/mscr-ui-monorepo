@@ -72,8 +72,7 @@ export default function generatePayload(
     }
   } else if (modalType == ModalType.RevisionMscr) {
     if (contentType == Type.Schema) {
-      const { organizations, ...revisionPayload } =
-        schemaPayload;
+      const { organizations, ...revisionPayload } = schemaPayload;
       return revisionPayload;
     } else if (contentType == Type.Crosswalk) {
       const { organizations, format, ...revisionPayload } = crosswalkPayload;

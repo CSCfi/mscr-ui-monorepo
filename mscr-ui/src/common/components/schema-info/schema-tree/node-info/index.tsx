@@ -163,12 +163,15 @@ export default function NodeInfo(props: {
               )}
 
               {nodeAttributes.map((attrib) => (
-                <RenderAttribute key={self.crypto.randomUUID()} attribute={attrib} />
+                <RenderAttribute
+                  key={self.crypto.randomUUID()}
+                  attribute={attrib}
+                />
               ))}
               {props.isNodeEditable &&
                 isLeafNode &&
                 nodeTypeAttribute !== '' && (
-                  <div className='col-12' key={self.crypto.randomUUID()}>
+                  <div className="col-12" key={self.crypto.randomUUID()}>
                     <div>@type:</div>
                     <div className="attribute-font">
                       {processHtmlLinks(nodeTypeAttribute)}

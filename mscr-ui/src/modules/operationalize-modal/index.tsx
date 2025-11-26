@@ -10,7 +10,7 @@ import {
 } from 'suomifi-ui-components';
 import { BorderedText } from './operationalize-modal.styles';
 import { Grid } from '@mui/material';
-import { sourceXmlContent,targetXMLContent } from './testdata';
+import { sourceXmlContent, targetXMLContent } from './testdata';
 import { ButtonBlock } from '../workspace/workspace.styles';
 
 interface OperationalizeProps {

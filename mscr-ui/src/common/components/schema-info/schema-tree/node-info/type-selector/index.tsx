@@ -1,8 +1,9 @@
 import {
-  Heading, Pagination,
+  Heading,
+  Pagination,
   Paragraph,
   RouterLink,
-  SearchInput
+  SearchInput,
 } from 'suomifi-ui-components';
 import { IconLinkExternal } from 'suomifi-icons';
 import { useTranslation } from 'next-i18next';
@@ -16,14 +17,24 @@ import {
   TypeSearchResultWrapper,
   TypeSelectorWrapper,
 } from '@app/common/components/schema-info/schema-tree/node-info/type-selector/type-selector.styles';
-import { useGetTypesSearchResultsQuery, usePatchDataTypeMutation } from '@app/common/components/schema/schema.slice';
+import {
+  useGetTypesSearchResultsQuery,
+  usePatchDataTypeMutation,
+} from '@app/common/components/schema/schema.slice';
 import Tooltip from '@mui/material/Tooltip';
 import { useStoreDispatch } from '@app/store';
 import { useSelector } from 'react-redux';
 import {
   resetDataTypeSearch,
-  selectHitCount, selectPage, selectPageSize, selectQuery,
-  selectResults, setHitCount, setPage, setQuery, setResults
+  selectHitCount,
+  selectPage,
+  selectPageSize,
+  selectQuery,
+  selectResults,
+  setHitCount,
+  setPage,
+  setQuery,
+  setResults,
 } from '@app/common/components/data-type-registry-search/data-type-registry-search.slice';
 
 export default function TypeSelector({ nodeId }: { nodeId?: string }) {
@@ -116,7 +127,9 @@ export default function TypeSelector({ nodeId }: { nodeId?: string }) {
         <Heading variant={'h4'}>
           {t('node-info.type-search-results-title')}
         </Heading>
-        <Paragraph aria-live={'polite'}>{t('node-info.found-results', { hitCount })}</Paragraph>
+        <Paragraph aria-live={'polite'}>
+          {t('node-info.found-results', { hitCount })}
+        </Paragraph>
       </HeadingAndCountWrapper>
       <div id={'results'} aria-labelledby={'results-label'}>
         {query.length > 1 && results && results.length > 0 && (

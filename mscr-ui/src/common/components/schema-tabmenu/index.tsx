@@ -6,7 +6,11 @@ import {
 } from '@app/common/components/content-view/content-view.slice';
 import { useTranslation } from 'next-i18next';
 import { Type } from '@app/common/interfaces/search.interface';
-import { SchemaTabIndex, SchemaTabText, SchemaTabs } from '@app/common/interfaces/tabmenu';
+import {
+  SchemaTabIndex,
+  SchemaTabText,
+  SchemaTabs,
+} from '@app/common/interfaces/tabmenu';
 import { ReactNode } from 'react';
 import {
   StyledTab,
@@ -48,7 +52,7 @@ export default function SchemaTabmenu({
     'SCHEMA.history-tab': t('tabs.history-tab'),
     'CROSSWALK.mapping-accordion-tab': t('tabs.mapping-accordion-tab'),
     'CROSSWALK.history-tab': t('tabs.history-tab'),
-    'stub': t('tabs.stub-metadata'), // If the content is removed, there's only one tab with only metadata.
+    stub: t('tabs.stub-metadata'), // If the content is removed, there's only one tab with only metadata.
   };
 
   function customTabProps(tab: SchemaTabText) {
@@ -63,7 +67,10 @@ export default function SchemaTabmenu({
     };
   }
 
-  const handleChange = (event: React.SyntheticEvent, newValue: SchemaTabIndex) => {
+  const handleChange = (
+    event: React.SyntheticEvent,
+    newValue: SchemaTabIndex
+  ) => {
     dispatch(setSelectedTab(newValue));
     dispatch(setQuery(''));
   };

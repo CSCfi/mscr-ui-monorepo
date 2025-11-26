@@ -9,7 +9,13 @@ import {
 } from 'yti-common-ui/utils/constants';
 import { SearchInput } from 'suomifi-ui-components';
 
-export default function SearchBar({ placeholder, hideLabel }: { placeholder?: string; hideLabel?: Boolean }) {
+export default function SearchBar({
+  placeholder,
+  hideLabel,
+}: {
+  placeholder?: string;
+  hideLabel?: Boolean;
+}) {
   const { t } = useTranslation('common');
   const { urlState, patchUrlState } = useUrlState();
   const [searchInputValue, setSearchInputValue] = useState<string>(urlState.q);

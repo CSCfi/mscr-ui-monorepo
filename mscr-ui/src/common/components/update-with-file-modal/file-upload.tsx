@@ -11,7 +11,10 @@ import {
   InlineAlert,
   Paragraph,
 } from 'suomifi-ui-components';
-import { ButtonBlock, DownloadIndicator } from './update-with-file-modal.styles';
+import {
+  ButtonBlock,
+  DownloadIndicator,
+} from './update-with-file-modal.styles';
 import { translateExcelParseError } from '@app/common/utils/translation-helpers copy';
 
 interface FileUploadProps {

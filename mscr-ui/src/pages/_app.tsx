@@ -10,7 +10,6 @@ import { wrapper } from '@app/store';
 import { appWithTranslation } from 'next-i18next';
 import './mscr-style-customizations.scss';
 
-
 function App({ Component, pageProps }: AppProps) {
   return (
     <SWRConfig

@@ -5,7 +5,7 @@ import { AppState, AppThunk } from '@app/store';
 const initialState = {
   query: '',
   hitCount: 0,
-  results: new Array<DataType>,
+  results: new Array<DataType>(),
   page: 1,
   pageSize: 10,
 };
@@ -45,11 +45,11 @@ export const dataTypeSlice = createSlice({
       };
     },
     setSearch(state, action) {
-      return{
+      return {
         ...state,
         ...action.payload,
       };
-    }
+    },
   },
 });
 
@@ -66,7 +66,8 @@ export function selectHitCount() {
 }
 
 export function setHitCount(hitCount: number): AppThunk {
-  return (dispatch) => dispatch(dataTypeSlice.actions.setHitCount({ hitCount }));
+  return (dispatch) =>
+    dispatch(dataTypeSlice.actions.setHitCount({ hitCount }));
 }
 
 export function selectResults() {
@@ -90,7 +91,8 @@ export function selectPageSize() {
 }
 
 export function setPageSize(pageSize: number): AppThunk {
-  return (dispatch) => dispatch(dataTypeSlice.actions.setPageSize({ pageSize }));
+  return (dispatch) =>
+    dispatch(dataTypeSlice.actions.setPageSize({ pageSize }));
 }
 
 export function resetDataTypeSearch(): AppThunk {

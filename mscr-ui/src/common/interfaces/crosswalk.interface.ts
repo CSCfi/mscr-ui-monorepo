@@ -66,5 +66,5 @@ export interface FilesRow {
 export enum SubType {
   SemanticMapping = 'SEMANTIC_MAPPING',
   SemanticAnnotation = 'SEMANTIC_ANNOTATION',
-  DataCrosswalk = 'DATA_CROSSWALK'
+  DataCrosswalk = 'DATA_CROSSWALK',
 }

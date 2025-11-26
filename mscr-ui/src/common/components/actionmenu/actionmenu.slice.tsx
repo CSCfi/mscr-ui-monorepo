@@ -160,7 +160,9 @@ export function selectSelectedRootNode() {
   return (state: AppState) => state.actionmenu.selectedRootNode;
 }
 
-export function setSelectedRootNode(newRootNode: RenderTree | undefined): AppThunk {
+export function setSelectedRootNode(
+  newRootNode: RenderTree | undefined
+): AppThunk {
   return (dispatch) =>
     dispatch(actionmenuSlice.actions.setSelectedRootNode(newRootNode));
 }
