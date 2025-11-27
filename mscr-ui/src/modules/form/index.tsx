@@ -113,7 +113,7 @@ export default function FormModal({
     useState<boolean>(false);
   const formDataFromInitialData = useCallback(() => {
     if (!initialData) return;
-  const existingData: FormType = {
+    const existingData: FormType = {
       format:
         modalType == ModalType.MscrCopy ? Format.Mscr : initialData.format,
       languages: [

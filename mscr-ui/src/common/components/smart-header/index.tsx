@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { Block } from 'suomifi-ui-components';
 import Modal from 'react-modal';
-import {
-  NavigationContainer,
-} from '../layout/layout.styles';
+import { NavigationContainer } from '../layout/layout.styles';
 import Logo from './logo';
 import MobileNavigationToggleButton from './mobile-navigation-toggle-button';
 import {
   HeaderWrapper,
   ModalOverlay,
   ModalContent,
-  FlexItemBlock
+  FlexItemBlock,
 } from './smart-header.styles';
 import MobileNavigation from 'yti-common-ui/navigation/mobile-navigation';
 import DesktopLocaleChooser from 'yti-common-ui/locale-chooser/desktop-locale-chooser';
@@ -156,7 +154,7 @@ export default function SmartHeader({
 
   function renderHeaderSearch() {
     return (
-      <SearchBar hideLabel={true}/>
+      <SearchBar hideLabel={true} />
       // <HeaderSearch
       //   isSearchOpen={isSearchOpen}
       //   setIsSearchOpen={setIsSearchOpen}

@@ -87,8 +87,8 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
           !isSidebarMinimized && !isFirstPageLoad
             ? 'sidebar-animate-fadein'
             : isSidebarMinimized
-              ? 'sidebar-animate-fadeout'
-              : undefined
+            ? 'sidebar-animate-fadeout'
+            : undefined
         }
       >
         <MscrSideNavigationLevel1
@@ -199,8 +199,8 @@ export default function SideNavigationPanel({ user }: { user?: MscrUser }) {
             isSidebarMinimized && !isFirstPageLoad
               ? 'sidebar-animate-fadein'
               : !isSidebarMinimized
-                ? 'sidebar-animate-fadeout'
-                : undefined
+              ? 'sidebar-animate-fadeout'
+              : undefined
           }
         >
           <PopoverNavigationMenu

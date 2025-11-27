@@ -15,14 +15,13 @@ interface PrivacyPageProps extends CommonContextState {
 }
 
 export default function PrivacyGuideComponent(props: PrivacyPageProps) {
- 
   return (
     <CommonContextProvider value={props}>
       <Layout
         user={props.user ?? undefined}
         fakeableUsers={props.fakeableUsers}
-      > 
-        <PrivacyGuide ></PrivacyGuide>
+      >
+        <PrivacyGuide></PrivacyGuide>
       </Layout>
     </CommonContextProvider>
   );

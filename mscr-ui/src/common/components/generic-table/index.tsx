@@ -4,7 +4,7 @@ import {
   StyledTableCell,
   StyledTableRow,
   StyledTableHead,
-  StyledTableContainer
+  StyledTableContainer,
 } from '@app/common/components/generic-table/generic-table.styles';
 
 // Usage: items can be an array of typed items e.g. FilesRow[]. Heading names are taken from the interface property names. Headings can be over-ridden with using headings array.
@@ -62,7 +62,9 @@ export default function GenericTable(props: {
       // Separate the highlight property and don't create a cell for it, if staticHighlight is passed as true
       // Used to highlight the currently viewed version in the version history table
       const { highlight, ...cells } = col;
-      for (const [, value] of Object.entries(props.staticHighlight ? cells : col)) {
+      for (const [, value] of Object.entries(
+        props.staticHighlight ? cells : col
+      )) {
         temp.push(
           <StyledTableCell key={self.crypto.randomUUID()}>
             {value}
@@ -70,7 +72,12 @@ export default function GenericTable(props: {
         );
       }
       rows.push(
-        <StyledTableRow key={self.crypto.randomUUID()} selected={props.staticHighlight && highlight == true}>{temp}</StyledTableRow>
+        <StyledTableRow
+          key={self.crypto.randomUUID()}
+          selected={props.staticHighlight && highlight == true}
+        >
+          {temp}
+        </StyledTableRow>
       );
     });
     return <TableBody>{rows}</TableBody>;

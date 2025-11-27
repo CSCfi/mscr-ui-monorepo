@@ -69,7 +69,7 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     isEditContentActive &&
     hasEditPermission &&
     schemaData?.format === Format.Mscr;
-  const hasCopyPermission = HasPermission({ action: 'MAKE_MSCR_COPY'});
+  const hasCopyPermission = HasPermission({ action: 'MAKE_MSCR_COPY' });
   const router = useRouter(); // Force refresh the page
   const isMscrCopyAvailable =
     hasCopyPermission &&
@@ -185,7 +185,10 @@ export default function SchemaView({ schemaId }: { schemaId: string }) {
     setTimeout(() => setLoadingSpinnerVisible(true), 500);
     return (
       <SpinnerWrapper>
-        <SpinnerOverlay animationVisible={loadingSpinnerVisible} transparentBackground={true} />
+        <SpinnerOverlay
+          animationVisible={loadingSpinnerVisible}
+          transparentBackground={true}
+        />
       </SpinnerWrapper>
     );
   } else if (isError) {

@@ -37,22 +37,28 @@ export const crosswalkApi = createApi({
       }),
     }),
 
-    putCrosswalkRevision: builder.mutation<Crosswalk, { pid: string; data: Partial<Metadata> }>({
-      query: ({pid, data }) => ({
+    putCrosswalkRevision: builder.mutation<
+      Crosswalk,
+      { pid: string; data: Partial<Metadata> }
+    >({
+      query: ({ pid, data }) => ({
         url: `/crosswalk?action=revisionOf&target=${pid}`,
         method: 'PUT',
         data: data,
-      })
+      }),
     }),
-    putCrosswalkFullRevision: builder.mutation<Crosswalk, { pid: string; data: FormData }>({
-      query: ({pid, data }) => ({
+    putCrosswalkFullRevision: builder.mutation<
+      Crosswalk,
+      { pid: string; data: FormData }
+    >({
+      query: ({ pid, data }) => ({
         url: `/crosswalkFull?action=revisionOf&target=${pid}`,
         method: 'PUT',
         data: data,
         headers: {
           'content-Type': 'multipart/form-data;',
         },
-      })
+      }),
     }),
 
     getCrosswalk: builder.query<Crosswalk, string>({

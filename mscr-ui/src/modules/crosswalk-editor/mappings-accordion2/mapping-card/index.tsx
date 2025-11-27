@@ -4,7 +4,10 @@ import {
   NodeItem,
   NodeList,
   FunctionDisplay,
-  MappingSubheading, NodeButton, FunctionLabel, ActionButton
+  MappingSubheading,
+  NodeButton,
+  FunctionLabel,
+  ActionButton,
 } from '@app/modules/crosswalk-editor/mappings-accordion2/mapping-card/mapping-card.styles';
 import { useTranslation } from 'next-i18next';
 import { StyledButton } from '@app/modules/crosswalk-editor/mappings-accordion/mappings-accordion.styles';
@@ -21,7 +24,7 @@ interface MappingNodeDisplay {
     id: string;
     name: string;
     params: {
-      [s:string]: string;
+      [s: string]: string;
     };
   };
   onClickNode: () => void;
@@ -42,9 +45,16 @@ export interface MappingCardInterface {
   onDelete: () => void;
 }
 
-export default function MappingCard({ mapping, isEditable }: { mapping: MappingCardInterface; isEditable: boolean }) {
+export default function MappingCard({
+  mapping,
+  isEditable,
+}: {
+  mapping: MappingCardInterface;
+  isEditable: boolean;
+}) {
   const { t } = useTranslation('common');
-  const [isDeleteMappingModalOpen, setIsDeleteMappingModalOpen] = useState(false);
+  const [isDeleteMappingModalOpen, setIsDeleteMappingModalOpen] =
+    useState(false);
   function handleDelete() {
     setIsDeleteMappingModalOpen(false);
     mapping.onDelete();
@@ -123,8 +133,15 @@ export default function MappingCard({ mapping, isEditable }: { mapping: MappingC
           {t('mappings-accordion.to')}:
         </MappingSubheading>
         {renderNodes(mapping.target)}
-        <ActionButton onClick={mapping.onClickEdit} disabled={!isEditable}>{t('edit')}</ActionButton>
-        <ActionButton onClick={() => setIsDeleteMappingModalOpen(true)} disabled={!isEditable}>{t('delete')}</ActionButton>
+        <ActionButton onClick={mapping.onClickEdit} disabled={!isEditable}>
+          {t('edit')}
+        </ActionButton>
+        <ActionButton
+          onClick={() => setIsDeleteMappingModalOpen(true)}
+          disabled={!isEditable}
+        >
+          {t('delete')}
+        </ActionButton>
       </MappingWrapper>
       {isDeleteMappingModalOpen && (
         <ConfirmModal

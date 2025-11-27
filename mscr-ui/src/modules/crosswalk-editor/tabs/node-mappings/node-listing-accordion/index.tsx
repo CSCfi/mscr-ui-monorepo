@@ -8,46 +8,38 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import {styled} from '@mui/material';
+import { styled } from '@mui/material';
 import TableCell from '@mui/material/TableCell';
-import {
-  Dropdown,
-  DropdownItem,
-  TextInput,
-} from 'suomifi-ui-components';
+import { Dropdown, DropdownItem, TextInput } from 'suomifi-ui-components';
 import ArrowCircleUp from '@mui/icons-material/ArrowCircleUp';
 import ArrowCircleDown from '@mui/icons-material/ArrowCircleDown';
 import Tooltip from '@mui/material/Tooltip';
 
 import {
   CrosswalkConnectionNew,
-  NodeListingRow} from '@app/common/interfaces/crosswalk-connection.interface';
-import {useCallback, useEffect, useState} from 'react';
-import {useTranslation} from 'next-i18next';
-import {
-  Button as SButton,
-} from 'suomifi-ui-components';
-import {highlightOperation} from "@app/modules/crosswalk-editor/mappings-accordion";
-
+  NodeListingRow,
+} from '@app/common/interfaces/crosswalk-connection.interface';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'next-i18next';
+import { Button as SButton } from 'suomifi-ui-components';
+import { highlightOperation } from '@app/modules/crosswalk-editor/mappings-accordion';
 
 const StyledCollapse = styled(Collapse)({
-  maxWidth: '277px'
+  maxWidth: '277px',
 });
-
 
 const StyledTableCell = styled(TableCell)({
   display: 'flex',
   justifyContent: 'center',
   flexDirection: 'column',
-  fontSize: '0.95rem'
+  fontSize: '0.95rem',
 });
 
 const StyledTableHeadingCell = styled(TableCell)({
   display: 'flex',
   flexDirection: 'column',
-  fontSize: '1rem'
+  fontSize: '1rem',
 });
-
 
 const StyledTableButtonCell = styled(TableCell)({
   display: 'flex',
@@ -58,10 +50,10 @@ const StyledTableButtonCell = styled(TableCell)({
     flexDirection: 'column',
     justifyContent: 'center',
   },
-  button: {maxHeight: '36px'}
+  button: { maxHeight: '36px' },
 });
 
-const StyledTableRow = styled(TableRow)(({theme}) => ({
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
   display: 'flex',
   flexWrap: 'nowrap',
   maxWidth: '300px',
@@ -71,7 +63,7 @@ const StyledTableRow = styled(TableRow)(({theme}) => ({
   },
 }));
 
-const StyledTableFoldRow = styled(TableRow)(({theme}) => ({
+const StyledTableFoldRow = styled(TableRow)(({ theme }) => ({
   display: 'flex',
   flexWrap: 'nowrap',
   maxWidth: '308px',
@@ -85,16 +77,15 @@ const StyledArrowCircleUp = styled(ArrowCircleUp)({
   fontSize: '1.4rem',
   color: '#3D6DB6',
   cursor: 'pointer',
-  padding: '0px 12px 0px 15px'
+  padding: '0px 12px 0px 15px',
 });
 
 const StyledArrowCircleDown = styled(ArrowCircleDown)({
   fontSize: '1.4rem',
   color: '#3D6DB6',
   cursor: 'pointer',
-  padding: '0px 12px 0px 15px'
+  padding: '0px 12px 0px 15px',
 });
-
 
 function Row(props: {
   row: NodeListingRow;
@@ -109,12 +100,13 @@ function Row(props: {
   isDataCrosswalk: boolean;
   highlightOperation: highlightOperation | undefined;
 }) {
-
   // if only one node in accordion, open it or open highlighted node
-  const [open, setOpen] = useState(props.rowCount < 2 && props.index === 0 || isNodeHighlighted());
+  const [open, setOpen] = useState(
+    (props.rowCount < 2 && props.index === 0) || isNodeHighlighted()
+  );
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const functionDropdownRef = useCallback(node => {
+  const functionDropdownRef = useCallback((node) => {
     if (node !== null && isNodeHighlighted() && !isInitialized) {
       //TODO: fix focus logic. if enabled, focus is jammed
       //node.focus();
@@ -122,8 +114,11 @@ function Row(props: {
     }
   }, []);
 
-  function isNodeHighlighted(){
-    return (props.highlightOperation && (props.highlightOperation?.nodeId === props.row.id))
+  function isNodeHighlighted() {
+    return (
+      props.highlightOperation &&
+      props.highlightOperation?.nodeId === props.row.id
+    );
   }
 
   function deleteNodeFromMapping() {
@@ -131,41 +126,84 @@ function Row(props: {
     setOpen(false);
   }
 
-  function setOperationSelection(mappingOperationKey: string | undefined, mappingId: string) {
+  function setOperationSelection(
+    mappingOperationKey: string | undefined,
+    mappingId: string
+  ) {
     if (mappingOperationKey) {
-        props.callBackFunction(props.isSourceAccordion, 'updateOperation', mappingId, '', '', mappingOperationKey);
+      props.callBackFunction(
+        props.isSourceAccordion,
+        'updateOperation',
+        mappingId,
+        '',
+        '',
+        mappingOperationKey
+      );
     }
   }
 
-  function updateOperationValue(mappingOperationKey: string | undefined, mappingId: string, newValue: string, inputName: string) {
+  function updateOperationValue(
+    mappingOperationKey: string | undefined,
+    mappingId: string,
+    newValue: string,
+    inputName: string
+  ) {
     if (inputName) {
-        props.callBackFunction(props.isSourceAccordion, 'updateOperationValue', mappingId, newValue, inputName, mappingOperationKey);
+      props.callBackFunction(
+        props.isSourceAccordion,
+        'updateOperationValue',
+        mappingId,
+        newValue,
+        inputName,
+        mappingOperationKey
+      );
     }
   }
 
-  function generateOperationFields(operationKey: string | undefined, mappingId: string) {
+  function generateOperationFields(
+    operationKey: string | undefined,
+    mappingId: string
+  ) {
     if (operationKey && operationKey.length > 0) {
-      const inputFieldParams = props?.mappingFunctions.filter((fnc: { uri: string | undefined; }) => {
-        return fnc.uri === operationKey;
-      })[0].parameters;
+      const inputFieldParams = props?.mappingFunctions.filter(
+        (fnc: { uri: string | undefined }) => {
+          return fnc.uri === operationKey;
+        }
+      )[0].parameters;
 
       if (operationKey !== 'N/A') {
-        const sourceOperationValues =
-          inputFieldParams.map(param => {
-
-            // If function has a default value, it's hidden form UI.
-            if (!param.defaultValue) {
-              const originalValue = getMappingFunctionOriginalValues(operationKey, param.name);
-              return (<div className='mt-2'><TextInput
-                labelText={param.name}
-                value={originalValue}
-                status={props.row.processing?.params[param.name]?.length > 0 ? 'default' : 'error'}
-                required={param.required}
-                onChange={(newValue) => updateOperationValue(operationKey, mappingId, newValue ? newValue.toString() : '', param.name)}
-                visualPlaceholder="Operation value"
-              /></div>)
-            }
-          });
+        const sourceOperationValues = inputFieldParams.map((param) => {
+          // If function has a default value, it's hidden form UI.
+          if (!param.defaultValue) {
+            const originalValue = getMappingFunctionOriginalValues(
+              operationKey,
+              param.name
+            );
+            return (
+              <div className="mt-2">
+                <TextInput
+                  labelText={param.name}
+                  value={originalValue}
+                  status={
+                    props.row.processing?.params[param.name]?.length > 0
+                      ? 'default'
+                      : 'error'
+                  }
+                  required={param.required}
+                  onChange={(newValue) =>
+                    updateOperationValue(
+                      operationKey,
+                      mappingId,
+                      newValue ? newValue.toString() : '',
+                      param.name
+                    )
+                  }
+                  visualPlaceholder="Operation value"
+                />
+              </div>
+            );
+          }
+        });
         return sourceOperationValues;
       }
     } else return '';
@@ -173,14 +211,30 @@ function Row(props: {
 
   function moveNode(moveUp: boolean) {
     if (moveUp) {
-      props.callBackFunction(props.isSourceAccordion, 'moveNodeUp', props.row.id, props);
+      props.callBackFunction(
+        props.isSourceAccordion,
+        'moveNodeUp',
+        props.row.id,
+        props
+      );
     } else {
-      props.callBackFunction(props.isSourceAccordion, 'moveNodeDown', props.row.id, props);
+      props.callBackFunction(
+        props.isSourceAccordion,
+        'moveNodeDown',
+        props.row.id,
+        props
+      );
     }
   }
 
-  function getMappingFunctionOriginalValues(operationKey: string | undefined, paramName: string) {
-    if (props.row.processing && props.row.processingSelection === operationKey) {
+  function getMappingFunctionOriginalValues(
+    operationKey: string | undefined,
+    paramName: string
+  ) {
+    if (
+      props.row.processing &&
+      props.row.processingSelection === operationKey
+    ) {
       // @ts-ignore
       return props.row.processing.params[paramName];
     }
@@ -190,9 +244,13 @@ function Row(props: {
     <>
       <StyledTableRow className="row">
         <StyledTableCell className="col-9 d-flex flex-row justify-content-start">
-          {props.isDataCrosswalk &&
+          {props.isDataCrosswalk && (
             <div
-              className={props.rowCount > 1 ? 'd-flex flex-column justify-content-center' : 'd-flex flex-column justify-content-center d-none'}
+              className={
+                props.rowCount > 1
+                  ? 'd-flex flex-column justify-content-center'
+                  : 'd-flex flex-column justify-content-center d-none'
+              }
             >
               <div>
                 <Tooltip
@@ -204,21 +262,20 @@ function Row(props: {
                 </Tooltip>
               </div>
               <div>
-                {props.index !== props.rowCount - 1 && props.rowCount > 1 &&
-                  <Tooltip
-                    title={'Order node down'}
-                    placement="left"
-                  >
+                {props.index !== props.rowCount - 1 && props.rowCount > 1 && (
+                  <Tooltip title={'Order node down'} placement="left">
                     <StyledArrowCircleDown onClick={() => moveNode(false)} />
                   </Tooltip>
-                }
+                )}
               </div>
             </div>
-          }
+          )}
           <div
-            className={props.rowCount > 1 && props.isDataCrosswalk
-              ? 'd-flex flex-column justify-content-center'
-              : 'd-flex flex-column justify-content-center ms-3'}
+            className={
+              props.rowCount > 1 && props.isDataCrosswalk
+                ? 'd-flex flex-column justify-content-center'
+                : 'd-flex flex-column justify-content-center ms-3'
+            }
           >
             {props.row.name}
           </div>
@@ -238,7 +295,7 @@ function Row(props: {
                   e.stopPropagation();
                 }}
               >
-                {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>
             </Tooltip>
           </div>
@@ -247,10 +304,7 @@ function Row(props: {
 
       <StyledTableFoldRow>
         <TableCell className="d-flex flex-nowrap p-0">
-          <StyledCollapse
-            in={open}
-            timeout="auto"
-          >
+          <StyledCollapse in={open} timeout="auto">
             <div className="row">
               <div className="col-12">
                 <div className="mx-3 mt-1 mb-2 d-flex flex-column">
@@ -260,17 +314,26 @@ function Row(props: {
                   </p>
                   <p>
                     <span className="fw-bold">Description: </span>
-                    {props?.row?.description?.length > 0 ? props?.row?.description : 'N/A'}
+                    {props?.row?.description?.length > 0
+                      ? props?.row?.description
+                      : 'N/A'}
                   </p>
-                  {props.isDataCrosswalk &&
+                  {props.isDataCrosswalk && (
                     <>
-                      <Dropdown className='mt-2 node-info-dropdown'
-                                  labelText={props.isSourceAccordion ? "Source operation" : "Target operation"}
-                                  ref={functionDropdownRef}
-                                  visualPlaceholder="Operation not selected"
-                                  defaultValue="Operation not selected"
-                                  value={props.row?.processing?.id}
-                                  onChange={(newValue) => setOperationSelection(newValue, props.row.id)}
+                      <Dropdown
+                        className="mt-2 node-info-dropdown"
+                        labelText={
+                          props.isSourceAccordion
+                            ? 'Source operation'
+                            : 'Target operation'
+                        }
+                        ref={functionDropdownRef}
+                        visualPlaceholder="Operation not selected"
+                        defaultValue="Operation not selected"
+                        value={props.row?.processing?.id}
+                        onChange={(newValue) =>
+                          setOperationSelection(newValue, props.row.id)
+                        }
                       >
                         {props?.mappingFunctions?.map((rt) => (
                           <DropdownItem key={rt.uri} value={rt.uri}>
@@ -278,23 +341,27 @@ function Row(props: {
                           </DropdownItem>
                         ))}
                       </Dropdown>
-                      {generateOperationFields(props.row?.processing?.id, props.row.id)}
+                      {generateOperationFields(
+                        props.row?.processing?.id,
+                        props.row.id
+                      )}
                     </>
-                  }
+                  )}
                 </div>
-                <br/>
+                <br />
               </div>
-              <div className='col-12 mt-4 d-flex flex-row gx-0 justify-content-end my-2'>
+              <div className="col-12 mt-4 d-flex flex-row gx-0 justify-content-end my-2">
                 <div className="d-flex flex-row">
-                  {props.rowCount > 1 &&
-                      <SButton className="align-self-end"
-                               style={{height: 'min-content'}}
-                               onClick={() => deleteNodeFromMapping()}
-                               variant="secondaryNoBorder"
-                      >
-                        {'Remove node'}
-                      </SButton>
-                  }
+                  {props.rowCount > 1 && (
+                    <SButton
+                      className="align-self-end"
+                      style={{ height: 'min-content' }}
+                      onClick={() => deleteNodeFromMapping()}
+                      variant="secondaryNoBorder"
+                    >
+                      {'Remove node'}
+                    </SButton>
+                  )}
                 </div>
               </div>
             </div>
@@ -320,7 +387,7 @@ interface nodeListingAccordionProps {
 //TODO: create interface for exact props attributes
 
 export default function NodeListingAccordion(props: nodeListingAccordionProps) {
-  const {t} = useTranslation('common');
+  const { t } = useTranslation('common');
   const [nodeData, setNodeData] = useState<NodeListingRow[]>([]);
   const [showAttributeNames, setShowAttributeNames] = useState<boolean>(true);
   const [mappingFunctions, setMappingFunctions] = useState<any>([]);
@@ -335,8 +402,11 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
           processingSelection: props.nodes[0]?.sourceProcessing?.id,
           processing: props.nodes[0]?.sourceProcessing,
           type: props.nodes[0]?.source?.properties?.type,
-          isSelected: false, notes: undefined, name: props.nodes[0]?.source?.name, id: props.nodes[0]?.source?.id
-        }
+          isSelected: false,
+          notes: undefined,
+          name: props.nodes[0]?.source?.name,
+          id: props.nodes[0]?.source?.id,
+        };
         newNodes.push(newNode);
       } else {
         props.nodes.forEach((node: CrosswalkConnectionNew) => {
@@ -345,8 +415,11 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
             processingSelection: node?.sourceProcessing?.id,
             processing: node?.sourceProcessing,
             type: node?.source.properties.type,
-            isSelected: false, notes: undefined, name: node.source.name, id: node.source.id
-          }
+            isSelected: false,
+            notes: undefined,
+            name: node.source.name,
+            id: node.source.id,
+          };
           newNodes.push(newNode);
         });
       }
@@ -359,8 +432,11 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
             processingSelection: node?.targetProcessing?.id,
             processing: node?.targetProcessing,
             type: node?.target?.properties?.type,
-            isSelected: false, notes: undefined, name: node?.target?.name, id: node?.target?.id
-          }
+            isSelected: false,
+            notes: undefined,
+            name: node?.target?.name,
+            id: node?.target?.id,
+          };
           newNodes.push(newNode);
         });
       } else {
@@ -369,15 +445,18 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
           processingSelection: props.nodes[0]?.targetProcessing?.id,
           processing: props.nodes[0]?.targetProcessing,
           type: props.nodes[0]?.target?.properties?.type,
-          isSelected: false, notes: undefined, name: props.nodes[0]?.target?.name, id: props.nodes[0]?.target?.id
-        }
+          isSelected: false,
+          notes: undefined,
+          name: props.nodes[0]?.target?.name,
+          id: props.nodes[0]?.target?.id,
+        };
         newNodes.push(newNode);
       }
     }
     setNodeData(newNodes);
     setShowAttributeNames(props.showAttributeNames);
     if (props?.mappingFunctions) {
-      const emptyDefaultValue = {name: '', uri: 'N/A'}
+      const emptyDefaultValue = { name: '', uri: 'N/A' };
       setMappingFunctions([emptyDefaultValue, ...props.mappingFunctions]);
     }
   }
@@ -393,8 +472,15 @@ export default function NodeListingAccordion(props: nodeListingAccordionProps) {
           <TableHead className="gx-0">
             <TableRow className="row gx-0">
               <StyledTableHeadingCell className="col-12">
-                <span
-                  className="fw-bold ps-3">{props.isSourceAccordion ? props.isOneToManyMapping ? 'Source' : 'Sources' : props.isOneToManyMapping ? 'Targets' : 'Target'}</span>
+                <span className="fw-bold ps-3">
+                  {props.isSourceAccordion
+                    ? props.isOneToManyMapping
+                      ? 'Source'
+                      : 'Sources'
+                    : props.isOneToManyMapping
+                    ? 'Targets'
+                    : 'Target'}
+                </span>
               </StyledTableHeadingCell>
             </TableRow>
           </TableHead>

@@ -126,4 +126,3 @@ export const targetXMLContent = `
     <dc:subject>000 computer science</dc:subject>
 </oai_dc:dc>
 `;
-

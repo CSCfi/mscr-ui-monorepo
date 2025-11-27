@@ -7,14 +7,13 @@ export default function MetadataAndFiles({
   schemaDetails,
   refetch,
   isMscrCopyAvailable,
-  hasEditPermission
+  hasEditPermission,
 }: {
   schemaDetails: SchemaWithVersionInfo;
   refetch: () => void;
   hasEditPermission: boolean;
   isMscrCopyAvailable?: boolean;
 }) {
-
   const schemaFiles = schemaDetails?.fileMetadata;
 
   return (

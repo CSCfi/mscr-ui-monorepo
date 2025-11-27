@@ -13,13 +13,13 @@ export const navigationSlice = createSlice({
     setIsSideNavigationMinimized(state, action) {
       return {
         ...state,
-        isSideNavigationMinimized: action.payload
+        isSideNavigationMinimized: action.payload,
       };
     },
     setShowFadeInAnimation(state, action) {
       return {
         ...state,
-        showFadeInAnimation: action.payload
+        showFadeInAnimation: action.payload,
       };
     },
   },
@@ -30,7 +30,10 @@ export function selectIsSideNavigationMinimized() {
 }
 
 export function setIsSideNavigationMinimized(isMinimized?: boolean): AppThunk {
-  return (dispatch) => dispatch(navigationSlice.actions.setIsSideNavigationMinimized(isMinimized ?? false));
+  return (dispatch) =>
+    dispatch(
+      navigationSlice.actions.setIsSideNavigationMinimized(isMinimized ?? false)
+    );
 }
 
 export function selectShowFadeInAnimation() {
@@ -38,5 +41,8 @@ export function selectShowFadeInAnimation() {
 }
 
 export function setShowFadeInAnimation(showAnimation?: boolean): AppThunk {
-  return (dispatch) => dispatch(navigationSlice.actions.setShowFadeInAnimation(showAnimation ?? false));
+  return (dispatch) =>
+    dispatch(
+      navigationSlice.actions.setShowFadeInAnimation(showAnimation ?? false)
+    );
 }

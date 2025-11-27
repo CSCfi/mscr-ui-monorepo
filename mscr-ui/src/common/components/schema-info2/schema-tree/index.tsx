@@ -41,13 +41,13 @@ function toTree(nodes: RenderTree, showQname: boolean) {
 }
 
 export default function SchemaTree({
-                                     nodes,
-                                     treeSelectedArray,
-                                     treeExpanded,
-                                     performTreeAction,
-                                     showQname,
-                                     isSourceTree,
-                                   }: {
+  nodes,
+  treeSelectedArray,
+  treeExpanded,
+  performTreeAction,
+  showQname,
+  isSourceTree,
+}: {
   nodes: RenderTree[];
   treeSelectedArray: string[];
   treeExpanded: string[];

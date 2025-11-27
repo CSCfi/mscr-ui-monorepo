@@ -18,7 +18,10 @@ export default function getApiError(
     if ('status' in error.data && typeof error.data.status === 'string') {
       mscrError.status = error.data.status ?? 'GENERAL_ERROR';
       // console.log(error.data.status);
-    } else if(('status' in error.data && typeof error.data.status === 'number') ) {
+    } else if (
+      'status' in error.data &&
+      typeof error.data.status === 'number'
+    ) {
       mscrError.status = error.data.status.toString();
     }
     if ('message' in error.data && typeof error.data.message === 'string') {

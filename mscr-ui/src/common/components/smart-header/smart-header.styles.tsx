@@ -23,7 +23,7 @@ export const HeaderWrapper = styled.div<{
 `;
 
 export const FlexItemBlock = styled(Block)`
-  flex: 0 0 calc(1rem*60/18);
+  flex: 0 0 calc(1rem * 60 / 18);
 `;
 
 export const MobileMenuButtonWrapper = styled.div`

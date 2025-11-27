@@ -5,11 +5,16 @@ import { useSelector } from 'react-redux';
 import {
   selectModal,
   setConfirmModalState,
-  setFormModalState
+  setFormModalState,
 } from '@app/common/components/actionmenu/actionmenu.slice';
 import {
-  useDeleteCrosswalkMutation, useDeleteMappingMutation, useGetCrosswalkWithRevisionsQuery, useGetMappingsQuery,
-  usePatchCrosswalkMutation, usePatchMappingMutation, usePutMappingMutation
+  useDeleteCrosswalkMutation,
+  useDeleteMappingMutation,
+  useGetCrosswalkWithRevisionsQuery,
+  useGetMappingsQuery,
+  usePatchCrosswalkMutation,
+  usePatchMappingMutation,
+  usePutMappingMutation,
 } from '@app/common/components/crosswalk/crosswalk.slice';
 import HasPermission from '@app/common/utils/has-permission';
 import { useEffect, useState } from 'react';
@@ -18,7 +23,7 @@ import { Type } from '@app/common/interfaces/search.interface';
 import { State } from '@app/common/interfaces/state.interface';
 import {
   selectIsEditContentActive,
-  setIsEditContentActive
+  setIsEditContentActive,
 } from '@app/common/components/content-view/content-view.slice';
 import { NotificationKeys } from '@app/common/interfaces/notifications.interface';
 import { mscrSearchApi } from '@app/common/components/mscr-search/mscr-search.slice';
@@ -36,16 +41,25 @@ import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import { SpinnerWrapper } from '@app/modules/crosswalk-view/crosswalk-view.styles';
 import MappingsAccordion, {
   highlightOperation,
-} from "@app/modules/crosswalk-editor/mappings-accordion";
-import {CrosswalkConnectionNew, NodeMapping, RenderTree} from "@app/common/interfaces/crosswalk-connection.interface";
+} from '@app/modules/crosswalk-editor/mappings-accordion';
 import {
-  useGetCrosswalkMappingFunctionsQuery
-} from "@app/common/components/crosswalk-functions/crosswalk-functions.slice";
-import {SchemaWithContent} from "@app/common/interfaces/schema.interface";
-import {useGetFrontendSchemaQuery, useGetSchemaQuery} from "@app/common/components/schema/schema.slice";
-import NodeMappingsModal from "@app/modules/crosswalk-editor/tabs/node-mappings";
+  CrosswalkConnectionNew,
+  NodeMapping,
+  RenderTree,
+} from '@app/common/interfaces/crosswalk-connection.interface';
+import { useGetCrosswalkMappingFunctionsQuery } from '@app/common/components/crosswalk-functions/crosswalk-functions.slice';
+import { SchemaWithContent } from '@app/common/interfaces/schema.interface';
+import {
+  useGetFrontendSchemaQuery,
+  useGetSchemaQuery,
+} from '@app/common/components/schema/schema.slice';
+import NodeMappingsModal from '@app/modules/crosswalk-editor/tabs/node-mappings';
 
-export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) {
+export default function CrosswalkView({
+  crosswalkId,
+}: {
+  crosswalkId: string;
+}) {
   const { t } = useTranslation('common');
   const dispatch = useStoreDispatch();
   const confirmModalIsOpen = useSelector(selectModal()).confirm;
@@ -57,12 +71,10 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
   const [sourceTreeSelection, setSourceTreeSelection] = useState<string[]>([]);
   const { data: mappingFunctions /*, isLoading: mappingFunctionsIsLoading*/ } =
     useGetCrosswalkMappingFunctionsQuery('');
-  const [scrollToSelectedSourceNodeId, setScrollToSelectedSourceNodeId] = useState<
-    string | undefined
-  >('');
-  const [scrollToSelectedTargetNodeId, setScrollToSelectedTargetNodeId] = useState<
-    string | undefined
-  >('');
+  const [scrollToSelectedSourceNodeId, setScrollToSelectedSourceNodeId] =
+    useState<string | undefined>('');
+  const [scrollToSelectedTargetNodeId, setScrollToSelectedTargetNodeId] =
+    useState<string | undefined>('');
   const [isPatchMappingOperation, setIsMappingPatchOperation] =
     useState<boolean>(false);
   const [patchPid, setPatchPid] = useState<string>('');
@@ -135,23 +147,30 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
   const { data: mappingFilters /*, isLoading: mappingFiltersIsLoading*/ } =
     useGetCrosswalkMappingFunctionsQuery('FILTERS');
 
-  let sourceSchemaFormat: Format | undefined, targetSchemaFormat: Format | undefined;
-  let sourceSchemaData: SchemaWithContent | undefined, targetSchemaData: SchemaWithContent | undefined;
+  let sourceSchemaFormat: Format | undefined,
+    targetSchemaFormat: Format | undefined;
+  let sourceSchemaData: SchemaWithContent | undefined,
+    targetSchemaData: SchemaWithContent | undefined;
 
   const sourceSchema = getSchema(crosswalkData?.sourceSchema || '');
-  const {data: getSchemaData1, isSuccess: getSchemaDataIsSuccess1} =
-        useGetFrontendSchemaQuery(crosswalkData?.sourceSchema?? '');
+  const { data: getSchemaData1, isSuccess: getSchemaDataIsSuccess1 } =
+    useGetFrontendSchemaQuery(crosswalkData?.sourceSchema ?? '');
   sourceSchemaFormat = sourceSchema?.format ?? undefined;
   sourceSchemaData = getSchemaData1 ?? undefined;
   const targetSchema = getSchema(crosswalkData?.targetSchema || '');
 
-  const {data: getSchemaData2, isSuccess: getSchemaDataIsSuccess} =
-        useGetFrontendSchemaQuery(crosswalkData?.targetSchema ?? '');
+  const { data: getSchemaData2, isSuccess: getSchemaDataIsSuccess } =
+    useGetFrontendSchemaQuery(crosswalkData?.targetSchema ?? '');
   targetSchemaFormat = targetSchema?.format ?? undefined;
   targetSchemaData = getSchemaData2 ?? undefined;
 
   useEffect(() => {
-    updateActionMenu(dispatch, Type.Crosswalk, crosswalkData, hasEditPermission);
+    updateActionMenu(
+      dispatch,
+      Type.Crosswalk,
+      crosswalkData,
+      hasEditPermission
+    );
   }, [dispatch, crosswalkData, hasEditPermission]);
 
   useEffect(() => {
@@ -219,29 +238,31 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
     }
   }
 
-
   const publishCrosswalk = () => {
-    const publishPayload = {...payloadBase, state: State.Published};
+    const publishPayload = { ...payloadBase, state: State.Published };
     dispatch(setIsEditContentActive(false));
     changeCrosswalkState(publishPayload, 'CROSSWALK_PUBLISH');
   };
 
   const deprecateCrosswalk = () => {
-    const deprecatePayload = {...payloadBase, state: State.Deprecated};
+    const deprecatePayload = { ...payloadBase, state: State.Deprecated };
     changeCrosswalkState(deprecatePayload, 'CROSSWALK_DEPRECATE');
   };
 
   const invalidateCrosswalk = () => {
-    const invalidatePayload = {...payloadBase, state: State.Invalid};
+    const invalidatePayload = { ...payloadBase, state: State.Invalid };
     changeCrosswalkState(invalidatePayload, 'CROSSWALK_INVALIDATE');
   };
 
   const removeCrosswalk = () => {
-    const removePayload = {...payloadBase, state: State.Removed};
+    const removePayload = { ...payloadBase, state: State.Removed };
     changeCrosswalkState(removePayload, 'CROSSWALK_DELETE');
   };
 
-  const changeCrosswalkState = (payload: StatePayload, notificationKey: NotificationKeys) => {
+  const changeCrosswalkState = (
+    payload: StatePayload,
+    notificationKey: NotificationKeys
+  ) => {
     if (!crosswalkData) return;
     patchCrosswalk({ payload: payload, pid: crosswalkData.id })
       .unwrap()
@@ -421,7 +442,7 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
     return mappingsToBeAdded;
   }
 
-  function handleScrolling(mapping: NodeMapping, nodeId? : string) {
+  function handleScrolling(mapping: NodeMapping, nodeId?: string) {
     if (nodeId === undefined) {
       setScrollToSelectedSourceNodeId(nodeId);
       setScrollToSelectedTargetNodeId(nodeId);
@@ -464,9 +485,7 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
   }
 
   function getSchema(schemaPid: string) {
-    const {data: schemaData} = useGetSchemaQuery(
-      schemaPid ?? '',
-    );
+    const { data: schemaData } = useGetSchemaQuery(schemaPid ?? '');
     return schemaData;
   }
 
@@ -506,7 +525,10 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
     setTimeout(() => setLoadingSpinnerVisible(true), 500);
     return (
       <SpinnerWrapper>
-        <SpinnerOverlay animationVisible={loadingSpinnerVisible} transparentBackground={true} />
+        <SpinnerOverlay
+          animationVisible={loadingSpinnerVisible}
+          transparentBackground={true}
+        />
       </SpinnerWrapper>
     );
   } else if (isError) {
@@ -525,9 +547,12 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
                 tabIndex: 0,
                 tabText: 'metadata-and-files-tab',
                 content: (
-                  <MetadataStub metadata={crosswalkData} type={Type.Crosswalk} />
-                )
-              }
+                  <MetadataStub
+                    metadata={crosswalkData}
+                    type={Type.Crosswalk}
+                  />
+                ),
+              },
             ]}
           />
         ) : (
@@ -542,40 +567,49 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
                     crosswalkData={crosswalkData}
                     refetch={refetch}
                   />
-                )
+                ),
               },
               {
                 tabIndex: 1,
                 tabText: 'content-and-editor-tab',
                 content: (
-                  <CrosswalkEditor crosswalkData={crosswalkData} hasEditPermission={hasEditPermission}
-                                   nodeMappings={nodeMappings} isEditModeActive={isEditModeActive}
-                                   showAttributeNames={showAttributeNames} setShowAttributeNames={setShowAttributeNames}
-                                   sourceTreeSelection={sourceTreeSelection}
-                                   scrollToSelectedSourceNodeId={scrollToSelectedSourceNodeId}
-                                   scrollToSelectedTargetNodeId={scrollToSelectedTargetNodeId}
-                                   deleteMappingResponse={deleteMappingResponse}
-                                   setIsMappingPatchOperation={setIsMappingPatchOperation}
-                                   isNodeMappingsModalOpen={isNodeMappingsModalOpen}
-                                   setNodeMappingsModalOpen={setNodeMappingsModalOpen}
-                                   mappingToBeEdited={mappingToBeEdited}
-                                   setMappingToBeEdited={setMappingToBeEdited}
-                                   isPatchMappingOperation={isPatchMappingOperation}
-                                   targetTreeSelection={targetTreeSelection}
-                                   isOneToManyMapping={isOneToManyMapping}
-                                   setIsOneToManyMapping={setIsOneToManyMapping}
-                                   mappingFunctions={mappingFunctions}
-                                   performCallbackFromAccordionAction={performCallbackFromAccordionAction}
-                                   sourceSchemaFormat={sourceSchemaFormat}
-                                   targetSchemaFormat={targetSchemaFormat}
-                                   mappingFilters={mappingFilters}
-                                   highlightOperation={highlightOperation}
-                                   performCallbackFromMappingsModal={performCallbackFromMappingsModal}
-                                   sourceSchemaData={sourceSchemaData}
-                                   targetSchemaData={targetSchemaData}
-                                   setPatchSourceNodes={setPatchSourceNodes}
-                                   setPatchTargetNodes={setPatchTargetNodes}/>
-                )
+                  <CrosswalkEditor
+                    crosswalkData={crosswalkData}
+                    hasEditPermission={hasEditPermission}
+                    nodeMappings={nodeMappings}
+                    isEditModeActive={isEditModeActive}
+                    showAttributeNames={showAttributeNames}
+                    setShowAttributeNames={setShowAttributeNames}
+                    sourceTreeSelection={sourceTreeSelection}
+                    scrollToSelectedSourceNodeId={scrollToSelectedSourceNodeId}
+                    scrollToSelectedTargetNodeId={scrollToSelectedTargetNodeId}
+                    deleteMappingResponse={deleteMappingResponse}
+                    setIsMappingPatchOperation={setIsMappingPatchOperation}
+                    isNodeMappingsModalOpen={isNodeMappingsModalOpen}
+                    setNodeMappingsModalOpen={setNodeMappingsModalOpen}
+                    mappingToBeEdited={mappingToBeEdited}
+                    setMappingToBeEdited={setMappingToBeEdited}
+                    isPatchMappingOperation={isPatchMappingOperation}
+                    targetTreeSelection={targetTreeSelection}
+                    isOneToManyMapping={isOneToManyMapping}
+                    setIsOneToManyMapping={setIsOneToManyMapping}
+                    mappingFunctions={mappingFunctions}
+                    performCallbackFromAccordionAction={
+                      performCallbackFromAccordionAction
+                    }
+                    sourceSchemaFormat={sourceSchemaFormat}
+                    targetSchemaFormat={targetSchemaFormat}
+                    mappingFilters={mappingFilters}
+                    highlightOperation={highlightOperation}
+                    performCallbackFromMappingsModal={
+                      performCallbackFromMappingsModal
+                    }
+                    sourceSchemaData={sourceSchemaData}
+                    targetSchemaData={targetSchemaData}
+                    setPatchSourceNodes={setPatchSourceNodes}
+                    setPatchTargetNodes={setPatchTargetNodes}
+                  />
+                ),
               },
               {
                 tabIndex: 2,
@@ -587,62 +621,80 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
                         nodeMappings={nodeMappings}
                         viewOnlyMode={false}
                         isEditModeActive={
-                          isEditModeActive && crosswalkData.state !== State.Published
+                          isEditModeActive &&
+                          crosswalkData.state !== State.Published
                         }
                         showAttributeNames={showAttributeNames}
                         mappingFunctions={mappingFunctions}
-                        performAccordionAction={performCallbackFromAccordionAction}
-                        schemaFormats={{sourceSchemaFormat: sourceSchemaFormat, targetSchemaFormat: targetSchemaFormat}}
-                        schemaDatas={{sourceSchemaData: sourceSchemaData, targetSchemaData: targetSchemaData}}
+                        performAccordionAction={
+                          performCallbackFromAccordionAction
+                        }
+                        schemaFormats={{
+                          sourceSchemaFormat: sourceSchemaFormat,
+                          targetSchemaFormat: targetSchemaFormat,
+                        }}
+                        schemaDatas={{
+                          sourceSchemaData: sourceSchemaData,
+                          targetSchemaData: targetSchemaData,
+                        }}
                         setNodeMappingsModalOpen={setNodeMappingsModalOpen}
                       />
                     </div>
 
-              {mappingToBeEdited && (
-                <NodeMappingsModal
-                  nodeSelections={mappingToBeEdited}
-                  performMappingsModalAction={performCallbackFromMappingsModal}
-                  mappingFilters={mappingFilters}
-                  mappingFunctions={mappingFunctions}
-                  modalOpen={isNodeMappingsModalOpen}
-                  isPatchMappingOperation={isPatchMappingOperation}
-                  isOneToManyMapping={isOneToManyMapping}
-                  highlightOperation={highlightOperation}
-                />
-              )}
-                    </>)
-                    },
-                    {
-                      tabIndex: 3,
-                      tabText: 'history-tab',
-                      content: (
-                      <VersionHistory
-                      revisions={crosswalkData.revisions}
+                    {mappingToBeEdited && (
+                      <NodeMappingsModal
+                        nodeSelections={mappingToBeEdited}
+                        performMappingsModalAction={
+                          performCallbackFromMappingsModal
+                        }
+                        mappingFilters={mappingFilters}
+                        mappingFunctions={mappingFunctions}
+                        modalOpen={isNodeMappingsModalOpen}
+                        isPatchMappingOperation={isPatchMappingOperation}
+                        isOneToManyMapping={isOneToManyMapping}
+                        highlightOperation={highlightOperation}
+                      />
+                    )}
+                  </>
+                ),
+              },
+              {
+                tabIndex: 3,
+                tabText: 'history-tab',
+                content: (
+                  <VersionHistory
+                    revisions={crosswalkData.revisions}
                     contentType={Type.Crosswalk}
                     currentRevision={crosswalkId}
                   />
-                )
-            }
+                ),
+              },
             ]}
-            />
-            )}
-            {confirmModalIsOpen.deleteDraft && (
-              <ConfirmModal
-                actionText={t('actionmenu.delete-crosswalk')}
-                cancelText={t('action.cancel')}
-                confirmAction={deleteCrosswalkDraft}
-                onClose={() => dispatch(setConfirmModalState({key: 'deleteDraft', value: false}))}
-                heading={t('confirm-modal.heading')}
-                text1={t('confirm-modal.delete-draft')}
-                text2={t('confirm-modal.delete-draft-info')}
-              />
-            )}
-            {confirmModalIsOpen.remove && (
-              <ConfirmModal
-                actionText={t('actionmenu.delete-crosswalk')}
+          />
+        )}
+        {confirmModalIsOpen.deleteDraft && (
+          <ConfirmModal
+            actionText={t('actionmenu.delete-crosswalk')}
+            cancelText={t('action.cancel')}
+            confirmAction={deleteCrosswalkDraft}
+            onClose={() =>
+              dispatch(
+                setConfirmModalState({ key: 'deleteDraft', value: false })
+              )
+            }
+            heading={t('confirm-modal.heading')}
+            text1={t('confirm-modal.delete-draft')}
+            text2={t('confirm-modal.delete-draft-info')}
+          />
+        )}
+        {confirmModalIsOpen.remove && (
+          <ConfirmModal
+            actionText={t('actionmenu.delete-crosswalk')}
             cancelText={t('action.cancel')}
             confirmAction={removeCrosswalk}
-            onClose={() => dispatch(setConfirmModalState({key: 'remove', value: false}))}
+            onClose={() =>
+              dispatch(setConfirmModalState({ key: 'remove', value: false }))
+            }
             heading={t('confirm-modal.heading')}
             text1={t('confirm-modal.delete-crosswalk')}
             text2={t('confirm-modal.delete-info')}
@@ -653,7 +705,9 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
             actionText={t('action.publish')}
             cancelText={t('action.cancel')}
             confirmAction={publishCrosswalk}
-            onClose={() => dispatch(setConfirmModalState({key: 'publish', value: false}))}
+            onClose={() =>
+              dispatch(setConfirmModalState({ key: 'publish', value: false }))
+            }
             heading={t('confirm-modal.heading')}
             text1={t('confirm-modal.publish-crosswalk1')}
             text2={t('confirm-modal.publish-crosswalk2')}
@@ -664,7 +718,11 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
             actionText={t('action.invalidate')}
             cancelText={t('action.cancel')}
             confirmAction={invalidateCrosswalk}
-            onClose={() => dispatch(setConfirmModalState({key: 'invalidate', value: false}))}
+            onClose={() =>
+              dispatch(
+                setConfirmModalState({ key: 'invalidate', value: false })
+              )
+            }
             heading={t('confirm-modal.heading')}
             text1={t('confirm-modal.invalidate-crosswalk')}
           />
@@ -674,7 +732,9 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
             actionText={t('action.deprecate')}
             cancelText={t('action.cancel')}
             confirmAction={deprecateCrosswalk}
-            onClose={() => dispatch(setConfirmModalState({key: 'deprecate', value: false}))}
+            onClose={() =>
+              dispatch(setConfirmModalState({ key: 'deprecate', value: false }))
+            }
             heading={t('confirm-modal.heading')}
             text1={t('confirm-modal.deprecate-crosswalk')}
           />
@@ -687,7 +747,9 @@ export default function CrosswalkView({ crosswalkId }: { crosswalkId: string }) 
           }
           contentType={Type.Crosswalk}
           visible={formModalIsOpen.version}
-          setVisible={(value) => dispatch(setFormModalState({key: 'version', value: value}))}
+          setVisible={(value) =>
+            dispatch(setFormModalState({ key: 'version', value: value }))
+          }
           initialData={crosswalkData}
         />
       </ThemeProvider>

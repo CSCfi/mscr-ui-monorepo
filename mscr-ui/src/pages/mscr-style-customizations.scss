@@ -2,33 +2,27 @@ body {
   font-family: 'Source Sans Pro', 'Helvetica Neue', 'Arial', sans-serif !important;
 }
 
-@keyframes fadeInAnimation
-{
-  0%
-  {
+@keyframes fadeInAnimation {
+  0% {
     opacity: 0;
   }
 
-  100%
-  {
+  100% {
     opacity: 1;
   }
 }
 
-@keyframes fadeOutAnimation
-{
-  0%
-  {
+@keyframes fadeOutAnimation {
+  0% {
     opacity: 1;
   }
 
-  100%
-  {
+  100% {
     opacity: 0;
   }
 }
 
-.fi-select-item-list_content_wrapper:has(li[id$="SHACL"]) {
+.fi-select-item-list_content_wrapper:has(li[id$='SHACL']) {
   max-height: 160px;
 }
 
@@ -179,7 +173,7 @@ body {
     }
 
     .MuiSvgIcon-root {
-      color: #3D6CB4;
+      color: #3d6cb4;
     }
 
     .MuiTableCell-root {

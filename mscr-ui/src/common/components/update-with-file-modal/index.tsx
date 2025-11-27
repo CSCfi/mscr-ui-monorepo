@@ -1,6 +1,6 @@
 /**This will be used if uploading file from detail page */
 import { translateFileUploadError } from '@app/common/utils/translation-helpers';
-import { IconUpload} from 'suomifi-ui-components';
+import { IconUpload } from 'suomifi-ui-components';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import {
@@ -99,7 +99,11 @@ export default function UpdateWithFileModal({
 
   return (
     <>
-      <Button variant="secondary" icon={<IconUpload />} onClick={() => handleVisible()}>
+      <Button
+        variant="secondary"
+        icon={<IconUpload />}
+        onClick={() => handleVisible()}
+      >
         {'Add a file'}
       </Button>
 

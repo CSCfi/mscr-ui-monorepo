@@ -6,7 +6,10 @@ import {
 } from '@app/common/components/schema/schema.slice';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { MscrSearchResult, MscrSearchResults } from '@app/common/interfaces/search.interface';
+import {
+  MscrSearchResult,
+  MscrSearchResults,
+} from '@app/common/interfaces/search.interface';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import { ModelFormContainer } from '@app/modules/form/form.styles';
 import { useTranslation } from 'next-i18next';
@@ -72,7 +75,7 @@ export default function TargetAndSourceSchemaSelector({
       skip:
         schemaSelectorDisabled ||
         (selectedSourceWorkspace !== 'personalWorkspace' &&
-        selectedTargetWorkspace !== 'personalWorkspace'),
+          selectedTargetWorkspace !== 'personalWorkspace'),
     }
   );
 
@@ -93,7 +96,9 @@ export default function TargetAndSourceSchemaSelector({
   const [defaultSchemas, setDefaultSchemas] = useState(
     Array<SelectableSchema>()
   );
-  const [personalSchemas, setPersonalSchemas] = useState(Array<SelectableSchema>());
+  const [personalSchemas, setPersonalSchemas] = useState(
+    Array<SelectableSchema>()
+  );
   const [sourceSchemas, setSourceSchemas] = useState(Array<SelectableSchema>());
   const [targetSchemas, setTargetSchemas] = useState(Array<SelectableSchema>());
 
@@ -142,31 +147,36 @@ export default function TargetAndSourceSchemaSelector({
     },
   ];
 
-  const optionsFromSchemas = useCallback((schemaData?: MscrSearchResults) => {
-    if (!schemaData) return [];
-    const schemaOptions: SelectableSchema[] = [];
-    schemaData?.hits.hits.forEach((item: MscrSearchResult) => {
-      const label = getLanguageVersion({
-        data: item._source.label,
-        lang,
-      });
+  const optionsFromSchemas = useCallback(
+    (schemaData?: MscrSearchResults) => {
+      if (!schemaData) return [];
+      const schemaOptions: SelectableSchema[] = [];
+      schemaData?.hits.hits.forEach((item: MscrSearchResult) => {
+        const label = getLanguageVersion({
+          data: item._source.label,
+          lang,
+        });
 
-      const schema = {
-        labelText: label,
-        uniqueItemId: item._source.id,
-        organizationIds:
-          item._source.organizations.length > 0
-            ? item._source.organizations.map((organization) => organization.id)
-            : [''],
-        owner:
-          item._source?.owner && item._source?.owner?.length > 0
-            ? item._source.owner
-            : [],
-      };
-      schemaOptions.push(schema);
-    });
-    return schemaOptions;
-  }, [lang]);
+        const schema = {
+          labelText: label,
+          uniqueItemId: item._source.id,
+          organizationIds:
+            item._source.organizations.length > 0
+              ? item._source.organizations.map(
+                  (organization) => organization.id
+                )
+              : [''],
+          owner:
+            item._source?.owner && item._source?.owner?.length > 0
+              ? item._source.owner
+              : [],
+        };
+        schemaOptions.push(schema);
+      });
+      return schemaOptions;
+    },
+    [lang]
+  );
 
   useEffect(() => {
     const fetchedSchemas: SelectableSchema[] = optionsFromSchemas(data);
@@ -204,7 +214,13 @@ export default function TargetAndSourceSchemaSelector({
         })
       );
     }
-  }, [selectedSourceWorkspace, groupWorkspacePid, defaultSchemas, personalSchemas, user.id]);
+  }, [
+    selectedSourceWorkspace,
+    groupWorkspacePid,
+    defaultSchemas,
+    personalSchemas,
+    user.id,
+  ]);
 
   useEffect(() => {
     if (selectedTargetWorkspace === 'all') {
@@ -222,7 +238,13 @@ export default function TargetAndSourceSchemaSelector({
         })
       );
     }
-  }, [selectedTargetWorkspace, groupWorkspacePid, defaultSchemas, personalSchemas, user.id]);
+  }, [
+    selectedTargetWorkspace,
+    groupWorkspacePid,
+    defaultSchemas,
+    personalSchemas,
+    user.id,
+  ]);
 
   function setSource(selectedSchemaId: string | null) {
     setFormData({

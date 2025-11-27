@@ -6,9 +6,7 @@ interface PaginationProps {
   lastPage: number;
 }
 
-export default function Pagination({
-  lastPage,
-}: PaginationProps) {
+export default function Pagination({ lastPage }: PaginationProps) {
   const { t } = useTranslation('common');
   const { urlState, patchUrlState } = useUrlState();
   return (

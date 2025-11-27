@@ -12,8 +12,8 @@ export default function PrivacyGuide() {
   return (
     <>
       <SiteTitle variant="h1">Privacy Guidelines for MSCR</SiteTitle>
-          <Paragraph>Effective as of Date 15.3.2025 </Paragraph>
-          <br></br>
+      <Paragraph>Effective as of Date 15.3.2025 </Paragraph>
+      <br></br>
       <StyledTableContainer>
         <Grid container rowSpacing={4} columnSpacing={4}>
           <Grid item xs={4}>

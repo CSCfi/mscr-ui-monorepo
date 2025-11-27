@@ -1,12 +1,21 @@
-import {useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {Button, Checkbox, ModalFooter, ModalTitle, SearchInput} from 'suomifi-ui-components';
+import {
+  Button,
+  Checkbox,
+  ModalFooter,
+  ModalTitle,
+  SearchInput,
+} from 'suomifi-ui-components';
 import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
 import SchemaTree from '@app/common/components/schema-info/schema-tree';
 import NodeInfo from '@app/common/components/schema-info/schema-tree/node-info';
-import {NodeMapping, RenderTree} from '@app/common/interfaces/crosswalk-connection.interface';
+import {
+  NodeMapping,
+  RenderTree,
+} from '@app/common/interfaces/crosswalk-connection.interface';
 import { generateTreeFromJson } from '@app/common/components/schema-info/schema-tree/schema-tree-renderer';
 import { useGetFrontendSchemaQuery } from '@app/common/components/schema/schema.slice';
 import { useTranslation } from 'next-i18next';
@@ -23,7 +32,7 @@ import { useRouter } from 'next/router';
 import { getLanguageVersion } from '@app/common/utils/get-language-version';
 import SpinnerOverlay from '@app/common/components/spinner-overlay';
 import Tooltip from '@mui/material/Tooltip';
-import {StyledPanel} from "@app/common/components/action-panel/action-panel.styles";
+import { StyledPanel } from '@app/common/components/action-panel/action-panel.styles';
 
 export default function SchemaInfo(props: {
   updateTreeNodeSelectionsOutput?: (
@@ -337,17 +346,16 @@ export default function SchemaInfo(props: {
           </Checkbox>
         </CheckboxWrapper>
         <StyledPanel>
-        <NodeInfoWrapper ref={modalRef}>
-          <NodeInfo
-            treeData={selectedTreeNodes}
-            currentlySelectedNodeId={currentlySelectedNodeId}
-            dataIsLoaded={isTreeDataFetched}
-            isNodeEditable={props.isNodeEditable}
-            hasCustomRoot={props.hasCustomRoot}
-          />
-        </NodeInfoWrapper>
+          <NodeInfoWrapper ref={modalRef}>
+            <NodeInfo
+              treeData={selectedTreeNodes}
+              currentlySelectedNodeId={currentlySelectedNodeId}
+              dataIsLoaded={isTreeDataFetched}
+              isNodeEditable={props.isNodeEditable}
+              hasCustomRoot={props.hasCustomRoot}
+            />
+          </NodeInfoWrapper>
         </StyledPanel>
-
       </TreeviewWrapper>
     </>
   );

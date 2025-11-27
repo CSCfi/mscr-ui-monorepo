@@ -58,7 +58,7 @@ export const formatsAvailableForSchemaRegistration: Format[] = [
 export const formatsAvailableForMscrCopy: Format[] = [
   Format.Csv,
   Format.Jsonschema,
-  Format.Xsd
+  Format.Xsd,
 ];
 
 export const fileExtensionsAvailableForCrosswalkRegistrationAttachments: FileExtensions[] =

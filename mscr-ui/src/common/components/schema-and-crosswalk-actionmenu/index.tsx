@@ -43,8 +43,8 @@ export default function SchemaAndCrosswalkActionMenu() {
                     ? 'FINISH_EDITING_MAPPINGS'
                     : 'FINISH_EDITING_SCHEMA'
                   : isCrosswalk
-                    ? 'EDIT_MAPPINGS'
-                    : 'EDIT_SCHEMA'
+                  ? 'EDIT_MAPPINGS'
+                  : 'EDIT_SCHEMA'
               )
             );
           }}
@@ -52,8 +52,8 @@ export default function SchemaAndCrosswalkActionMenu() {
           {isContentEditActive
             ? t('actionmenu.finish-editing')
             : isCrosswalk
-              ? t('actionmenu.edit-mappings')
-              : t('actionmenu.edit-schema')}
+            ? t('actionmenu.edit-mappings')
+            : t('actionmenu.edit-schema')}
         </ActionMenuItem>
       );
     }
@@ -154,7 +154,12 @@ export default function SchemaAndCrosswalkActionMenu() {
         <ActionMenuItem
           key={'unsetRootNodeSelection'}
           onClick={() =>
-            dispatch(setConfirmModalState({ key: 'unsetRootNodeSelection', value: true }))
+            dispatch(
+              setConfirmModalState({
+                key: 'unsetRootNodeSelection',
+                value: true,
+              })
+            )
           }
         >
           {t('actionmenu.unset-root-node-selection')}
