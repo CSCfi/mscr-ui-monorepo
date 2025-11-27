@@ -24,7 +24,7 @@ export default function SiteInformationModule() {
   return (
     <>
       <StyledHeading variant="h2" >{t('landing.title')}</StyledHeading>
-      <StyledText variant="lead">{t('landing.description')}</StyledText>
+      <Text>{t('landing.description')}</Text>
       <Heading variant="h3">{t('landing.what-can-do')}</Heading>
       <StyledList>
         <li>
