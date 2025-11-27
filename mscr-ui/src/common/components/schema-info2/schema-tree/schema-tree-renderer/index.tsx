@@ -6,7 +6,7 @@ function createRenderTree(
   input: any,
   rootPathIds: string[],
   definitions: any,
-  idToNodeDictionary: { [key: string]: RenderTree[] },
+  idToNodeDictionary: { [key: string]: RenderTree[] }
 ) {
   const retArray: RenderTree[] = [];
   for (const obj in input) {
@@ -30,7 +30,7 @@ function createRenderTree(
         input[obj],
         newNode.rootPathIds,
         definitions,
-        idToNodeDictionary,
+        idToNodeDictionary
       );
     }
     retArray.push(newNode);
@@ -52,6 +52,6 @@ export function generateTreeFromJson(jsonInput: any) {
     );
     // console.log('renderedTree ', renderedTree);
     resolve(renderedTree);
-    });
-  return {generatedTree, nodeIdToShallowNode};
+  });
+  return { generatedTree, nodeIdToShallowNode };
 }

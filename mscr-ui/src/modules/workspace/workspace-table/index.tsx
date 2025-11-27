@@ -62,7 +62,10 @@ export default function WorkspaceTable({
   }
 
   function renderSearchInput() {
-    const label = contentType == Type.Schema ? t('workspace.search.schemas') : t('workspace.search.crosswalks')
+    const label =
+      contentType == Type.Schema
+        ? t('workspace.search.schemas')
+        : t('workspace.search.crosswalks');
     return (
       <TextInput
         labelText={label}

@@ -20,8 +20,8 @@ export const CrosswalkTabs = {
 
 export type CrosswalkTabText = keyof typeof CrosswalkTabs;
 
-export type CrosswalkTabIndex = (typeof CrosswalkTabs)[CrosswalkTabText];
+export type CrosswalkTabIndex = typeof CrosswalkTabs[CrosswalkTabText];
 
 export type SchemaTabText = keyof typeof SchemaTabs;
 
-export type SchemaTabIndex = (typeof SchemaTabs)[SchemaTabText];
+export type SchemaTabIndex = typeof SchemaTabs[SchemaTabText];

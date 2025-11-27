@@ -15,8 +15,6 @@ interface unauthorizedPageProps extends CommonContextState {
   user: MscrUser;
 }
 
-
-
 export default function UnauthorizedPage(props: unauthorizedPageProps) {
   useEffect(() => {
     if (props && !props.user.anonymous) {

@@ -234,9 +234,9 @@ export default function SchemaInfo2(props: {
             title={
               getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                  data: getSchemaData.metadata.label,
-                  lang,
-                })
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
                 : t('schema-tree.no-label')
             }
             placement="bottom-start"
@@ -244,9 +244,9 @@ export default function SchemaInfo2(props: {
             <SchemaHeading variant="h2">
               {getSchemaData?.metadata.label
                 ? getLanguageVersion({
-                  data: getSchemaData.metadata.label,
-                  lang,
-                })
+                    data: getSchemaData.metadata.label,
+                    lang,
+                  })
                 : t('schema-tree.no-label')}
             </SchemaHeading>
           </Tooltip>

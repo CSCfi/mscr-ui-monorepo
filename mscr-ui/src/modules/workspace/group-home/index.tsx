@@ -128,7 +128,7 @@ export default function GroupWorkspace({
             </TitleDescriptionWrapper>
           }
         />
-        {hasCreatePermission &&
+        {hasCreatePermission && (
           <div>
             <Separator isLarge />
             <ButtonBlock>
@@ -175,7 +175,7 @@ export default function GroupWorkspace({
             </ButtonBlock>
             <Separator isLarge />
           </div>
-        }
+        )}
         <WorkspaceTable
           content={content}
           contentType={contentType}

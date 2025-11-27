@@ -1,7 +1,12 @@
 import * as React from 'react';
 import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 
-import { Button as Sbutton, Paragraph, SearchInput, Text } from 'suomifi-ui-components';
+import {
+  Button as Sbutton,
+  Paragraph,
+  SearchInput,
+  Text,
+} from 'suomifi-ui-components';
 import Tooltip from '@mui/material/Tooltip';
 import {
   MappingNodeSummary,
@@ -33,7 +38,10 @@ function extractPath(strings: string[]): string {
       if (i === 0) {
         separator = '';
       }
-      if (i === strings.length - 2 || i === strings.length - 3 && strings.length > 3) {
+      if (
+        i === strings.length - 2 ||
+        (i === strings.length - 3 && strings.length > 3)
+      ) {
         separator = '/ ';
       }
       if (i % 2 === 0) {
@@ -44,8 +52,10 @@ function extractPath(strings: string[]): string {
   return returnString;
 }
 
-function returnFullPath(id: string) : string {
-  let returnString = id.substring(id?.indexOf('#root-Root-') + '#root-Root-'.length);
+function returnFullPath(id: string): string {
+  let returnString = id.substring(
+    id?.indexOf('#root-Root-') + '#root-Root-'.length
+  );
   let strings;
   if (returnString) {
     strings = returnString.split('-');
@@ -59,17 +69,35 @@ function returnFullPath(id: string) : string {
   return returnString;
 }
 
-function returnPath(id: string, label: string, schemaFormat: Format | undefined, schemaData: SchemaWithContent | undefined) : string {
+function returnPath(
+  id: string,
+  label: string,
+  schemaFormat: Format | undefined,
+  schemaData: SchemaWithContent | undefined
+): string {
   let returnString = '';
-  if (schemaFormat === Format.Xsd || schemaFormat === Format.Jsonschema
-  || schemaFormat === Format.Enum || schemaFormat === Format.Mscr) {
-    returnString = id.substring(id?.indexOf('#root-Root-') + '#root-Root-'.length);
+  if (
+    schemaFormat === Format.Xsd ||
+    schemaFormat === Format.Jsonschema ||
+    schemaFormat === Format.Enum ||
+    schemaFormat === Format.Mscr
+  ) {
+    returnString = id.substring(
+      id?.indexOf('#root-Root-') + '#root-Root-'.length
+    );
     let strings;
     if (returnString) {
       strings = returnString.split('-');
       returnString = '';
       if (strings.length > 7) {
-        returnString = strings[0] + '/{' + (strings.length - 5) / 2 + '}/' + strings[strings.length - 2] + '/ ' + strings[strings.length - 1];
+        returnString =
+          strings[0] +
+          '/{' +
+          (strings.length - 5) / 2 +
+          '}/' +
+          strings[strings.length - 2] +
+          '/ ' +
+          strings[strings.length - 1];
       } else if (strings.length > 1) {
         returnString = extractPath(strings);
       } else {
@@ -77,7 +105,6 @@ function returnPath(id: string, label: string, schemaFormat: Format | undefined,
       }
     }
     return returnString;
-
   } else if (schemaFormat === Format.Shacl) {
     const definitions = schemaData?.content?.definitions;
     let titleValue = undefined;
@@ -117,56 +144,81 @@ function returnPath(id: string, label: string, schemaFormat: Format | undefined,
   }
 }
 
-function filterMappings(nodeMappingsInput: NodeMapping[], value: string, showAttributeNames: boolean) {
+function filterMappings(
+  nodeMappingsInput: NodeMapping[],
+  value: string,
+  showAttributeNames: boolean
+) {
   const results: NodeMapping[] = [];
   const searchString = value.toLowerCase();
-  nodeMappingsInput.forEach(item => {
-      let itemFound = false;
-      if (item?.notes && item.notes.toLowerCase().includes(searchString) && !itemFound) {
-        results.push(item);
-        itemFound = true;
-      }
-      if (!itemFound) {
-        item.source.forEach(src => {
-          if (src.label.toLowerCase().includes(searchString) && !itemFound) {
-            results.push(item);
-            itemFound = true;
-          }
-        });
-      }
-      if (!itemFound) {
-        item.target.forEach(src => {
-          if (src.label.toLowerCase().includes(searchString) && !itemFound) {
-            results.push(item);
-            itemFound = true;
-          }
-        });
-      }
+  nodeMappingsInput.forEach((item) => {
+    let itemFound = false;
+    if (
+      item?.notes &&
+      item.notes.toLowerCase().includes(searchString) &&
+      !itemFound
+    ) {
+      results.push(item);
+      itemFound = true;
     }
-  );
+    if (!itemFound) {
+      item.source.forEach((src) => {
+        if (src.label.toLowerCase().includes(searchString) && !itemFound) {
+          results.push(item);
+          itemFound = true;
+        }
+      });
+    }
+    if (!itemFound) {
+      item.target.forEach((src) => {
+        if (src.label.toLowerCase().includes(searchString) && !itemFound) {
+          results.push(item);
+          itemFound = true;
+        }
+      });
+    }
+  });
   return results;
 }
 
-export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditModeActive, showAttributeNames,
-                                            mappingFunctions, performAccordionAction, schemaFormats, schemaDatas, setNodeMappingsModalOpen,
-                                           selectedSourceNodes, selectedTargetNodes, addMappingButtonClick, hasEditPermission, crosswalkData}
-                                            :
-{nodeMappings: NodeMapping[];
+export default function MappingsAccordion2({
+  nodeMappings,
+  viewOnlyMode,
+  isEditModeActive,
+  showAttributeNames,
+  mappingFunctions,
+  performAccordionAction,
+  schemaFormats,
+  schemaDatas,
+  setNodeMappingsModalOpen,
+  selectedSourceNodes,
+  selectedTargetNodes,
+  addMappingButtonClick,
+  hasEditPermission,
+  crosswalkData,
+}: {
+  nodeMappings: NodeMapping[];
   viewOnlyMode: boolean;
   isEditModeActive: boolean;
   showAttributeNames: boolean;
   mappingFunctions: any;
   performAccordionAction: Function;
-  schemaFormats: {sourceSchemaFormat: Format | undefined; targetSchemaFormat: Format | undefined};
-  schemaDatas: {sourceSchemaData: SchemaWithContent | undefined; targetSchemaData: SchemaWithContent | undefined };
-  setNodeMappingsModalOpen:  Dispatch<SetStateAction<boolean>>;
+  schemaFormats: {
+    sourceSchemaFormat: Format | undefined;
+    targetSchemaFormat: Format | undefined;
+  };
+  schemaDatas: {
+    sourceSchemaData: SchemaWithContent | undefined;
+    targetSchemaData: SchemaWithContent | undefined;
+  };
+  setNodeMappingsModalOpen: Dispatch<SetStateAction<boolean>>;
   selectedSourceNodes: RenderTree[];
   selectedTargetNodes: RenderTree[];
   addMappingButtonClick: Function;
   hasEditPermission: boolean;
   crosswalkData: CrosswalkWithVersionInfo;
 }) {
-  const {t} = useTranslation('common');
+  const { t } = useTranslation('common');
   const [mappingData, setMappingData] = React.useState<NodeMapping[]>([]);
 
   useEffect(() => {
@@ -179,18 +231,25 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
 
   const mappingCardData = useMemo(() => {
     return nodeMappings.map((orig) => {
-      const getOriginalFunction = (id?: string) => mappingFunctions.find((fnc: {uri: string}) => id && fnc.uri === id);
+      const getOriginalFunction = (id?: string) =>
+        mappingFunctions.find((fnc: { uri: string }) => id && fnc.uri === id);
       function formatNode(node: MappingNodeSummary, isSource: boolean) {
-        const onClick = () => performAccordionAction(
-          orig,
-          'selectFromTreesByMapping',
-          node.id,
-          '',
-          isSource
-        );
+        const onClick = () =>
+          performAccordionAction(
+            orig,
+            'selectFromTreesByMapping',
+            node.id,
+            '',
+            isSource
+          );
         const baseNode = {
           id: node.id,
-          label: returnPath(node.id, node.label, schemaFormats?.sourceSchemaFormat, schemaDatas?.sourceSchemaData),
+          label: returnPath(
+            node.id,
+            node.label,
+            schemaFormats?.sourceSchemaFormat,
+            schemaDatas?.sourceSchemaData
+          ),
           fullPath: returnFullPath(node.id),
           onClickNode: onClick,
         };
@@ -200,8 +259,8 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
             processing: {
               id: node.processing?.id,
               name: getOriginalFunction(node.processing?.id).name,
-              params: node.processing?.params
-            }
+              params: node.processing?.params,
+            },
           };
         } else {
           return baseNode;
@@ -215,20 +274,28 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
           setNodeMappingsModalOpen(true);
           performAccordionAction(orig, 'openMappingDetails');
         },
-        onDelete: () => performAccordionAction(orig, 'removeMapping')
+        onDelete: () => performAccordionAction(orig, 'removeMapping'),
       };
-      if (orig.predicate && [SubType.SemanticMapping, SubType.SemanticAnnotation].includes(crosswalkData.subType)) {
+      if (
+        orig.predicate &&
+        [SubType.SemanticMapping, SubType.SemanticAnnotation].includes(
+          crosswalkData.subType
+        )
+      ) {
         return {
           ...baseData,
-          predicate: orig.predicate
+          predicate: orig.predicate,
         };
-      } else if (orig.processing && crosswalkData.subType === SubType.DataCrosswalk) {
+      } else if (
+        orig.processing &&
+        crosswalkData.subType === SubType.DataCrosswalk
+      ) {
         return {
           ...baseData,
           processing: {
             ...orig.processing,
-            name: getOriginalFunction(orig.processing?.id).name
-          }
+            name: getOriginalFunction(orig.processing?.id).name,
+          },
         };
       }
       return baseData;
@@ -241,8 +308,8 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
     schemaDatas?.sourceSchemaData,
     schemaFormats?.sourceSchemaFormat,
     setNodeMappingsModalOpen,
-    showAttributeNames
-  ]) ;
+    showAttributeNames,
+  ]);
 
   const nodeMappingsInput = mappingData;
   return (
@@ -251,7 +318,9 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
         className="d-flex justify-content-between ps-1"
         style={{ maxHeight: '600px' }}
       >
-        <MappingsHeading variant="h2">{t('mappings-accordion.title')}</MappingsHeading>
+        <MappingsHeading variant="h2">
+          {t('mappings-accordion.title')}
+        </MappingsHeading>
         <SearchInput
           labelText={''}
           labelMode="hidden"
@@ -276,12 +345,11 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
         {hasEditPermission && (
           <Tooltip
             title={
-              selectedSourceNodes.length > 1 &&
-              selectedTargetNodes.length > 1
+              selectedSourceNodes.length > 1 && selectedTargetNodes.length > 1
                 ? 'Many to many node mappings are not supported'
                 : !isEditModeActive
-                  ? 'Activate edit mode to enable mappings'
-                  : 'Map selected nodes'
+                ? 'Activate edit mode to enable mappings'
+                : 'Map selected nodes'
             }
             placement="bottom"
           >
@@ -306,19 +374,21 @@ export default function MappingsAccordion2({nodeMappings, viewOnlyMode, isEditMo
             </Sbutton>
           </Tooltip>
         )}
-        {mappingData?.length > 0 && mappingCardData.map((mapping) => (
-          <MappingCard
-            key={mapping.id ?? self.crypto.randomUUID()}
-            mapping={mapping}
-            isEditable={hasEditPermission && isEditModeActive}
-          />
-        ))}
-        {!mappingData || mappingData.length === 0 && (
-          <>
-            <InfoIcon></InfoIcon>
-            <Text>{t('mappings-accordion.no-mappings')}</Text>
-          </>
-        )}
+        {mappingData?.length > 0 &&
+          mappingCardData.map((mapping) => (
+            <MappingCard
+              key={mapping.id ?? self.crypto.randomUUID()}
+              mapping={mapping}
+              isEditable={hasEditPermission && isEditModeActive}
+            />
+          ))}
+        {!mappingData ||
+          (mappingData.length === 0 && (
+            <>
+              <InfoIcon></InfoIcon>
+              <Text>{t('mappings-accordion.no-mappings')}</Text>
+            </>
+          ))}
       </MappingListWrapper>
     </>
   );

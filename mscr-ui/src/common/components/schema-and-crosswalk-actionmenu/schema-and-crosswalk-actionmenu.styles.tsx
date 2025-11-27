@@ -13,7 +13,8 @@ export const ActionMenuWrapper = styled.div`
     }
   }
 
-  && button.deleteDraft:hover, button.deleteDraft.fi-action-menu-item--selected {
+  && button.deleteDraft:hover,
+  button.deleteDraft.fi-action-menu-item--selected {
     color: ${(props) => props.theme.suomifi.colors.whiteBase};
     background-color: ${(props) => props.theme.suomifi.colors.alertBase};
   }
@@ -21,7 +22,7 @@ export const ActionMenuWrapper = styled.div`
   && .fi-action-menu-popover {
     padding: 0;
   }
-  
+
   && .fi-action-menu-popover_list {
     max-height: unset;
   }

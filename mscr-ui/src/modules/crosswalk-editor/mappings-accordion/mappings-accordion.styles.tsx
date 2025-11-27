@@ -6,7 +6,7 @@ import TableRow from '@mui/material/TableRow';
 import TableContainer from '@mui/material/TableContainer';
 
 export const AccordionContainer = styled(TableContainer)({
-  overflow: 'hidden'
+  overflow: 'hidden',
 });
 
 export const SearchWrapper = styled.div`
@@ -19,9 +19,8 @@ export const SearchWrapper = styled.div`
 
 export const StyledArrowRightIcon = styled(ArrowRightIcon)({
   color: '#d8e3f4',
-  margin: '6px -6px 6px -8px'
+  margin: '6px -6px 6px -8px',
 });
-
 
 export const StyledTableCell = styled(TableCell)({
   height: 'auto',
@@ -51,7 +50,7 @@ export const StyledTableActionsCell = styled(TableCell)({
   flexDirection: 'column',
   alignSelf: 'normal',
   textAlign: 'right',
-  paddingRight: '47px'
+  paddingRight: '47px',
 });
 
 export const StyledTableButtonCell = styled(TableCell)({
@@ -60,8 +59,8 @@ export const StyledTableButtonCell = styled(TableCell)({
   justifyContent: 'end',
   padding: '0px 15px',
   Sbutton: {
-    padding: '0px 15px'
-  }
+    padding: '0px 15px',
+  },
 });
 
 export const StyledButton = styled(Button)({
@@ -71,10 +70,10 @@ export const StyledButton = styled(Button)({
   textTransform: 'none',
   textAlign: 'initial',
   lineHeight: '1.3rem',
-  padding: '0px'
+  padding: '0px',
 });
 
-export const StyledTableRow = styled(TableRow)(({theme}) => ({
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     //backgroundColor: theme.palette.action.hover,
   },
@@ -178,7 +177,7 @@ export const HorizontalLineStartSecond = styled.div`
   min-width: 40px;
 `;
 
-export const HorizontalLineMidStart= styled.div`
+export const HorizontalLineMidStart = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
@@ -195,7 +194,7 @@ export const HorizontalLineMidStart= styled.div`
   }
 `;
 
-export const HorizontalLineMidEnd= styled.div`
+export const HorizontalLineMidEnd = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
@@ -211,7 +210,7 @@ export const HorizontalLineMidEnd= styled.div`
   }
 `;
 
-export const HorizontalLineTarget= styled.div`
+export const HorizontalLineTarget = styled.div`
   margin-right: -8px;
   width: 100%;
   display: flex;
@@ -265,8 +264,6 @@ export const HorizontalLineTargetEnd = styled.div`
   min-width: 40px;
   margin-right: -8px;
 `;
-
-
 
 export const VerticalLine = styled.div`
   display: flex;

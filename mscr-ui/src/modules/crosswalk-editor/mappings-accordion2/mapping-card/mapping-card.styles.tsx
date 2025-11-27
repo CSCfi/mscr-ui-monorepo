@@ -5,7 +5,9 @@ export const MappingWrapper = styled(Block)`
   background-color: ${(props) => props.theme.suomifi.colors.whiteBase};
   padding: 12px;
   margin-top: 8px;
-  ol + h3, ul + h3, span + h3 {
+  ol + h3,
+  ul + h3,
+  span + h3 {
     margin-top: 12px;
   }
 `;
@@ -20,9 +22,7 @@ export const NodeList = styled.ol`
   margin: 0;
 `;
 
-export const NodeItem = styled.li`
-
-`;
+export const NodeItem = styled.li``;
 
 export const NodeButton = styled.button`
   background: none;

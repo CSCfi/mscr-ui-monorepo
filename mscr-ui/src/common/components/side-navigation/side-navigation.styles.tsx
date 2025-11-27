@@ -4,15 +4,19 @@ import {
   ActionMenu,
   Heading,
   SideNavigation,
-  SideNavigationItem
+  SideNavigationItem,
 } from 'suomifi-ui-components';
 
-export const SideNavigationWrapper = styled.div<{ $breakpoint: Breakpoint; $isSidebarMinimized: boolean }>`
+export const SideNavigationWrapper = styled.div<{
+  $breakpoint: Breakpoint;
+  $isSidebarMinimized: boolean;
+}>`
   // Breakpoint isn't in use, but could be used for responsiveness
 
   padding-left: 16px;
   background-color: ${(props) => props.theme.suomifi.colors.whiteBase};
-  border-right: 3px solid ${(props) => props.theme.suomifi.colors.highlightLight2};
+  border-right: 3px solid
+    ${(props) => props.theme.suomifi.colors.highlightLight2};
 
   // Keep the white background in place when scrolling
   height: 100vh;
@@ -54,17 +58,19 @@ export const NavigationHeading = styled(Heading)`
 
 export const MscrSideNavigation = styled(SideNavigation)`
   // Remove line and heading from above navigation
-  .fi-side-navigation_divider, && .fi-side-navigation_heading {
+  .fi-side-navigation_divider,
+  && .fi-side-navigation_heading {
     display: none;
   }
   nav {
     position: sticky;
     // Remove the height of the header banner
-    height: calc(100vh - 1rem*60/18);
+    height: calc(100vh - 1rem * 60 / 18);
     width: 222px;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: ${(props) => props.theme.suomifi.colors.depthDark2} ${(props) => props.theme.suomifi.colors.highlightLight2};
+    scrollbar-color: ${(props) => props.theme.suomifi.colors.depthDark2}
+      ${(props) => props.theme.suomifi.colors.highlightLight2};
   }
 `;
 
@@ -72,13 +78,13 @@ export const MscrSideNavigationLevel1 = styled(SideNavigationItem)`
   padding-right: 4px;
   // A 'mask' to hide the bottom part of the gray border on the left when it's the last group in the list
   & > ul > li:last-child::before {
-    content: "";
-    width:5px;
-    height:50%;
-    background-color:white;
+    content: '';
+    width: 5px;
+    height: 50%;
+    background-color: white;
     position: absolute;
-    left:-1px;
-    bottom:-1px;
+    left: -1px;
+    bottom: -1px;
   }
 `;
 
@@ -100,9 +106,11 @@ export const MscrSideNavigationLevel2 = styled(SideNavigationItem)`
     background-color: transparent;
   }
 
-  &.fi-side-navigation-item--child-selected, &.group-selected {
+  &.fi-side-navigation-item--child-selected,
+  &.group-selected {
     // Opened group name is highlight blue
-    && h3, && .fi-icon {
+    && h3,
+    && .fi-icon {
       color: ${(props) => props.theme.suomifi.colors.highlightBase};
     }
     // Above was defined a 'mask' covering the bottom half of the decorative line on the last group in the list
@@ -119,7 +127,8 @@ export const MscrSideNavigationLevel3 = styled(SideNavigationItem)`
   &&&& a {
     font-size: 16px;
     font-weight: bold;
-    margin: ${(props) => props.theme.suomifi.spacing.xxs} ${(props) => props.theme.suomifi.spacing.xs};
+    margin: ${(props) => props.theme.suomifi.spacing.xxs}
+      ${(props) => props.theme.suomifi.spacing.xs};
     padding: 0 ${(props) => props.theme.suomifi.spacing.xs};
     // Links in inactive sections are gray
     color: ${(props) => props.theme.suomifi.colors.depthDark1};
@@ -169,7 +178,8 @@ export const GroupButton = styled.button`
     margin-left: ${(props) => props.theme.suomifi.spacing.s};
   }
 
-  &:hover h3, &&:hover .fi-icon {
+  &:hover h3,
+  &&:hover .fi-icon {
     color: ${(props) => props.theme.suomifi.colors.highlightBase};
   }
 
@@ -198,8 +208,10 @@ export const ExpanderButton = styled.button`
 export const ExpanderIcon = styled.div`
   height: 40px;
   width: 2px;
-  border-left: solid 3px ${(props) => props.theme.suomifi.colors.highlightLight2};
-  border-right: solid 3px ${(props) => props.theme.suomifi.colors.highlightLight2};
+  border-left: solid 3px
+    ${(props) => props.theme.suomifi.colors.highlightLight2};
+  border-right: solid 3px
+    ${(props) => props.theme.suomifi.colors.highlightLight2};
 `;
 
 export const MinimizedNavigationWrapper = styled.nav`
@@ -209,11 +221,12 @@ export const MinimizedNavigationWrapper = styled.nav`
   padding-right: 4px;
   // Same stuff as with the expanded navigation
   position: sticky;
-  height: calc(100vh - 1rem*60/18);
+  height: calc(100vh - 1rem * 60 / 18);
   width: 62px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: ${(props) => props.theme.suomifi.colors.depthDark2} ${(props) => props.theme.suomifi.colors.highlightLight2};
+  scrollbar-color: ${(props) => props.theme.suomifi.colors.depthDark2}
+    ${(props) => props.theme.suomifi.colors.highlightLight2};
 `;
 
 export const PopoverNavigationMenu = styled(ActionMenu)`
@@ -291,7 +304,8 @@ export const PopoverNavigationMenu = styled(ActionMenu)`
   && .fi-action-menu-popover_popper-arrow {
     // Rotate and correct position of the triangle that points to the opening button
     transform: translate(-18px, 20px) !important;
-    &::before, &::after {
+    &::before,
+    &::after {
       transform: rotate(0.75turn);
       inset: 0;
     }
@@ -304,7 +318,7 @@ export const PopoverNavigationMenu = styled(ActionMenu)`
   // Make the whole menu button be the link
   & .fi-action-menu-item {
     padding: 0;
-    a  {
+    a {
       width: 90px;
       height: 36px;
       padding: 10px 0 0 15px;
@@ -344,13 +358,13 @@ export const MinimizedGroupList = styled.ul`
   padding: 0;
   // Again, the 'mask' to hide the bottom part of the gray border on the left when it's the last group in the list
   && > li:last-child::before {
-    content: "";
-    width:5px;
-    height:50%;
-    background-color:white;
+    content: '';
+    width: 5px;
+    height: 50%;
+    background-color: white;
     position: absolute;
-    left:-1px;
-    bottom:-1px;
+    left: -1px;
+    bottom: -1px;
   }
 `;
 

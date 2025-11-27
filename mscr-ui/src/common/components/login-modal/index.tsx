@@ -38,12 +38,11 @@ export default function LoginModalView({
           <Paragraph>
             <Text>{t('site-login-info-1')}</Text>
           </Paragraph>
-          <br/>
+          <br />
           <Paragraph>
             <Text>{t('site-login-info-2')} </Text>
           </Paragraph>
-         <br/>
-          
+          <br />
         </ModalContentSmPadding>
 
         <ModalFooter>

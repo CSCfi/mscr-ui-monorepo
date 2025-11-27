@@ -1,5 +1,13 @@
 import { useTranslation } from 'next-i18next';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
 import router from 'next/router';
 import { Crosswalk } from '@app/common/interfaces/crosswalk.interface';
 
@@ -10,9 +18,7 @@ export interface CrosswalkListProps {
   deleteDisabled: string[] | boolean;
 }
 
-export default function CrosswalkList({
-  items
-}: CrosswalkListProps) {
+export default function CrosswalkList({ items }: CrosswalkListProps) {
   const { t } = useTranslation('admin');
 
   if (items && items.length < 1) {
@@ -28,10 +34,8 @@ export default function CrosswalkList({
   return (
     //Creating Header row
     <div>
-      <Typography marginTop={5}>
-        {'Crosswalks'}
-      </Typography>
-      <TableContainer >
+      <Typography marginTop={5}>{'Crosswalks'}</Typography>
+      <TableContainer>
         <Table aria-label={'Schemas'}>
           <TableHead>
             <TableRow>
@@ -66,6 +70,5 @@ export default function CrosswalkList({
         </Table>
       </TableContainer>
     </div>
-
   );
 }

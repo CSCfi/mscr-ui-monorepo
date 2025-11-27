@@ -6,7 +6,11 @@ import {
 } from '@app/common/components/content-view/content-view.slice';
 import { useTranslation } from 'next-i18next';
 import { Type } from '@app/common/interfaces/search.interface';
-import { CrosswalkTabIndex, CrosswalkTabText, CrosswalkTabs } from '@app/common/interfaces/tabmenu';
+import {
+  CrosswalkTabIndex,
+  CrosswalkTabText,
+  CrosswalkTabs,
+} from '@app/common/interfaces/tabmenu';
 import { ReactNode } from 'react';
 import {
   StyledTab,
@@ -44,7 +48,7 @@ export default function CrosswalkTabmenu({
     'SCHEMA.history-tab': t('tabs.history-tab'),
     'CROSSWALK.mapping-accordion-tab': t('tabs.mapping-accordion-tab'),
     'CROSSWALK.history-tab': t('tabs.history-tab'),
-    'stub': t('tabs.stub-metadata'), // If the content is removed, there's only one tab with only metadata.
+    stub: t('tabs.stub-metadata'), // If the content is removed, there's only one tab with only metadata.
   };
 
   function customTabProps(tab: CrosswalkTabText) {
@@ -59,7 +63,10 @@ export default function CrosswalkTabmenu({
     };
   }
 
-  const handleChange = (event: React.SyntheticEvent, newValue: CrosswalkTabIndex) => {
+  const handleChange = (
+    event: React.SyntheticEvent,
+    newValue: CrosswalkTabIndex
+  ) => {
     dispatch(setSelectedTab(newValue));
     dispatch(setQuery(''));
   };

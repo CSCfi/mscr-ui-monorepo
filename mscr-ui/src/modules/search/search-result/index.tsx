@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { useStoreDispatch } from '@app/store';
 import {
   setIsEditContentActive,
-  setIsEditMetadataActive
+  setIsEditMetadataActive,
 } from '@app/common/components/content-view/content-view.slice';
 
 export default function SearchResult({ hit }: { hit: MscrSearchResult }) {

@@ -3,7 +3,8 @@ import { translateStatus } from '@app/common/utils/translation-helpers';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import {
-  Button, IconPlus,
+  Button,
+  IconPlus,
   ModalContent,
   ModalFooter,
   ModalTitle,

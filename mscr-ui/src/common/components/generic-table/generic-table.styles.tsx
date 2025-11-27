@@ -32,5 +32,5 @@ export const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
   '&&.Mui-selected': {
     backgroundColor: theme.suomifi.colors.successSecondary,
-  }
+  },
 }));

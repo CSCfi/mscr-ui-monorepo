@@ -26,22 +26,22 @@ module.exports = () => {
         "base-uri 'self';",
         "default-src 'self';",
         "font-src 'self';",
-        "img-src 'self' data:;",
-        "script-src 'self' 'unsafe-inline';",
+        "img-src 'self' data: https://i.ytimg.com;",
+        "script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com;",
         "connect-src 'self';",
         "style-src 'self' 'unsafe-inline' data:;",
-        "frame-src 'self';",
+        "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com;",
       ];
 
       const ContentSecurityPolicy = [
         "base-uri 'self';",
         "default-src 'self';",
         "font-src 'self';",
-        "img-src 'self' 'unsafe-eval' 'unsafe-inline' data:;",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
+        "img-src 'self' 'unsafe-eval' 'unsafe-inline' data: https://i.ytimg.com;",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com;",
         "connect-src 'self';",
         "style-src 'self' 'unsafe-inline' data:;",
-        "frame-src 'self';",
+        "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com;",
       ];
 
       return [

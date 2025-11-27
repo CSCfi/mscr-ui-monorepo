@@ -11,7 +11,10 @@ import { Format } from '@app/common/interfaces/format.interface';
 import { Metadata } from '@app/common/interfaces/metadata.interface';
 import { DataTypeResults } from '@app/common/interfaces/data-type.interface';
 
-function createSearchUrl(formatRestrictions: Array<Format>, includePersonalDraft?: boolean) {
+function createSearchUrl(
+  formatRestrictions: Array<Format>,
+  includePersonalDraft?: boolean
+) {
   const formatString = formatRestrictions.reduce((filterString, fr) => {
     return `${filterString}&format=${fr}`;
   }, '');
@@ -21,7 +24,15 @@ function createSearchUrl(formatRestrictions: Array<Format>, includePersonalDraft
   return `/mscrSearch?type=SCHEMA${formatString}&pageSize=1000`;
 }
 
-function createDataTypeUrl({schemaId, target, dataType}: {schemaId: string; target: string; dataType: string}) {
+function createDataTypeUrl({
+  schemaId,
+  target,
+  dataType,
+}: {
+  schemaId: string;
+  target: string;
+  dataType: string;
+}) {
   const encodedTarget = encodeURIComponent(target);
   const encodedDataType = encodeURIComponent(dataType);
   return `/dtr/schema/${schemaId}/properties?target=${encodedTarget}&datatype=${encodedDataType}`;
@@ -57,26 +68,35 @@ export const schemaApi = createApi({
         },
       }),
     }),
-    putSchemaRevision: builder.mutation<Schema, { pid: string; data: FormData }>({
-      query: ({pid, data }) => ({
+    putSchemaRevision: builder.mutation<
+      Schema,
+      { pid: string; data: FormData }
+    >({
+      query: ({ pid, data }) => ({
         url: `/schemaFull?action=revisionOf&target=${pid}`,
         method: 'PUT',
         data: data,
         headers: {
           'content-Type': 'multipart/form-data;',
         },
-      })
+      }),
     }),
     // this should be the API for creating revisions of schemas in MSCR format
-    putMscrSchemaRevision: builder.mutation<Schema, { pid: string; data: Partial<Metadata> }>({
-      query: ({pid, data }) => ({
+    putMscrSchemaRevision: builder.mutation<
+      Schema,
+      { pid: string; data: Partial<Metadata> }
+    >({
+      query: ({ pid, data }) => ({
         url: `/schema?action=revisionOf&target=${pid}`,
         method: 'PUT',
         data: data,
-      })
+      }),
     }),
-    putSchemaMscrCopy: builder.mutation<Schema, { pid: string; data: Partial<Metadata> }>({
-      query: ({pid, data }) => ({
+    putSchemaMscrCopy: builder.mutation<
+      Schema,
+      { pid: string; data: Partial<Metadata> }
+    >({
+      query: ({ pid, data }) => ({
         url: `/schema?action=mscrCopyOf&target=${pid}`,
         method: 'PUT',
         data: data,
@@ -85,9 +105,16 @@ export const schemaApi = createApi({
         },
       }),
     }),
-    patchSchemaRootSelection: builder.mutation<Schema, { schemaId: string; value: string }>({
+    patchSchemaRootSelection: builder.mutation<
+      Schema,
+      { schemaId: string; value: string }
+    >({
       query: (value) => ({
-        url: value.value ? `/schema/${value.schemaId}/rootResource?value=${encodeURIComponent(value.value)}` : `/schema/${value.schemaId}/rootResource`,
+        url: value.value
+          ? `/schema/${value.schemaId}/rootResource?value=${encodeURIComponent(
+              value.value
+            )}`
+          : `/schema/${value.schemaId}/rootResource`,
         method: 'PATCH',
       }),
     }),
@@ -125,9 +152,15 @@ export const schemaApi = createApi({
         method: 'GET',
       }),
     }),
-    getPublicSchemas: builder.query<MscrSearchResults, { formatRestrictions: Array<Format>; includePersonalDrafts?: boolean }>({
+    getPublicSchemas: builder.query<
+      MscrSearchResults,
+      { formatRestrictions: Array<Format>; includePersonalDrafts?: boolean }
+    >({
       query: (query) => ({
-        url: createSearchUrl(query.formatRestrictions, query.includePersonalDrafts),
+        url: createSearchUrl(
+          query.formatRestrictions,
+          query.includePersonalDrafts
+        ),
         method: 'GET',
       }),
       providesTags: ['FrontendSchema'],
@@ -153,15 +186,21 @@ export const schemaApi = createApi({
         data: value.payload,
       }),
     }),
-    getTypesSearchResults: builder.query<DataTypeResults, { query: string; page: number; pageSize: number }>({
+    getTypesSearchResults: builder.query<
+      DataTypeResults,
+      { query: string; page: number; pageSize: number }
+    >({
       query: ({ query, page, pageSize }) => ({
         url: `/dtr/searchBasicInfoTypes?query=${query}&page=${page}&pageSize=${pageSize}`,
         method: 'GET',
       }),
     }),
-    patchDataType: builder.mutation<Schema, {schemaId: string; target: string; dataType: string }>({
-      query: ({schemaId, target, dataType}) => ({
-        url: createDataTypeUrl({schemaId, target, dataType}),
+    patchDataType: builder.mutation<
+      Schema,
+      { schemaId: string; target: string; dataType: string }
+    >({
+      query: ({ schemaId, target, dataType }) => ({
+        url: createDataTypeUrl({ schemaId, target, dataType }),
         method: 'PATCH',
       }),
       invalidatesTags: ['FrontendSchema'],
@@ -203,5 +242,11 @@ export const {
   util: { getRunningQueriesThunk },
 } = schemaApi;
 
-export const { putSchema, getSchema, deleteSchema, getSchemas, putSchemaFull, putSchemaRevision } =
-  schemaApi.endpoints;
+export const {
+  putSchema,
+  getSchema,
+  deleteSchema,
+  getSchemas,
+  putSchemaFull,
+  putSchemaRevision,
+} = schemaApi.endpoints;

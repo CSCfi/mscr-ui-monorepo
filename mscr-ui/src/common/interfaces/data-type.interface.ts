@@ -1,7 +1,7 @@
 export interface DataTypeResults {
   found: number;
   page: number;
-  hits: [{document: DataType}];
+  hits: [{ document: DataType }];
 }
 
 export interface DataType {

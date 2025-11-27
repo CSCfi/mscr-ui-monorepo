@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {Block, Button, MultiSelect} from 'suomifi-ui-components';
+import { Block, Button, MultiSelect } from 'suomifi-ui-components';
 
 export const ModelFormContainer = styled(Block)`
   display: flex;
@@ -20,9 +20,9 @@ export const CloseButton = styled(Button)`
   position: absolute;
   z-index: 700;
   right: 0;
-  &&:hover, &&:focus {
+  &&:hover,
+  &&:focus {
     background: none;
     position: absolute;
   }
 `;
-

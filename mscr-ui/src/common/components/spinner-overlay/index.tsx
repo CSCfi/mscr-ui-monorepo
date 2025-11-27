@@ -10,7 +10,7 @@ export const delay = async (ms: number | undefined) => {
 
 export default function SpinnerOverlay({
   animationVisible,
-  transparentBackground
+  transparentBackground,
 }: {
   animationVisible: boolean;
   transparentBackground?: boolean;
@@ -21,7 +21,10 @@ export default function SpinnerOverlay({
   if (!animationVisible) return <></>;
 
   return (
-    <StyledOverlay $breakpoint={breakpoint} $transparentBackground={transparentBackground ?? false}>
+    <StyledOverlay
+      $breakpoint={breakpoint}
+      $transparentBackground={transparentBackground ?? false}
+    >
       <RotatingLines
         width="190"
         strokeColor={defaultSuomifiTheme.colors.highlightBase}

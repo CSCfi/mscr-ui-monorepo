@@ -67,7 +67,7 @@ export const contentViewSlice = createSlice({
         ...state,
         ...action.payload,
       };
-    }
+    },
   },
 });
 

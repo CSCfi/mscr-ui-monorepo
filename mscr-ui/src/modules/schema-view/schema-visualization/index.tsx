@@ -4,13 +4,13 @@ import {
   Format,
   formatsAvailableForCrosswalkCreation,
 } from '@app/common/interfaces/format.interface';
-import SchemaInfo2 from "@app/common/components/schema-info2";
+import SchemaInfo2 from '@app/common/components/schema-info2';
 
 export default function SchemaVisualization({
   pid,
   format,
   isNodeEditable,
-  hasCustomRoot
+  hasCustomRoot,
 }: {
   pid: string;
   format: Format;

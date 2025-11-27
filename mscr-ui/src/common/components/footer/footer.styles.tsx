@@ -29,7 +29,7 @@ export const VersionInfo = styled.div`
   display: flex;
 `;
 
-export  const FooterLink= styled.a`
+export const FooterLink = styled.a`
   color: ${(props) => props.theme.suomifi.colors.brandBase};
   font-size: ${(props) => props.theme.suomifi.typography.bodyTextSmall};
   text-decoration: none;
@@ -37,7 +37,7 @@ export  const FooterLink= styled.a`
   &:hover {
     text-decoration: underline;
   }
-  &:visited {   
+  &:visited {
     color: ${(props) => props.theme.suomifi.colors.brandBase};
   }
   &:active {
@@ -49,5 +49,4 @@ export  const FooterLink= styled.a`
   &:focus-visible {
     color: ${(props) => props.theme.suomifi.colors.brandBase};
   }
- 
-    `;
+`;
